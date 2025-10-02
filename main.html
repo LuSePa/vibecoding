@@ -1,0 +1,2389 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIBE CODING</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos para la cabecera fija */
+        body {
+            padding-top: 140px;
+            /* Ajusta este valor al alto de tu cabecera */
+            background-color: #FFF7ED;
+            color: #4A2E2B;
+            font-family: 'Inter', sans-serif;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        /* Estilos para los tooltips */
+        [data-tooltip] {
+            position: relative;
+            cursor: pointer;
+        }
+        [data-tooltip]::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            margin-bottom: 5px;
+        }
+        [data-tooltip]:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Estilos para el tablero del Trivial */
+        .trivial-board {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: repeat(7, 1fr);
+            gap: 4px;
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 1 / 1;
+        }
+        .trivial-cell {
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .trivial-cell.path { background-color: #f0e6d2; border: 1px solid #d4cba6; }
+        .trivial-cell .player-token {
+            width: 60%;
+            height: 60%;
+            background-color: #c53030;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+        }
+    </style>
+</head>
+
+<body class="bg-orange-50 font-sans">
+    <!-- Modal de Contraseña -->
+    <div id="password-modal" class="fixed inset-0 z-[2000] flex items-center justify-center bg-black bg-opacity-60">
+        <div class="bg-orange-100 border-4 border-amber-700 rounded-2xl p-8 shadow-xl text-center max-w-sm w-full">
+            <h2 class="text-2xl font-bold text-amber-800 mb-4">Acceso Protegido</h2>
+            <p class="text-stone-700 mb-6">Completa la frase para continuar:</p>
+            <p class="text-lg italic text-amber-900 mb-2">Si no están (<input type="text" id="pass1" class="w-20 text-center rounded border-amber-500">) no se les pueden dar los (<input type="text" id="pass2" class="w-24 text-center rounded border-amber-500">).</p>
+            <button id="submit-password" class="mt-6 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300">Entrar</button>
+            <p id="password-error" class="text-red-600 font-bold mt-4 hidden">Contraseña incorrecta. ¡Inténtalo de nuevo!</p>
+        </div>
+    </div>
+
+
+    <!-- Cabecera -->
+    <header id="main-header" class="bg-crema-claro shadow-md bg-orange-100 hidden">
+        <div class="container mx-auto px-6 py-3 flex flex-col items-center">
+            <div class="flex items-center mb-3">
+                <img src="https://i.postimg.cc/gjycnBqp/Imagen1.png" alt="Logo Vibe Coding" class="h-12 w-auto mr-4">
+                <h1 id="main-title" class="text-4xl font-bold text-calabaza" style="color: #8B4513; text-shadow: 2px 2px 0 #F5DEB3, -2px -2px 0 #F5DEB3, 2px -2px 0 #F5DEB3, -2px 2px 0 #F5DEB3;">
+                    VIBE CODING
+                </h1>
+            </div>
+            <nav id="main-nav" class="flex flex-wrap justify-center gap-2">
+                <button data-page="changelog" class="nav-button bg-orange-400 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">Changelog</button>
+                <button data-page="game" class="nav-button bg-orange-400 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">Juego de Secuencias</button>
+                <button data-page="memory" class="nav-button bg-orange-400 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">Memory</button>
+                <button data-page="codyroby" class="nav-button bg-orange-400 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">Cody & Roby</button>
+                <button data-page="algoritmos" class="nav-button bg-orange-400 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">Algoritmos</button>
+                <button data-page="trivial" class="nav-button bg-orange-400 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">Trivial</button>
+                <button data-page="redes" class="nav-button bg-orange-400 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">Redes</button>
+                <button data-page="enlaces" class="nav-button bg-orange-400 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">Enlaces</button>
+                <button data-page="tips" class="nav-button bg-orange-400 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">Consejos</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal -->
+    <main class="container mx-auto p-6 hidden">
+        <!-- Página de Changelog -->
+        <div id="page-changelog">
+            <p class="text-lg text-amber-900 italic mb-4 text-center">La creación de contenido puede ser un proceso iterativo. Con Vibe Coding, puedes generar una base, probarla, y refinarla con nuevos prompts, permitiendo una evolución constante de tus recursos educativos de manera ágil y sencilla.</p>
+
+            <h2 class="text-3xl font-bold text-center mb-6 text-amber-800">Historial de Cambios</h2>
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    v0.x - Estructura y Estilo Inicial
+                </summary>
+                <div class="px-6 pb-4 border-t border-orange-200">
+                    <table class="min-w-full">
+                        <thead class="sr-only"><tr><th>Versión</th><th>Prompt</th><th>Efecto</th></tr></thead>
+                        <tbody class="divide-y divide-orange-100">
+                            <tr><td class="py-4 pr-4 align-top w-24"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">v0.1</span></td><td class="py-4 pr-4 text-sm text-stone-700 align-top">Crear página web con cabecera fija, título "VIBE CODING" y un changelog inicial. Paleta de colores "otoño cálido".</td><td class="py-4 text-sm text-stone-700 align-top">Se crea la estructura básica de la página con la cabecera y la tabla de changelog.</td></tr>
+                            <tr><td class="py-4 pr-4 align-top w-24"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">v0.2</span></td><td class="py-4 pr-4 text-sm text-stone-700 align-top">Cambiar sombreado de cabecera por un bordeado y añadir pie de página.</td><td class="py-4 text-sm text-stone-700 align-top">Se ajusta el estilo del título y se añade el pie de página.</td></tr>
+                            <tr><td class="py-4 pr-4 align-top w-24"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">v0.3</span></td><td class="py-4 pr-4 text-sm text-stone-700 align-top">Ajustar tablas para que el texto se ajuste al ancho y resaltar nombre en el pie.</td><td class="py-4 text-sm text-stone-700 align-top">Mejoras de formato en la tabla y el pie de página para mayor legibilidad.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    v1.x y v2.x - Creación y Refinamiento del Juego de Secuencias
+                </summary>
+                 <div class="px-6 pb-4 border-t border-orange-200">
+                    <table class="min-w-full">
+                        <thead class="sr-only"><tr><th>Versión</th><th>Prompt</th><th>Efecto</th></tr></thead>
+                        <tbody class="divide-y divide-orange-100">
+                             <tr><td class="py-4 pr-4 align-top w-24"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800">v1.0-v2.10</span></td><td class="py-4 pr-4 text-sm text-stone-700 align-top">Iteraciones sucesivas para crear un juego de secuencias lógicas, integrando recursos de ARASAAC, depurando errores de código, añadiendo niveles, mejorando la interfaz y la estructura de la página.</td><td class="py-4 text-sm text-stone-700 align-top">Se desarrolla un juego interactivo completo, se mejora la organización del contenido y se añaden nuevas pestañas de navegación.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    v3.x - Nueva Actividad: Memory
+                </summary>
+                 <div class="px-6 pb-4 border-t border-orange-200">
+                    <table class="min-w-full">
+                        <thead class="sr-only"><tr><th>Versión</th><th>Prompt</th><th>Efecto</th></tr></thead>
+                        <tbody class="divide-y divide-orange-100">
+                             <tr><td class="py-4 pr-4 align-top w-24"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">v3.0-v3.4</span></td><td class="py-4 pr-4 text-sm text-stone-700 align-top">Se desarrolla un memory interactivo, se ajusta su estética, se completa la documentación y se mejora la visualización del proceso de creación con diagramas de flujo.</td><td class="py-4 text-sm text-stone-700 align-top">Se añade y documenta una nueva actividad de Memory, manteniendo la coherencia visual y estructural de la web.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    v4.x - Nueva Actividad y Consejos
+                </summary>
+                 <div class="px-6 pb-4 border-t border-orange-200">
+                    <table class="min-w-full">
+                        <thead class="sr-only"><tr><th>Versión</th><th>Prompt</th><th>Efecto</th></tr></thead>
+                        <tbody class="divide-y divide-orange-100">
+                            <tr><td class="py-4 pr-4 align-top w-24"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">v4.0-v4.7</span></td><td class="py-4 pr-4 text-sm text-stone-700 align-top">Se añade el simulador de Cody & Roby. Se realizan ajustes de diseño, se unifica la paleta de colores, se reestructura la cabecera y se amplía y organiza la sección de "Consejos".</td><td class="py-4 text-sm text-stone-700 align-top">Se añade una nueva actividad de programación, se refina el diseño global y se mejora la sección de consejos.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+             <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    v5.x - Nueva Actividad: Algoritmos y Enlaces
+                </summary>
+                 <div class="px-6 pb-4 border-t border-orange-200">
+                    <table class="min-w-full">
+                        <thead class="sr-only"><tr><th>Versión</th><th>Prompt</th><th>Efecto</th></tr></thead>
+                        <tbody class="divide-y divide-orange-100">
+                             <tr><td class="py-4 pr-4 align-top w-24"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">v5.0-v5.2</span></td><td class="py-4 pr-4 text-sm text-stone-700 align-top">Se crea un visualizador de algoritmos y una nueva pestaña de "Enlaces". Se añade justificación práctica a la actividad de algoritmos.</td><td class="py-4 text-sm text-stone-700 align-top">Se expande el proyecto con una nueva actividad y una sección de recursos para la comunidad.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden" open>
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    v6.x - Nueva Actividad: Trivial y Mejoras Pedagógicas
+                </summary>
+                 <div class="px-6 pb-4 border-t border-orange-200">
+                    <table class="min-w-full">
+                        <thead class="sr-only"><tr><th>Versión</th><th>Prompt</th><th>Efecto</th></tr></thead>
+                        <tbody class="divide-y divide-orange-100">
+                             <tr><td class="py-4 pr-4 align-top w-24"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">v6.0-v6.5</span></td><td class="py-4 pr-4 text-sm text-stone-700 align-top">Se añade un Trivial sobre descomposición, se enriquece el contenido pedagógico de otras secciones, se refina el Trivial a un formato de ruleta con un banco de preguntas ampliado y se añade un simulador de redes.</td><td class="py-4 text-sm text-stone-700 align-top">Se incorporan dos nuevas actividades (Trivial, Redes) y se mejora la justificación pedagógica general. El Trivial evoluciona a un formato de ruleta.</td></tr>
+                             <tr><td class="py-4 pr-4 align-top w-24"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">v6.6</span></td><td class="py-4 pr-4 text-sm text-stone-700 align-top">Añadir una contraseña para acceder al contenido.</td><td class="py-4 text-sm text-stone-700 align-top">Se implementa un modal de contraseña que bloquea el acceso a la web hasta que se introduce la clave correcta.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+
+        </div>
+
+        <!-- Página del Juego de Secuencia -->
+        <div id="page-game" class="hidden">
+            <p class="text-lg text-amber-900 italic mb-4 text-center">La creación de actividades interactivas puede ser compleja. Con Vibe Coding, los docentes pueden generar juegos personalizados basados en el currículo, modificarlos sobre la marcha y adaptarlos a las necesidades de su alumnado, facilitando la integración de la tecnología en el aula.</p>
+
+            <!-- Sección 1: El camino hasta el producto final -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    El camino hasta el producto final
+                </summary>
+                <div class="p-6 border-t border-orange-200">
+                    <p class="mb-6 text-stone-700 text-center">A continuación se muestra el flujo de trabajo seguido para la creación de esta actividad, desde la idea inicial hasta el producto final.</p>
+                    <div class="flex flex-col items-center space-y-4">
+                        <!-- Nodo 1 -->
+                        <div class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 rounded-r-lg shadow-md w-full max-w-2xl">
+                            <p class="font-bold">v1.0 - Creación Inicial</p>
+                            <p class="text-sm">Se genera la estructura base del juego de secuencias en una nueva pestaña, con funcionalidad de arrastrar y soltar.</p>
+                        </div>
+                        <div class="text-2xl font-bold text-orange-400">↓</div>
+                        <!-- Nodo 2 -->
+                        <div class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 rounded-r-lg shadow-md w-full max-w-2xl">
+                            <p class="font-bold">v1.1 - Integración de Recursos</p>
+                            <p class="text-sm">Se sustituyen los elementos gráficos iniciales por pictogramas de ARASAAC para alinear el juego con objetivos de accesibilidad.</p>
+                        </div>
+                        <div class="text-2xl font-bold text-orange-400">↓</div>
+                        <!-- Nodo 3 -->
+                        <div class="bg-amber-100 border-l-4 border-amber-500 text-amber-700 p-4 rounded-r-lg shadow-md w-full max-w-2xl">
+                            <p class="font-bold">v1.2 a v1.3 - Depuración y Corrección</p>
+                            <p class="text-sm">Se solucionan errores de código relacionados con la compatibilidad táctil y la carga de la librería de sonido.</p>
+                        </div>
+                        <div class="text-2xl font-bold text-amber-400">↓</div>
+                         <!-- Nodo 4 -->
+                        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-r-lg shadow-md w-full max-w-2xl">
+                            <p class="font-bold">v2.0 a v2.6 - Refinamiento y Contenido</p>
+                            <p class="text-sm">Se añaden los tres niveles ("Tengo sed", "¡Fuego!", "Un martes más"), se mejora la interfaz con tooltips, se elimina la librería de audio externa y se añade feedback de finalización (aplausos, copa). </p>
+                        </div>
+                         <div class="text-2xl font-bold text-yellow-400">↓</div>
+                        <!-- Nodo 5 -->
+                        <div class="bg-stone-100 border-l-4 border-stone-500 text-stone-700 p-4 rounded-r-lg shadow-md w-full max-w-2xl">
+                            <p class="font-bold">v2.7 a v2.10 - Reorganización Estructural</p>
+                            <p class="text-sm">Se reorganiza la página en secciones colapsables para una mejor presentación del contenido y se crean nuevas pestañas.</p>
+                        </div>
+                    </div>
+                </div>
+            </details>
+            
+            <!-- Sección 2: Relación con PC y currículo -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Relación con Pensamiento Computacional y Currículo
+                </summary>
+                <div class="p-6 border-t border-orange-200">
+                    <div id="carousel-secuencia" class="relative overflow-hidden rounded-lg shadow-lg">
+                        <div class="carousel-inner-secuencia flex transition-transform duration-500">
+                            <!-- Diapositiva 1 -->
+                            <div class="carousel-item-secuencia w-full flex-shrink-0 bg-orange-100 p-8">
+                                <h3 class="text-2xl font-bold text-amber-800 mb-4">Pensamiento Computacional</h3>
+                                <ul class="list-disc list-inside space-y-2 text-stone-700">
+                                    <li><strong>Secuenciación y patrones:</strong> El alumnado debe ordenar los pictogramas en una secuencia lógica, reconociendo el patrón temporal o causal que los une.</li>
+                                    <li><strong>Algoritmos:</strong> Cada solución correcta es, en esencia, un pequeño algoritmo visual que representa un proceso.</li>
+                                    <li><strong>Descomposición:</strong> Para resolver la secuencia, deben descomponer un evento complejo (como la rutina matutina) en pasos más pequeños y manejables.</li>
+                                </ul>
+                            </div>
+                            <!-- Diapositiva 2 -->
+                            <div class="carousel-item-secuencia w-full flex-shrink-0 bg-orange-100 p-8">
+                                <h3 class="text-2xl font-bold text-amber-800 mb-4">Relación con el Currículo (CLM)</h3>
+                                <ul class="list-disc list-inside space-y-2 text-stone-700">
+                                    <li><strong>Área "Descubrimiento del Entorno":</strong> Se trabajan relaciones de secuencia y causalidad sobre fenómenos del entorno natural y social.</li>
+                                    <li><strong>Competencia Específica 2:</strong> Se desarrollan procedimientos del método científico y destrezas de pensamiento computacional de manera lúdica.</li>
+                                    <li><strong>Saberes Básicos:</strong> Se abordan "Relaciones de causalidad y consecuencia" del bloque B-Entorno.</li>
+                                    <li><strong>Código Escuela 4.0:</strong> La actividad se alinea con la integración de las TIC y el desarrollo de competencias digitales.</li>
+                                </ul>
+                            </div>
+                            <!-- Diapositiva 3 -->
+                            <div class="carousel-item-secuencia w-full flex-shrink-0 bg-orange-100 p-8">
+                                <h3 class="text-2xl font-bold text-amber-800 mb-4">Consejos Vibe Coding para esta actividad</h3>
+                                <p class="text-stone-700">
+                                    Para generar una actividad como esta, puedes usar prompts como:
+                                    <br><br>
+                                    - "Crea un juego de arrastrar y soltar para ordenar secuencias lógicas sobre [tema], para niños de 4 años."
+                                    <br>
+                                    - "Añade tres niveles de dificultad, con 3, 4 y 5 elementos respectivamente."
+                                    <br>
+                                    - "Incorpora un sonido de celebración cuando la secuencia sea correcta."
+                                    <br>
+                                    - "Usa estas imágenes [enlaces] para las tarjetas del juego."
+                                </p>
+                            </div>
+                        </div>
+                        <button class="prev-secuencia absolute top-1/2 left-2 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 rounded-full p-2 transition"><span class="text-2xl">‹</span></button>
+                        <button class="next-secuencia absolute top-1/2 right-2 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 rounded-full p-2 transition"><span class="text-2xl">›</span></button>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Sección de Justificación Práctica -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Justificación Práctica: ¿Por qué aprender esto?
+                </summary>
+                <div class="p-6 border-t border-orange-200 text-stone-700 space-y-3">
+                    <p>Entender y ordenar secuencias es una habilidad fundamental que usamos todos los días, ¡incluso sin darnos cuenta!</p>
+                    <ul class="list-disc list-inside space-y-2 pl-4">
+                        <li><strong>Seguir una receta:</strong> Para cocinar algo, tienes que seguir los pasos en el orden correcto.</li>
+                        <li><strong>Contar una historia:</strong> Las historias tienen un principio, un desarrollo y un final. Ordenar los eventos es clave para que se entiendan.</li>
+                        <li><strong>Rutinas diarias:</strong> Nos levantamos, desayunamos, nos vestimos... todo sigue una secuencia lógica que nos ayuda a organizarnos.</li>
+                        <li><strong>Montar un juguete:</strong> Las instrucciones son una secuencia de pasos que debemos seguir para construir algo correctamente.</li>
+                    </ul>
+                    <p class="mt-4">Este juego ayuda a los niños a desarrollar la base del pensamiento lógico que necesitarán para resolver problemas más complejos en el futuro.</p>
+                </div>
+            </details>
+
+            <!-- Sección 3: Producto final -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden" open>
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Producto Final
+                </summary>
+                <div class="p-6 border-t border-orange-200">
+                    <div id="game-container" class="max-w-4xl mx-auto p-4 rounded-lg shadow-lg bg-orange-200">
+                        <h2 id="level-title" class="text-2xl font-bold text-center mb-4 text-amber-800">Nivel 1: Tengo sed</h2>
+                        <div id="drop-container" class="flex justify-center items-center space-x-2 p-4 bg-orange-100 rounded-lg min-h-[120px]">
+                            <!-- Drop zones will be generated here -->
+                        </div>
+                        <div id="drag-container" class="flex justify-center items-center space-x-2 mt-4 p-4 min-h-[120px]">
+                            <!-- Drag items will be generated here -->
+                        </div>
+                        <div class="flex justify-center mt-4 space-x-4">
+                            <button id="level1" data-tooltip="Nivel 1" class="level-btn bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg">1</button>
+                            <button id="level2" data-tooltip="Nivel 2" class="level-btn bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg">2</button>
+                            <button id="level3" data-tooltip="Nivel 3" class="level-btn bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg">3</button>
+                        </div>
+                        <!-- Modal for next level -->
+                        <div id="next-level-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                            <div class="bg-white p-8 rounded-lg shadow-xl text-center">
+                                <p id="modal-message" class="text-xl mb-4"></p>
+                                <img id="final-cup" src="https://i.postimg.cc/0NJhsL4T/copa.png" alt="Copa" class="mx-auto mb-4 h-24 hidden"/>
+                                <button id="next-level-btn" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded">Siguiente Nivel</button>
+                                <button id="close-modal-btn" class="bg-stone-500 hover:bg-stone-600 text-white font-bold py-2 px-4 rounded">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4 text-sm text-stone-600">
+                        <p><strong>Pictogramas:</strong> ARASAAC (Sergio Palao) | <strong>Licencia:</strong> CC (BY-NC-SA)</p>
+                    </div>
+                </div>
+            </details>
+        </div>
+        
+        <!-- Página del Memory -->
+        <div id="page-memory" class="hidden">
+             <p class="text-lg text-amber-900 italic mb-4 text-center">Los juegos de memoria son un clásico en el aula. Con Vibe Coding, puedes transformar esta actividad tradicional en un recurso digital interactivo en minutos, seleccionando temáticas, niveles de dificultad y obteniendo un producto final listo para usar con tu alumnado.</p>
+            
+            <!-- Sección 1: El camino hasta el producto final (Memory) -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    El camino hasta el producto final
+                </summary>
+                <div class="p-6 border-t border-orange-200">
+                    <p class="mb-6 text-stone-700 text-center">A continuación se muestra el flujo de trabajo seguido para la creación de esta actividad, desde la idea inicial hasta el producto final.</p>
+                    <div class="flex flex-col items-center space-y-4">
+                        <!-- Nodo 1 -->
+                        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-r-lg shadow-md w-full max-w-2xl">
+                            <p class="font-bold">v3.0 - Creación a partir de Prompt Detallado</p>
+                            <p class="text-sm">Se genera el juego de Memory completo en una nueva pestaña, incluyendo la fundamentación curricular, la lógica del juego, los estilos y la estructura HTML en una sola iteración.</p>
+                        </div>
+                        <div class="text-2xl font-bold text-yellow-400">↓</div>
+                        <!-- Nodo 2 -->
+                        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-r-lg shadow-md w-full max-w-2xl">
+                            <p class="font-bold">v3.1 - Organización del Contenido</p>
+                            <p class="text-sm">Se aplica la estructura de secciones colapsables (proceso, currículo, producto) para mantener la coherencia con el resto de la web.</p>
+                        </div>
+                        <div class="text-2xl font-bold text-yellow-400">↓</div>
+                        <!-- Nodo 3 -->
+                         <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-r-lg shadow-md w-full max-w-2xl">
+                            <p class="font-bold">v3.2 y v3.3 - Ajustes y Documentación</p>
+                            <p class="text-sm">Se centra el juego, se ajusta la paleta de colores para alinearla con la web y se completa la documentación del proceso de creación.</p>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Sección 2: Relación con PC y currículo (Memory) -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Relación con Pensamiento Computacional y Currículo
+                </summary>
+                <div class="p-6 border-t border-orange-200">
+                     <div id="carousel-memory" class="relative overflow-hidden rounded-lg shadow-lg">
+                        <div class="carousel-inner-memory flex transition-transform duration-500">
+                            <!-- Diapositiva 1 -->
+                            <div class="carousel-item-memory w-full flex-shrink-0 bg-orange-100 p-8">
+                                <h3 class="text-2xl font-bold text-amber-800 mb-4">Pensamiento Computacional Aplicado</h3>
+                                <ul class="list-disc list-inside space-y-2 text-stone-700">
+                                    <li><strong>Reconocimiento de Patrones:</strong> Identificar elementos iguales entre opciones diferentes.</li>
+                                    <li><strong>Abstracción:</strong> Generalizar características comunes de objetos similares.</li>
+                                    <li><strong>Memoria Algorítmica:</strong> Recordar posiciones y crear estrategias de búsqueda.</li>
+                                    <li><strong>Comparación:</strong> Evaluar semejanzas y diferencias visuales.</li>
+                                </ul>
+                            </div>
+                            <!-- Diapositiva 2 -->
+                            <div class="carousel-item-memory w-full flex-shrink-0 bg-orange-100 p-8">
+                                <h3 class="text-2xl font-bold text-amber-800 mb-4">Relación con el Currículo (CLM)</h3>
+                                <ul class="list-disc list-inside space-y-2 text-stone-700">
+                                    <li><strong>Área "Comunicación y Representación":</strong> Se trabaja la comprensión de la funcionalidad de diferentes códigos.</li>
+                                    <li><strong>Saberes Básicos:</strong> Se abordan relaciones de correspondencia, semejanza y diferencia.</li>
+                                    <li><strong>Pensamiento Computacional:</strong> Se introduce desde metodologías experienciales y lúdicas.</li>
+                                    <li><strong>Código Escuela 4.0:</strong> La actividad promueve el desarrollo de competencias digitales transversales.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <button class="prev-memory absolute top-1/2 left-2 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 rounded-full p-2 transition"><span class="text-2xl">‹</span></button>
+                        <button class="next-memory absolute top-1/2 right-2 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 rounded-full p-2 transition"><span class="text-2xl">›</span></button>
+                    </div>
+                </div>
+            </details>
+
+             <!-- Sección de Justificación Práctica -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Justificación Práctica: ¿Por qué aprender esto?
+                </summary>
+                <div class="p-6 border-t border-orange-200 text-stone-700 space-y-3">
+                    <p>La memoria visual y el reconocimiento de patrones son como superpoderes para nuestro cerebro. Los usamos constantemente:</p>
+                    <ul class="list-disc list-inside space-y-2 pl-4">
+                        <li><strong>Para encontrar cosas:</strong> Cuando buscas tus calcetines en un cajón, tu cerebro está buscando un patrón (el par que coincide).</li>
+                        <li><strong>Para aprender a leer:</strong> Reconocer la misma letra una y otra vez es un ejercicio de memoria visual y de patrones.</li>
+                        <li><strong>Para recordar caras:</strong> Identificamos a las personas reconociendo los patrones de sus rasgos faciales.</li>
+                        <li><strong>En los juegos:</strong> Desde encontrar las diferencias hasta jugar al ajedrez, reconocer patrones es clave para ganar.</li>
+                    </ul>
+                    <p class="mt-4">Entrenar la memoria con juegos como este hace que nuestro cerebro sea más rápido y eficiente a la hora de identificar información importante.</p>
+                </div>
+            </details>
+            
+            <!-- Sección 3: Producto final (Memory) -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden" open>
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Producto Final
+                </summary>
+                <div class="p-6 border-t border-orange-200 flex justify-center">
+                    <div class="memory-game-container max-w-2xl bg-orange-200 border-4 border-amber-700 rounded-2xl p-6 shadow-xl">
+                        <h1 class="text-3xl font-bold text-center text-amber-800 mb-4">🧩 Memory de Parejas</h1>
+                        <div class="flex justify-center gap-4 my-4">
+                            <button class="memory-difficulty-btn active bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-full" data-level="easy">🌱 Fácil</button>
+                            <button class="memory-difficulty-btn bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-full" data-level="medium">🌿 Medio</button>
+                            <button class="memory-difficulty-btn bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-full" data-level="hard">🌳 Difícil</button>
+                        </div>
+                        <div class="flex justify-around text-center my-4 text-amber-900 font-bold">
+                            <div>Intentos: <span id="memory-attempts" class="text-xl">0</span></div>
+                            <div>Parejas: <span id="memory-pairs" class="text-xl">0/6</span></div>
+                            <div>Tiempo: <span id="memory-timer" class="text-xl">00:00</span></div>
+                        </div>
+                        <div class="memory-board board-easy grid gap-3 mx-auto" id="memory-gameBoard"></div>
+                        <div id="memory-successModal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center">
+                            <div class="bg-white p-8 rounded-lg shadow-xl text-center">
+                                <h2 class="text-2xl font-bold text-amber-700 mb-2">¡Fantástico! 🎉</h2>
+                                <p>¡Has encontrado todas las parejas!</p>
+                                <button id="memory-playAgainBtn" class="mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-full">Jugar otra vez</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="text-center mt-4 text-sm text-stone-600">
+                    <p><strong>Pictogramas:</strong> ARASAAC (Sergio Palao) | <strong>Licencia:</strong> CC (BY-NC-SA)</p>
+                </div>
+            </details>
+        </div>
+
+        <!-- Página de Cody & Roby -->
+        <div id="page-codyroby" class="hidden">
+            <p class="text-lg text-amber-900 italic mb-4 text-center">Enseñar a programar puede parecer un reto. Vibe Coding simplifica la creación de simuladores como este, donde el alumnado puede experimentar con algoritmos y depuración en un entorno visual, sentando las bases del pensamiento computacional antes de pasar a la robótica física.</p>
+
+            <!-- Sección 1: El camino hasta el producto final -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    El camino hasta el producto final
+                </summary>
+                <div class="p-6 border-t border-orange-200">
+                     <p class="mb-6 text-stone-700 text-center">A continuación se muestra el flujo de trabajo seguido para la creación de esta actividad, desde la idea inicial hasta el producto final.</p>
+                    <div class="flex flex-col items-center space-y-4">
+                        <!-- Nodo 1 -->
+                        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-r-lg shadow-md w-full max-w-2xl">
+                            <p class="font-bold">v4.0 - Creación a partir de Prompt Detallado</p>
+                            <p class="text-sm">Se genera el simulador de Cody & Roby, junto con su documentación curricular y estructura, en una única iteración a partir de un prompt elaborado con la ayuda de <span class="font-semibold">Perplexity</span>.</p>
+                        </div>
+                         <div class="text-2xl font-bold text-red-400">↓</div>
+                        <!-- Nodo 2 -->
+                        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-r-lg shadow-md w-full max-w-2xl">
+                            <p class="font-bold">Ajustes y Adaptación Visual</p>
+                            <p class="text-sm">Se adapta la paleta de colores y el diseño del simulador para integrarlo de forma coherente con la estética "otoño cálido" del resto de la web. Se reemplazan los marcadores de imagen por emojis funcionales.</p>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Sección 2: Relación con PC y currículo -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Relación con Pensamiento Computacional y Currículo
+                </summary>
+                <div class="p-6 border-t border-orange-200">
+                    <div id="carousel-codyroby" class="relative overflow-hidden rounded-lg shadow-lg">
+                        <div class="carousel-inner-codyroby flex transition-transform duration-500">
+                            <!-- Diapositiva 1 -->
+                            <div class="carousel-item-codyroby w-full flex-shrink-0 bg-orange-100 p-8">
+                                <h3 class="text-2xl font-bold text-amber-800 mb-4">Pensamiento Computacional Integrado</h3>
+                                <ul class="list-disc list-inside space-y-2 text-stone-700">
+                                    <li><strong>Algoritmos:</strong> Creación de secuencias de comandos para resolver desafíos.</li>
+                                    <li><strong>Debugging:</strong> Identificación y corrección sistemática de errores de ruta.</li>
+                                    <li><strong>Bucles y Condicionales:</strong> Aplicación de repeticiones y lógica IF-THEN.</li>
+                                    <li><strong>Descomposición:</strong> División de problemas complejos en subproblemas simples.</li>
+                                </ul>
+                            </div>
+                            <!-- Diapositiva 2 -->
+                            <div class="carousel-item-codyroby w-full flex-shrink-0 bg-orange-100 p-8">
+                                <h3 class="text-2xl font-bold text-amber-800 mb-4">Relación con el Currículo (CLM)</h3>
+                                <ul class="list-disc list-inside space-y-2 text-stone-700">
+                                    <li><strong>Área de Matemáticas:</strong> Desarrollo de destrezas personales y gestión de emociones en el aprendizaje.</li>
+                                    <li><strong>Área de Conocimiento del Medio:</strong> Identificación de elementos del paisaje y acciones humanas.</li>
+                                    <li><strong>Integración Transversal:</strong> Fomenta el pensamiento computacional en todas las áreas, como marcan los artículos 16 y 21 del decreto.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <button class="prev-codyroby absolute top-1/2 left-2 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 rounded-full p-2 transition"><span class="text-2xl">‹</span></button>
+                        <button class="next-codyroby absolute top-1/2 right-2 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 rounded-full p-2 transition"><span class="text-2xl">›</span></button>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Sección de Justificación Práctica -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Justificación Práctica: ¿Por qué aprender esto?
+                </summary>
+                <div class="p-6 border-t border-orange-200 text-stone-700 space-y-3">
+                    <p>Programar un robot en un tablero es, en realidad, una forma de practicar cómo dar instrucciones claras y precisas, una habilidad esencial para la vida.</p>
+                    <ul class="list-disc list-inside space-y-2 pl-4">
+                        <li><strong>Montar un mueble:</strong> Las instrucciones son un algoritmo que debes seguir paso a paso para no equivocarte.</li>
+                        <li><strong>Planificar una excursión:</strong> Tienes que decidir la ruta (los pasos), prever posibles problemas (obstáculos) y asegurarte de llegar a tu destino.</li>
+                        <li><strong>Explicar un juego de mesa:</strong> Debes dar las reglas de forma ordenada para que los demás entiendan cómo jugar.</li>
+                        <li><strong>Resolver un problema matemático:</strong> A menudo, tienes que aplicar una serie de operaciones en un orden específico para llegar a la solución.</li>
+                    </ul>
+                    <p class="mt-4">Actividades como Cody & Roby nos enseñan a pensar de forma estructurada y a dividir grandes tareas en pasos más pequeños y manejables.</p>
+                </div>
+            </details>
+            
+            <!-- Sección 3: Producto final -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden" open>
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Producto Final
+                </summary>
+                <div class="p-6 border-t border-orange-200">
+                    <div class="codyroby-game-container max-w-6xl mx-auto bg-orange-200 border-4 border-amber-700 rounded-2xl p-6 shadow-xl">
+                        <h1 class="text-3xl font-bold text-center text-amber-800 mb-4">🤖 Simulador Cody & Roby</h1>
+                        <div class="level-selector flex justify-center gap-4 mb-4">
+                            <button class="codyroby-level-btn active" data-level="1">Nivel 1</button>
+                            <button class="codyroby-level-btn" data-level="2">Nivel 2</button>
+                            <button class="codyroby-level-btn" data-level="3">Nivel 3</button>
+                            <button class="codyroby-level-btn" data-level="4">Nivel 4</button>
+                        </div>
+                        <div class="codyroby-game-layout grid gap-4">
+                            <div class="command-bank bg-orange-100 border-2 border-amber-600 rounded-lg p-4">
+                                <h3 class="text-lg font-bold text-center text-amber-800 mb-2">Banco de Comandos</h3>
+                                <div class="command-card" draggable="true" data-command="forward">⬆️<br>Avanzar</div>
+                                <div class="command-card" draggable="true" data-command="turn-left">⬅️<br>Girar Izq.</div>
+                                <div class="command-card" draggable="true" data-command="turn-right">➡️<br>Girar Der.</div>
+                            </div>
+                            <div class="codyroby-game-board grid grid-cols-8 grid-rows-8 gap-1 bg-amber-100 p-2 rounded-lg"></div>
+                            <div class="program-area bg-orange-100 border-2 border-amber-600 rounded-lg p-4">
+                                <h3 class="text-lg font-bold text-center text-amber-800 mb-2">Mi Programa</h3>
+                                <div class="program-sequence min-h-[300px] bg-white border-2 border-dashed border-amber-500 rounded p-2 flex flex-col gap-1"></div>
+                            </div>
+                        </div>
+                        <div class="control-panel flex justify-center gap-4 mt-4">
+                            <button id="codyroby-executeBtn" class="codyroby-control-button">▶️ Ejecutar</button>
+                            <button id="codyroby-clearBtn" class="codyroby-control-button">🗑️ Borrar</button>
+                            <button id="codyroby-resetBtn" class="codyroby-control-button">🔄 Reiniciar</button>
+                        </div>
+                    </div>
+                </div>
+                 <div class="text-center mt-4 text-sm text-stone-600">
+                    <p><strong>Pictogramas:</strong> ARASAAC (Sergio Palao) | <strong>Licencia:</strong> CC (BY-NC-SA)</p>
+                </div>
+            </details>
+        </div>
+
+        <!-- Página de Algoritmos -->
+        <div id="page-algoritmos" class="hidden">
+            <p class="text-lg text-amber-900 italic mb-4 text-center">Los algoritmos de ordenación son fundamentales en informática, pero pueden ser abstractos. Con Vibe Coding, puedes crear visualizadores que convierten estos procesos complejos en animaciones claras y comprensibles, facilitando al alumnado la conexión entre matemáticas y programación.</p>
+            
+            <!-- Sección 1: El camino hasta el producto final -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    El camino hasta el producto final
+                </summary>
+                <div class="p-6 border-t border-orange-200">
+                     <p class="mb-6 text-stone-700 text-center">A continuación se muestra el flujo de trabajo seguido para la creación de esta actividad.</p>
+                    <div class="flex flex-col items-center space-y-4">
+                        <!-- Nodo 1 -->
+                        <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded-r-lg shadow-md w-full max-w-2xl">
+                            <p class="font-bold">v5.0 - Creación a partir de Prompt Detallado</p>
+                            <p class="text-sm">Se genera el visualizador de algoritmos, con su documentación y lógica, a partir de un prompt elaborado con la ayuda de <span class="font-semibold">Perplexity</span>.</p>
+                        </div>
+                         <div class="text-2xl font-bold text-blue-400">↓</div>
+                        <!-- Nodo 2 -->
+                        <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded-r-lg shadow-md w-full max-w-2xl">
+                            <p class="font-bold">Ajustes y Adaptación Visual</p>
+                            <p class="text-sm">Se integra la actividad en una nueva pestaña, se adapta la paleta de colores a la estética "otoño cálido" y se reemplazan las imágenes por emojis.</p>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+             <!-- Sección 2: Relación con PC y currículo -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Relación con Pensamiento Computacional y Currículo
+                </summary>
+                <div class="p-6 border-t border-orange-200">
+                    <div id="carousel-algoritmos" class="relative overflow-hidden rounded-lg shadow-lg">
+                        <div class="carousel-inner-algoritmos flex transition-transform duration-500">
+                            <!-- Diapositiva 1 -->
+                            <div class="carousel-item-algoritmos w-full flex-shrink-0 bg-orange-100 p-8">
+                                <h3 class="text-2xl font-bold text-amber-800 mb-4">Pensamiento Computacional Aplicado</h3>
+                                <ul class="list-disc list-inside space-y-2 text-stone-700">
+                                    <li><strong>Algoritmos:</strong> Comprensión de secuencias de pasos para clasificar datos.</li>
+                                    <li><strong>Optimización:</strong> Comparar la eficiencia entre diferentes métodos de ordenación.</li>
+                                    <li><strong>Abstracción:</strong> Generalizar conceptos de comparación e intercambio.</li>
+                                    <li><strong>Patrones:</strong> Reconocer estructuras repetitivas en los procesos de ordenación.</li>
+                                </ul>
+                            </div>
+                            <!-- Diapositiva 2 -->
+                            <div class="carousel-item-algoritmos w-full flex-shrink-0 bg-orange-100 p-8">
+                                <h3 class="text-2xl font-bold text-amber-800 mb-4">Relación con el Currículo (CLM)</h3>
+                                <ul class="list-disc list-inside space-y-2 text-stone-700">
+                                    <li><strong>Área de Matemáticas:</strong> Aplicación de métodos de resolución de problemas en situaciones cotidianas.</li>
+                                    <li><strong>Saberes Básicos:</strong> Estrategias de cálculo y comparación con números naturales.</li>
+                                    <li><strong>Integración Transversal:</strong> Conecta los algoritmos informáticos con el pensamiento lógico-matemático.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <button class="prev-algoritmos absolute top-1/2 left-2 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 rounded-full p-2 transition"><span class="text-2xl">‹</span></button>
+                        <button class="next-algoritmos absolute top-1/2 right-2 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 rounded-full p-2 transition"><span class="text-2xl">›</span></button>
+                    </div>
+                </div>
+            </details>
+            
+            <!-- Sección de Justificación Práctica -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Justificación Práctica: ¿Por qué aprender esto?
+                </summary>
+                <div class="p-6 border-t border-orange-200 text-stone-700 space-y-3">
+                    <p>Aunque parezca algo muy técnico, ¡los algoritmos de ordenación están por todas partes! Entender cómo funcionan nos ayuda a comprender mejor el mundo digital que nos rodea.</p>
+                    <ul class="list-disc list-inside space-y-2 pl-4">
+                        <li><strong>En tu móvil:</strong> Cuando buscas un contacto, tu teléfono lo encuentra rápidamente porque la lista está ordenada alfabéticamente.</li>
+                        <li><strong>En los videojuegos:</strong> Las tablas de puntuaciones que te muestran quién va en primer lugar usan algoritmos para ordenar a los jugadores.</li>
+                        <li><strong>En las tiendas online:</strong> Cuando buscas un producto y lo ordenas por "precio más bajo", la web está usando un algoritmo de ordenación.</li>
+                        <li><strong>En la música:</strong> Tu aplicación de música puede ordenar tus canciones por artista, álbum o título. ¡Eso también es un algoritmo!</li>
+                    </ul>
+                    <p class="mt-4">Aprender sobre ellos es como descubrir los "trucos" secretos que hacen que la tecnología funcione de manera tan rápida y eficiente.</p>
+                </div>
+            </details>
+
+
+            <!-- Sección 3: Producto Final -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden" open>
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Producto Final
+                </summary>
+                <div class="p-6 border-t border-orange-200">
+                    <div class="sorting-game-container max-w-4xl mx-auto bg-orange-200 border-4 border-amber-700 rounded-2xl p-6 shadow-xl">
+                        <h1 class="text-3xl font-bold text-center text-amber-800 mb-4">📊 Algoritmos de Ordenación</h1>
+                        <div class="algorithm-selector flex justify-center flex-wrap gap-4 mb-4">
+                            <button class="sorting-algorithm-btn active" data-algorithm="bubble">🫧 Burbuja</button>
+                            <button class="sorting-algorithm-btn" data-algorithm="selection">👆 Selección</button>
+                            <button class="sorting-algorithm-btn" data-algorithm="insertion">📝 Inserción</button>
+                        </div>
+                        <div class="sorting-area bg-orange-100 border-2 border-amber-600 rounded-lg p-4 min-h-[250px] flex justify-center items-end" id="sorting-dataContainer">
+                            <!-- Barras generadas por JS -->
+                        </div>
+                        <div class="controls flex justify-center flex-wrap gap-4 mt-4">
+                            <button id="sorting-startBtn" class="sorting-control-btn">▶️ Iniciar</button>
+                            <button id="sorting-randomBtn" class="sorting-control-btn">🎲 Datos Aleatorios</button>
+                            <button id="sorting-resetBtn" class="sorting-control-btn">🔄 Reiniciar</button>
+                        </div>
+                        <div class="stats-panel grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-center">
+                            <div><h4 class="font-bold text-amber-900">Comparaciones</h4><p id="sorting-comparisons" class="text-xl">0</p></div>
+                            <div><h4 class="font-bold text-amber-900">Intercambios</h4><p id="sorting-swaps" class="text-xl">0</p></div>
+                        </div>
+                         <div class="algorithm-info bg-amber-100 border-2 border-amber-600 rounded-lg p-4 mt-4" id="sorting-algorithmInfo">
+                            <!-- Info generada por JS -->
+                        </div>
+                    </div>
+                </div>
+                 <div class="text-center mt-4 text-sm text-stone-600">
+                    <p><strong>Pictogramas:</strong> ARASAAC (Sergio Palao) | <strong>Licencia:</strong> CC (BY-NC-SA)</p>
+                </div>
+            </details>
+        </div>
+        
+        <!-- Página del Trivial -->
+        <div id="page-trivial" class="hidden">
+            <p class="text-lg text-amber-900 italic mb-4 text-center">La resolución de problemas es una competencia clave. Con este Trivial, generado con Vibe Coding, los docentes pueden presentar problemas complejos de distintas áreas de una forma lúdica, guiando al alumnado en el proceso de descomposición y fomentando el pensamiento analítico.</p>
+            
+             <!-- Sección 1: El camino hasta el producto final -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    El camino hasta el producto final
+                </summary>
+                <div class="p-6 border-t border-orange-200">
+                     <p class="mb-6 text-stone-700 text-center">A continuación se muestra el flujo de trabajo seguido para la creación de esta actividad.</p>
+                    <div class="flex flex-col items-center space-y-4">
+                        <!-- Nodo 1 -->
+                        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-r-lg shadow-md w-full max-w-2xl">
+                            <p class="font-bold">v6.0 - Creación Inicial</p>
+                            <p class="text-sm">Se genera el Trivial interactivo sobre descomposición de problemas, con su documentación y lógica, a partir de un prompt elaborado con la ayuda de <span class="font-semibold">Perplexity</span>.</p>
+                        </div>
+                         <div class="text-2xl font-bold text-green-400">↓</div>
+                        <!-- Nodo 2 -->
+                        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-r-lg shadow-md w-full max-w-2xl">
+                            <p class="font-bold">v6.1 - Simplificación</p>
+                            <p class="text-sm">Se elimina la selección de equipos para una experiencia individual y se añade un botón de pregunta aleatoria para agilizar el juego.</p>
+                        </div>
+                         <div class="text-2xl font-bold text-green-400">↓</div>
+                        <!-- Nodo 3 -->
+                        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-r-lg shadow-md w-full max-w-2xl">
+                            <p class="font-bold">v6.2 - Rediseño y Expansión</p>
+                            <p class="text-sm">Se transforma el juego a un formato de tablero con dado y "quesitos". Se expande el banco de preguntas a 50, enfocadas en 5º y 6º de Primaria.</p>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+             <!-- Sección 2: Relación con PC y currículo -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Relación con Pensamiento Computacional y Currículo
+                </summary>
+                <div class="p-6 border-t border-orange-200">
+                     <div id="carousel-trivial" class="relative overflow-hidden rounded-lg shadow-lg">
+                        <div class="carousel-inner-trivial flex transition-transform duration-500">
+                            <!-- Diapositiva 1 -->
+                            <div class="carousel-item-trivial w-full flex-shrink-0 bg-orange-100 p-8">
+                                <h3 class="text-2xl font-bold text-amber-800 mb-4">Pensamiento Computacional Aplicado</h3>
+                                <ul class="list-disc list-inside space-y-2 text-stone-700">
+                                    <li><strong>Descomposición:</strong> Es el eje central del juego, enseñando a dividir problemas grandes en partes pequeñas.</li>
+                                    <li><strong>Algoritmos:</strong> Cada conjunto de pasos para resolver un problema es un algoritmo.</li>
+                                    <li><strong>Abstracción y Patrones:</strong> Los jugadores aprenden a identificar la información clave y a reconocer estructuras similares en diferentes problemas.</li>
+                                </ul>
+                            </div>
+                            <!-- Diapositiva 2 -->
+                            <div class="carousel-item-trivial w-full flex-shrink-0 bg-orange-100 p-8">
+                                <h3 class="text-2xl font-bold text-amber-800 mb-4">Relación con el Currículo (CLM)</h3>
+                                <ul class="list-disc list-inside space-y-2 text-stone-700">
+                                    <li><strong>Transversalidad:</strong> La actividad integra problemas de Lengua, Matemáticas y Conocimiento del Medio.</li>
+                                    <li><strong>Competencias Clave:</strong> Se trabajan la interpretación de textos, la resolución de problemas y la participación social.</li>
+                                    <li><strong>Artículo 16:</strong> Se aplica el pensamiento computacional de forma transversal, como indica el decreto.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <button class="prev-trivial absolute top-1/2 left-2 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 rounded-full p-2 transition"><span class="text-2xl">‹</span></button>
+                        <button class="next-trivial absolute top-1/2 right-2 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 rounded-full p-2 transition"><span class="text-2xl">›</span></button>
+                    </div>
+                </div>
+            </details>
+            
+            <!-- Sección de Justificación Práctica -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Justificación Práctica: ¿Por qué aprender esto?
+                </summary>
+                <div class="p-6 border-t border-orange-200 text-stone-700 space-y-3">
+                    <p>La "descomposición" suena complicada, pero es algo que hacemos todos los días para no agobiarnos con tareas grandes. Consiste simplemente en dividir un gran problema en partes más pequeñas y manejables.</p>
+                    <ul class="list-disc list-inside space-y-2 pl-4">
+                        <li><strong>Organizar una fiesta:</strong> En lugar de pensar en "organizar una fiesta", lo divides en: hacer la lista de invitados, enviar invitaciones, comprar la comida, preparar la música...</li>
+                        <li><strong>Hacer los deberes:</strong> No piensas en "hacer todos los deberes", sino que lo divides por asignaturas: primero matemáticas, luego lengua, etc.</li>
+                        <li><strong>Limpiar tu habitación:</strong> Es más fácil si lo divides en tareas: hacer la cama, recoger la ropa, ordenar los juguetes y barrer el suelo.</li>
+                    </ul>
+                    <p class="mt-4">Este trivial nos entrena para abordar cualquier reto, por grande que parezca, de una forma más ordenada y con menos estrés.</p>
+                </div>
+            </details>
+
+            <!-- Sección 3: Producto Final -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden" open>
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Producto Final
+                </summary>
+                 <div class="p-6 border-t border-orange-200">
+                    <div class="trivial-game-container max-w-5xl mx-auto bg-orange-200 border-4 border-amber-700 rounded-2xl p-6 shadow-xl">
+                        <h1 class="text-3xl font-bold text-center text-amber-800 mb-4">🧩 Trivial de Descomposición</h1>
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <!-- Columna Izquierda: Ruleta y Controles -->
+                            <div class="flex-grow flex flex-col items-center">
+                                <div class="relative w-80 h-80 mb-4">
+                                    <div id="trivial-roulette" class="w-full h-full rounded-full border-8 border-amber-700 shadow-lg transition-transform duration-[4000ms] ease-out">
+                                        <!-- Los sectores se generan con JS -->
+                                    </div>
+                                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full w-0 h-0 border-l-8 border-r-8 border-b-16 border-l-transparent border-r-transparent border-b-red-600"></div>
+                                </div>
+                                <button id="trivial-spin-btn" class="trivial-control-btn">🎡 Girar Ruleta</button>
+                                <button id="trivial-restart-btn" class="trivial-control-btn bg-red-700 hover:bg-red-800 mt-4">🔄 Reiniciar Partida</button>
+                            </div>
+                            <!-- Columna Derecha: Equipos y Preguntas -->
+                            <div id="trivial-panel-right" class="w-full md:w-2/5 bg-orange-100 p-4 rounded-lg shadow-inner">
+                                <!-- Info de equipos -->
+                                <div id="trivial-teams-info" class="mb-4">
+                                    <h3 class="font-bold text-lg text-center text-amber-800 mb-2">Puntuación</h3>
+                                    <div class="flex justify-around gap-4">
+                                        <div id="trivial-team-1" class="text-center p-2 rounded-lg border-2 border-transparent">
+                                            <div class="font-bold">Equipo 1</div>
+                                            <div class="flex gap-1 mt-1 justify-center"></div>
+                                        </div>
+                                        <div id="trivial-team-2" class="text-center p-2 rounded-lg border-2 border-transparent">
+                                            <div class="font-bold">Equipo 2</div>
+                                            <div class="flex gap-1 mt-1 justify-center"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="trivial-question-area" class="hidden">
+                                   <h3 id="trivial-category-title" class="text-xl font-bold text-center mb-2"></h3>
+                                   <p id="trivial-question-text" class="font-semibold text-amber-900 mb-4"></p>
+                                   <div id="trivial-answer-options" class="grid grid-cols-1 gap-2"></div>
+                                   <div id="trivial-feedback-area" class="mt-4 p-3 rounded-lg bg-amber-200 hidden"></div>
+                                   <button id="trivial-continue-btn" class="trivial-control-btn mx-auto mt-4 hidden">➡️ Continuar</button>
+                                </div>
+                                <div id="trivial-welcome-message" class="text-center text-amber-800">
+                                    <h3 class="font-bold text-lg">¡Bienvenido al Trivial!</h3>
+                                    <p>Turno del <span id="trivial-current-turn" class="font-bold">Equipo 1</span>. ¡Gira la ruleta!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                         <div id="trivial-win-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+                            <div class="bg-white p-8 rounded-lg shadow-xl text-center">
+                                <h2 class="text-2xl font-bold text-amber-700 mb-2">🏆 ¡Enhorabuena! 🏆</h2>
+                                <p id="trivial-winner-text" class="mb-4"></p>
+                                <button id="trivial-play-again-btn" class="mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-full">Jugar otra vez</button>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+                 <div class="text-center mt-4 text-sm text-stone-600">
+                    <p><strong>Pictogramas:</strong> ARASAAC (Sergio Palao) | <strong>Licencia:</strong> CC (BY-NC-SA)</p>
+                </div>
+            </details>
+        </div>
+
+        <!-- Página de Redes -->
+        <div id="page-redes" class="hidden">
+            <p class="text-lg text-amber-900 italic mb-4 text-center">El funcionamiento de Internet puede parecer magia. Este simulador, creado con Vibe Coding, desmitifica las redes de comunicación, permitiendo al alumnado de secundaria construir, simular y analizar topologías de red, conectando conceptos abstractos con la infraestructura digital que usan a diario.</p>
+
+            <!-- Sección 1: El camino hasta el producto final -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    El camino hasta el producto final
+                </summary>
+                <div class="p-6 border-t border-orange-200">
+                     <p class="mb-6 text-stone-700 text-center">A continuación se muestra el flujo de trabajo seguido para la creación de esta actividad.</p>
+                    <div class="flex flex-col items-center space-y-4">
+                        <!-- Nodo 1 -->
+                        <div class="bg-purple-100 border-l-4 border-purple-500 text-purple-700 p-4 rounded-r-lg shadow-md w-full max-w-2xl">
+                            <p class="font-bold">v6.3 - Creación a partir de Prompt Detallado</p>
+                            <p class="text-sm">Se genera el simulador de redes de comunicación, con su documentación curricular y lógica, a partir de un prompt elaborado con la ayuda de <span class="font-semibold">Perplexity</span>.</p>
+                        </div>
+                         <div class="text-2xl font-bold text-purple-400">↓</div>
+                        <!-- Nodo 2 -->
+                        <div class="bg-purple-100 border-l-4 border-purple-500 text-purple-700 p-4 rounded-r-lg shadow-md w-full max-w-2xl">
+                            <p class="font-bold">Ajustes y Adaptación Visual</p>
+                            <p class="text-sm">Se integra la actividad en una nueva pestaña, se adapta la paleta de colores a la estética "otoño cálido" y se reemplazan los marcadores de imagen por emojis funcionales.</p>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+             <!-- Sección 2: Relación con PC y currículo -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Relación con Pensamiento Computacional y Currículo
+                </summary>
+                <div class="p-6 border-t border-orange-200">
+                     <div id="carousel-redes" class="relative overflow-hidden rounded-lg shadow-lg">
+                        <div class="carousel-inner-redes flex transition-transform duration-500">
+                            <!-- Diapositiva 1 -->
+                            <div class="carousel-item-redes w-full flex-shrink-0 bg-orange-100 p-8">
+                                <h3 class="text-2xl font-bold text-amber-800 mb-4">Pensamiento Computacional Avanzado</h3>
+                                <ul class="list-disc list-inside space-y-2 text-stone-700">
+                                    <li><strong>Algoritmos de Grafos:</strong> Comprensión de rutas óptimas y algoritmos de enrutamiento.</li>
+                                    <li><strong>Abstracción de Redes:</strong> Modelado de sistemas complejos mediante nodos y conexiones.</li>
+                                    <li><strong>Optimización:</strong> Análisis de eficiencia, latencia y ancho de banda.</li>
+                                    <li><strong>Debugging de Sistemas:</strong> Identificación y resolución de fallos en arquitecturas de red.</li>
+                                </ul>
+                            </div>
+                            <!-- Diapositiva 2 -->
+                            <div class="carousel-item-redes w-full flex-shrink-0 bg-orange-100 p-8">
+                                <h3 class="text-2xl font-bold text-amber-800 mb-4">Relación con el Currículo (CLM)</h3>
+                                <ul class="list-disc list-inside space-y-2 text-stone-700">
+                                    <li><strong>Materia de Tecnología y Digitalización:</strong> Se trabaja la competencia específica 6 sobre el funcionamiento de dispositivos y aplicaciones.</li>
+                                    <li><strong>Saberes Básicos:</strong> Aborda la "Digitalización del entorno personal de aprendizaje".</li>
+                                    <li><strong>Pensamiento Computacional:</strong> Se aplica a la resolución de problemas tecnológicos, como indica el artículo 27.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <button class="prev-redes absolute top-1/2 left-2 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 rounded-full p-2 transition"><span class="text-2xl">‹</span></button>
+                        <button class="next-redes absolute top-1/2 right-2 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 rounded-full p-2 transition"><span class="text-2xl">›</span></button>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Sección de Justificación Práctica -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Justificación Práctica: ¿Por qué aprender esto?
+                </summary>
+                <div class="p-6 border-t border-orange-200 text-stone-700 space-y-3">
+                    <p>Las redes de comunicación son la columna vertebral del mundo moderno. Entender sus bases nos ayuda a comprender cómo funciona casi todo lo que hacemos online.</p>
+                    <ul class="list-disc list-inside space-y-2 pl-4">
+                        <li><strong>¿Por qué mi videojuego tiene 'lag'?:</strong> La latencia y el ancho de banda que ves en el simulador son las causas. Entenderlo te ayuda a saber si el problema es tu WiFi, tu router o el servidor del juego.</li>
+                        <li><strong>Enviar un WhatsApp:</strong> Tu mensaje viaja en "paquetes de datos" a través de múltiples nodos (routers, servidores) hasta llegar a su destino. Este simulador te muestra ese viaje.</li>
+                        <li><strong>Cuando se cae una web:</strong> Puede que un servidor haya fallado o que una conexión esté rota. Simular estos fallos te ayuda a entender la importancia de tener redes con múltiples caminos (redundancia).</li>
+                        <li><strong>La 'nube':</strong> No es una nube real, sino una red de servidores interconectados por todo el mundo donde guardamos nuestras fotos y archivos.</li>
+                    </ul>
+                    <p class="mt-4">Este simulador convierte conceptos invisibles como 'paquete de datos' o 'ruta de red' en algo visual y tangible, dándote el poder de entender y solucionar problemas tecnológicos cotidianos.</p>
+                </div>
+            </details>
+
+            <!-- Sección 3: Producto Final -->
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden" open>
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Producto Final
+                </summary>
+                 <div class="p-6 border-t border-orange-200">
+                     <div class="network-simulator-container max-w-7xl mx-auto bg-orange-200 border-4 border-amber-700 rounded-2xl p-6 shadow-xl">
+                        <h1 class="text-3xl font-bold text-center text-amber-800 mb-4">🌐 Simulador de Redes</h1>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <!-- Columna 1: Controles -->
+                            <div class="col-span-1 bg-orange-100 p-4 rounded-lg">
+                                <h3 class="font-bold text-amber-800 mb-2">Dispositivos</h3>
+                                <div class="grid grid-cols-2 gap-2 mb-4">
+                                    <div class="network-device-item" draggable="true" data-type="computer">💻<br>PC</div>
+                                    <div class="network-device-item" draggable="true" data-type="server">🖥️<br>Servidor</div>
+                                    <div class="network-device-item" draggable="true" data-type="router">📡<br>Router</div>
+                                    <div class="network-device-item" draggable="true" data-type="switch">🔌<br>Switch</div>
+                                </div>
+                                <h3 class="font-bold text-amber-800 mb-2">Simulación</h3>
+                                <div class="flex flex-col gap-2">
+                                     <button id="network-sendDataBtn" class="network-control-btn">📤 Enviar Datos</button>
+                                     <button id="network-analyzePathBtn" class="network-control-btn">🔍 Analizar Ruta</button>
+                                     <button id="network-clearNetworkBtn" class="network-control-btn bg-red-700 hover:bg-red-800">🗑️ Limpiar</button>
+                                </div>
+                            </div>
+                            <!-- Columna 2: Canvas -->
+                            <div class="col-span-1 md:col-span-2 bg-white rounded-lg shadow-inner relative" id="network-canvas">
+                                <!-- Nodos y conexiones aqui -->
+                            </div>
+                            <!-- Columna 3: Stats -->
+                            <div class="col-span-1 bg-orange-100 p-4 rounded-lg">
+                                <h3 class="font-bold text-amber-800 mb-2">Métricas</h3>
+                                <div class="grid grid-cols-2 gap-2 mb-4">
+                                    <div class="text-center"><div id="network-latencyValue" class="font-bold text-xl">0ms</div><div class="text-xs">Latencia</div></div>
+                                    <div class="text-center"><div id="network-packetsValue" class="font-bold text-xl">0</div><div class="text-xs">Paquetes</div></div>
+                                </div>
+                                <h3 class="font-bold text-amber-800 mb-2">Log de Transmisión</h3>
+                                <div id="network-transmissionLog" class="bg-gray-800 text-green-400 font-mono text-xs rounded p-2 h-48 overflow-y-auto"></div>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+            </details>
+        </div>
+
+
+        <!-- Página de Enlaces -->
+        <div id="page-enlaces" class="hidden">
+            <p class="text-lg text-amber-900 italic mb-4 text-center">Explorar y aprender de la comunidad es clave. Aquí tienes una selección de recursos y enlaces para seguir profundizando en el mundo de Vibe Coding y la creación de contenido educativo.</p>
+            <h2 class="text-3xl font-bold text-center mb-6 text-amber-800">Enlaces de Interés</h2>
+            <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
+                <ul class="space-y-4">
+                    <li>
+                        <a href="https://t.me/vceduca" target="_blank" class="flex items-center p-4 bg-orange-100 rounded-lg hover:bg-orange-200 transition">
+                            <span class="text-2xl mr-4">➡️</span>
+                            <span class="text-amber-800 font-semibold">Grupo de Telegram de Vibe Coding</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://vibe-coding-educativo.github.io/app_edu/" target="_blank" class="flex items-center p-4 bg-orange-100 rounded-lg hover:bg-orange-200 transition">
+                            <span class="text-2xl mr-4">➡️</span>
+                            <span class="text-amber-800 font-semibold">Repositorio del grupo de Telegram</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://educacion.bilateria.org/category/vibe-coding" target="_blank" class="flex items-center p-4 bg-orange-100 rounded-lg hover:bg-orange-200 transition">
+                            <span class="text-2xl mr-4">➡️</span>
+                            <span class="text-amber-800 font-semibold">Artículos sobre Vibe Coding</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+        <!-- Página de Consejos -->
+        <div id="page-tips" class="hidden">
+            <p class="text-lg text-amber-900 italic mb-4 text-center">Detrás de cada recurso digital hay pequeñas decisiones técnicas. En esta sección compartimos algunos consejos y buenas prácticas que hemos seguido durante la creación de este proyecto, para que puedas aplicarlos en tus propias creaciones con Vibe Coding.</p>
+            <h2 class="text-3xl font-bold text-center mb-6 text-amber-800">Consejos de Creación</h2>
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Alojamiento de Imágenes
+                </summary>
+                <div class="p-6 border-t border-orange-200 text-stone-700 space-y-3">
+                    <p>Para que las imágenes de tus actividades funcionen correctamente, necesitan estar alojadas en internet y tener una URL directa.</p>
+                    <p><strong>¿Por qué es importante?</strong> Cuando le pides a Vibe Coding que use una imagen, no puede acceder a los archivos de tu ordenador. Necesita una dirección web (URL) para encontrarla y mostrarla.</p>
+                    <p><strong>Herramientas recomendadas:</strong> Existen servicios gratuitos como <a href="https://postimages.org/" target="_blank" class="text-orange-600 hover:underline font-semibold">Postimages</a>. Te permiten subir una imagen desde tu equipo y te proporcionan una "URL directa" que puedes copiar y pegar en tus prompts.</p>
+                    <p class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 rounded-r-lg"><strong>Ejemplo de prompt:</strong> "Crea una tarjeta con la imagen <span class="font-mono bg-orange-200 px-1 rounded">https://i.postimg.cc/mgy9hDHf/vaso-de-agua.png</span> y el texto 'Vaso Lleno'".</p>
+                </div>
+            </details>
+             <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Aprende del Proceso
+                </summary>
+                <div class="p-6 border-t border-orange-200 text-stone-700 space-y-3">
+                    <p>Cada interacción es una oportunidad de aprendizaje. Vibe Coding no solo crea el producto final, sino que también genera el código que lo hace funcionar.</p>
+                     <ul class="list-disc list-inside space-y-2 pl-4">
+                        <li><strong>Observa el código:</strong> Aunque no sepas programar, puedes empezar a identificar patrones. Fíjate en cómo un cambio en tu prompt se traduce en el código HTML, CSS o JavaScript.</li>
+                        <li><strong>Analiza los prompts:</strong> Revisa el "Changelog" y los diagramas de flujo. Ver los prompts que se usaron te dará ideas sobre cómo formular tus propias peticiones de manera más efectiva.</li>
+                        <li><strong>Experimenta:</strong> No tengas miedo de pedir cosas "raras" o muy específicas. Ver cómo responde la IA te ayudará a entender mejor sus capacidades y limitaciones.</li>
+                    </ul>
+                </div>
+            </details>
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Crea tu propio estilo
+                </summary>
+                <div class="p-6 border-t border-orange-200 text-stone-700 space-y-3">
+                    <p>Una de las grandes ventajas de trabajar con Vibe Coding es la facilidad para personalizar el diseño. No necesitas saber de CSS para cambiar la apariencia de tus actividades. Simplemente, pídelo con un prompt.</p>
+                    <p><strong>¿Qué puedes cambiar?</strong> Prácticamente todo. Puedes pedir un cambio general o un detalle muy específico.</p>
+                     <ul class="list-disc list-inside space-y-2 pl-4">
+                        <li><strong>Paleta de colores:</strong> Prueba a pedir temáticas. Por ejemplo, "Usa una paleta de colores 'primavera' con tonos pastel" o "Cambia el diseño a un estilo 'espacial' con fondos oscuros y letras brillantes".</li>
+                        <li><strong>Fuentes:</strong> ¿Prefieres otro tipo de letra? "Usa una fuente como 'Comic Sans MS' (aunque muchos opinen que es para gente sin alma)" o "Cambia a una fuente elegante como 'Georgia'".</li>
+                        <li><strong>Formas y bordes:</strong> Puedes ajustar los detalles. "Haz que todos los botones sean completamente redondos" o "Añade un borde más grueso y de color rojo a las tarjetas del memory".</li>
+                    </ul>
+                    <p class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 rounded-r-lg"><strong>Ejemplo de prompt:</strong> "Aplica una paleta de colores 'otoño cálido' a toda la página, con tonos cremas, calabazas y cafés."</p>
+                </div>
+            </details>
+            <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    Itera
+                </summary>
+                <div class="p-6 border-t border-orange-200 text-stone-700 space-y-3">
+                    <p>No intentes conseguir el producto perfecto en el primer intento. La creación de contenido con IA es un proceso de diálogo y refinamiento.</p>
+                    <p><strong>Empieza simple y construye sobre ello:</strong></p>
+                     <ul class="list-disc list-inside space-y-2 pl-4">
+                        <li>Pide primero la estructura básica de tu actividad.</li>
+                        <li>Luego, en un nuevo prompt, pide que añada una funcionalidad específica (como un temporizador o un sistema de puntos).</li>
+                        <li>Después, solicita cambios de estilo o la adición de nuevo contenido.</li>
+                    </ul>
+                    <p>Este enfoque, que puedes ver en el diagrama de flujo del "Juego de Secuencias", te permite tener control sobre el proceso y corregir el rumbo fácilmente si algo no sale como esperabas.</p>
+                </div>
+            </details>
+             <details class="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
+                <summary class="px-6 py-4 text-xl font-bold text-amber-800 cursor-pointer hover:bg-orange-50">
+                    ¡Tú mandas, tú controlas!
+                </summary>
+                <div class="p-6 border-t border-orange-200 text-stone-700 space-y-3">
+                    <p>Recuerda que Vibe Coding es una herramienta a tu servicio. El resultado final depende directamente de la calidad y la claridad de tus instrucciones.</p>
+                     <ul class="list-disc list-inside space-y-2 pl-4">
+                        <li><strong>Sé específico:</strong> En lugar de "hazlo más bonito", prueba con "usa un borde redondeado y una sombra suave en los botones".</li>
+                        <li><strong>Proporciona contexto:</strong> Explica para quién es la actividad (ej: "para niños de 3 años") y cuál es su objetivo. Esto ayuda a la IA a tomar mejores decisiones de diseño y funcionalidad.</li>
+                        <li><strong>Da ejemplos:</strong> Si tienes una idea clara, ¡muéstrasela! Puedes incluir enlaces a imágenes o describir una web que te guste como inspiración.</li>
+                    </ul>
+                </div>
+            </details>
+        </div>
+
+    </main>
+
+    <!-- Pie de página -->
+    <footer class="bg-orange-200 mt-12 py-6 text-center text-amber-900">
+        <p>Creado por <strong class="text-amber-800">Lucía Serrano Palomo</strong> con la asistencia de <em>Vibe Coding</em></p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lógica de navegación principal
+            const pages = document.querySelectorAll('main > div');
+            const navButtons = document.querySelectorAll('.nav-button');
+            const passwordModal = document.getElementById('password-modal');
+            const mainHeader = document.getElementById('main-header');
+            const mainContent = document.querySelector('main');
+            const submitPasswordBtn = document.getElementById('submit-password');
+
+            function showPage(pageId) {
+                pages.forEach(page => {
+                    page.classList.toggle('hidden', page.id !== `page-${pageId}`);
+                });
+                navButtons.forEach(button => {
+                    button.classList.toggle('bg-orange-600', button.dataset.page === pageId);
+                     button.classList.toggle('bg-orange-400', button.dataset.page !== pageId);
+                });
+            }
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    showPage(button.dataset.page);
+                });
+            });
+
+            // Lógica de contraseña
+            submitPasswordBtn.addEventListener('click', () => {
+                const pass1 = document.getElementById('pass1').value.toLowerCase().trim();
+                const pass2 = document.getElementById('pass2').value.toLowerCase().trim();
+                const errorMsg = document.getElementById('password-error');
+
+                if (pass1 === 'patos' && pass2 === 'cerditos') {
+                    passwordModal.classList.add('hidden');
+                    mainHeader.classList.remove('hidden');
+                    mainContent.classList.remove('hidden');
+                    showPage('changelog'); // Mostrar la página de Changelog por defecto al entrar
+                } else {
+                    errorMsg.classList.remove('hidden');
+                }
+            });
+
+
+            // --- Lógica del Juego de Secuencias ---
+            const gamePage = document.getElementById('page-game');
+            if (gamePage) {
+                const levels = {
+                    1: {
+                        title: "Nivel 1: Tengo sed",
+                        items: [
+                            { id: 1, img: "https://i.postimg.cc/mgy9hDHf/vaso-de-agua.png" },
+                            { id: 2, img: "https://i.postimg.cc/vZtnDBVw/beber.png" },
+                            { id: 3, img: "https://i.postimg.cc/MKRV2tZH/vaso.png" }
+                        ]
+                    },
+                    2: {
+                        title: "Nivel 2: ¡Fuego!",
+                        items: [
+                            { id: 1, img: "https://i.postimg.cc/G24wH495/incendio.png" },
+                            { id: 2, img: "https://i.postimg.cc/nzXbCXMS/llamar-al-112.png" },
+                            { id: 3, img: "https://i.postimg.cc/B6j9XjtM/cami-n-de-bomberos.png" },
+                            { id: 4, img: "https://i.postimg.cc/bJZcsZdF/bombero.png" }
+                        ]
+                    },
+                    3: {
+                        title: "Nivel 3: Un martes más",
+                        items: [
+                            { id: 1, img: "https://i.postimg.cc/634WFjVq/despertar.png" },
+                            { id: 2, img: "https://i.postimg.cc/85fpxKd5/vestir.png" },
+                            { id: 3, img: "https://i.postimg.cc/50Q4D752/desayunar.png" },
+                            { id: 4, img: "https://i.postimg.cc/Y9LrTnNS/ir-al-colegio.png" },
+                            { id: 5, img: "https://i.postimg.cc/3R08zSjJ/estudiar.png" }
+                        ]
+                    }
+                };
+
+                let currentLevel = 1;
+                const dropContainer = document.getElementById('drop-container');
+                const dragContainer = document.getElementById('drag-container');
+                const levelTitle = document.getElementById('level-title');
+                const nextLevelModal = document.getElementById('next-level-modal');
+                const nextLevelBtn = document.getElementById('next-level-btn');
+                const closeModalBtn = document.getElementById('close-modal-btn');
+                const modalMessage = document.getElementById('modal-message');
+                const finalCup = document.getElementById('final-cup');
+
+                let audioContext;
+                
+                function initAudio() {
+                    if (!audioContext) {
+                        try {
+                            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        } catch (e) {
+                            console.error("Web Audio API is not supported in this browser");
+                        }
+                    }
+                }
+                
+                function playSound(type) {
+                    if (!audioContext) return;
+                    
+                    if (audioContext.state === 'suspended') {
+                        audioContext.resume();
+                    }
+
+                    if (type === 'applause') {
+                        const oscillator = audioContext.createOscillator();
+                        const gainNode = audioContext.createGain();
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioContext.destination);
+
+                        oscillator.type = 'sawtooth';
+                        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                        
+                        for(let i = 0; i < 20; i++) {
+                            const freq = 400 + Math.random() * 800;
+                            oscillator.frequency.setValueAtTime(freq, audioContext.currentTime + i * 0.05);
+                            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + i * 0.05 + 0.04);
+                        }
+                        oscillator.start(audioContext.currentTime);
+                        oscillator.stop(audioContext.currentTime + 1);
+                    }
+                }
+
+                function loadLevel(level) {
+                    currentLevel = level;
+                    levelTitle.textContent = levels[level].title;
+                    dropContainer.innerHTML = '';
+                    dragContainer.innerHTML = '';
+
+                    const levelItems = [...levels[level].items];
+                    
+                    for (let i = 0; i < levelItems.length; i++) {
+                        const dropZone = document.createElement('div');
+                        dropZone.className = 'w-24 h-24 bg-white rounded-lg border-2 border-dashed border-gray-400 flex items-center justify-center';
+                        dropZone.dataset.id = i + 1;
+                        dropContainer.appendChild(dropZone);
+                    }
+
+                    levelItems.sort(() => Math.random() - 0.5);
+                    levelItems.forEach(item => {
+                        const dragItem = document.createElement('img');
+                        dragItem.src = item.img;
+                        dragItem.className = 'w-24 h-24 rounded-lg cursor-pointer shadow-md';
+                        dragItem.draggable = true;
+                        dragItem.dataset.id = item.id;
+                        dragContainer.appendChild(dragItem);
+                    });
+                    
+                    addDragListeners();
+                }
+
+                function addDragListeners() {
+                     document.querySelectorAll('#drag-container img').forEach(item => {
+                        item.addEventListener('dragstart', handleDragStart);
+                    });
+
+                    document.querySelectorAll('#drop-container div').forEach(zone => {
+                        zone.addEventListener('dragover', handleDragOver);
+                        zone.addEventListener('drop', handleDrop);
+                    });
+                }
+
+                function handleDragStart(e) {
+                    e.dataTransfer.setData('text/plain', e.target.dataset.id);
+                }
+
+                function handleDragOver(e) {
+                    e.preventDefault();
+                }
+
+                function handleDrop(e) {
+                    e.preventDefault();
+                    const id = e.dataTransfer.getData('text/plain');
+                    const draggableElement = document.querySelector(`#drag-container [data-id='${id}']`);
+                    const dropZone = e.currentTarget;
+
+                    if (draggableElement && !dropZone.querySelector('img')) {
+                        dropZone.appendChild(draggableElement);
+                        checkSequence();
+                    }
+                }
+
+                function checkSequence() {
+                    const droppedItems = dropContainer.querySelectorAll('img');
+                    if (droppedItems.length !== levels[currentLevel].items.length) return;
+
+                    const isCorrect = Array.from(droppedItems).every((item, index) => {
+                        return parseInt(item.dataset.id) === (index + 1);
+                    });
+
+                    if (isCorrect) {
+                        initAudio();
+                        playSound('applause');
+                        if (currentLevel < 3) {
+                            modalMessage.textContent = '¡Muy bien! ¡Secuencia correcta!';
+                            nextLevelBtn.textContent = 'Siguiente Nivel';
+                            nextLevelBtn.style.display = 'inline-block';
+                            finalCup.style.display = 'none';
+                        } else {
+                            modalMessage.textContent = '¡Felicidades! ¡Has completado todos los niveles!';
+                            nextLevelBtn.style.display = 'none';
+                            finalCup.style.display = 'block';
+                        }
+                        nextLevelModal.classList.remove('hidden');
+                    } else {
+                         setTimeout(() => {
+                            alert('Secuencia incorrecta. ¡Inténtalo de nuevo!');
+                            loadLevel(currentLevel);
+                        }, 200);
+                    }
+                }
+                
+                document.querySelectorAll('.level-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const level = parseInt(e.target.id.replace('level', ''));
+                        loadLevel(level);
+                    });
+                });
+
+                nextLevelBtn.addEventListener('click', () => {
+                    nextLevelModal.classList.add('hidden');
+                    if (currentLevel < 3) {
+                        loadLevel(currentLevel + 1);
+                    }
+                });
+
+                closeModalBtn.addEventListener('click', () => {
+                    nextLevelModal.classList.add('hidden');
+                });
+
+                loadLevel(1);
+            }
+
+             // --- Lógica del Carousel ---
+            function setupCarousel(carouselId) {
+                const carousel = document.getElementById(carouselId);
+                if (!carousel) return;
+
+                const inner = carousel.querySelector(`.carousel-inner-${carouselId.split('-')[1]}`);
+                const items = carousel.querySelectorAll(`.carousel-item-${carouselId.split('-')[1]}`);
+                const prevBtn = carousel.querySelector(`.prev-${carouselId.split('-')[1]}`);
+                const nextBtn = carousel.querySelector(`.next-${carouselId.split('-')[1]}`);
+                let currentIndex = 0;
+
+                function updateCarousel() {
+                    if(inner) inner.style.transform = `translateX(${-currentIndex * 100}%)`;
+                }
+
+                if(prevBtn) prevBtn.addEventListener('click', () => {
+                    currentIndex = (currentIndex > 0) ? currentIndex - 1 : items.length - 1;
+                    updateCarousel();
+                });
+
+                if(nextBtn) nextBtn.addEventListener('click', () => {
+                    currentIndex = (currentIndex < items.length - 1) ? currentIndex + 1 : 0;
+                    updateCarousel();
+                });
+            }
+
+            setupCarousel('carousel-secuencia');
+            setupCarousel('carousel-memory');
+            setupCarousel('carousel-codyroby');
+            setupCarousel('carousel-algoritmos');
+            setupCarousel('carousel-trivial');
+
+
+            // --- Lógica del Memory ---
+            if(document.getElementById('page-memory')){
+                class MemoryGame {
+                    constructor() {
+                        this.symbols = ['🐱', '🐶', '🐰', '🦆', '🐸', '🐝', '🦋', '🐠', '🌸', '🌟', '🎈', '🎨'];
+                        this.currentLevel = 'easy';
+                        this.levelConfig = { easy: 6, medium: 8, hard: 10 };
+                        this.cards = [];
+                        this.flippedCards = [];
+                        this.matchedPairs = 0;
+                        this.attempts = 0;
+                        this.timer = null;
+                        this.init();
+                    }
+                    init() {
+                        this.bindEvents();
+                        this.createGame();
+                    }
+                    createGame() {
+                        const pairsCount = this.levelConfig[this.currentLevel];
+                        this.cards = [];
+                        for (let i = 0; i < pairsCount; i++) {
+                            this.cards.push(this.symbols[i], this.symbols[i]);
+                        }
+                        this.shuffleCards();
+                        this.renderCards();
+                        this.updateStats();
+                    }
+                    shuffleCards() {
+                        this.cards.sort(() => Math.random() - 0.5);
+                    }
+                    renderCards() {
+                        const gameBoard = document.getElementById('memory-gameBoard');
+                        const pairsCount = this.levelConfig[this.currentLevel];
+                        gameBoard.className = `memory-board grid gap-3 mx-auto board-${this.currentLevel}`;
+                        gameBoard.innerHTML = '';
+                         gameBoard.style.gridTemplateColumns = `repeat(${this.currentLevel === 'easy' ? 3 : 4}, 1fr)`;
+
+                        this.cards.forEach((symbol) => {
+                            const card = document.createElement('div');
+                            card.className = 'memory-card w-24 h-24 rounded-lg cursor-pointer flex items-center justify-center text-4xl shadow-md bg-orange-400 text-white';
+                            card.dataset.symbol = symbol;
+                            card.innerHTML = '❓';
+                            gameBoard.appendChild(card);
+                        });
+                        document.getElementById('memory-pairs').textContent = `0/${pairsCount}`;
+                    }
+                    bindEvents() {
+                        document.getElementById('memory-gameBoard').addEventListener('click', (e) => {
+                            if (e.target.classList.contains('memory-card')) {
+                                this.handleCardClick(e.target);
+                            }
+                        });
+                        document.querySelectorAll('.memory-difficulty-btn').forEach(btn => {
+                            btn.addEventListener('click', () => this.changeDifficulty(btn.dataset.level));
+                        });
+                        document.getElementById('memory-playAgainBtn').addEventListener('click', () => this.resetGame());
+                    }
+                    handleCardClick(card) {
+                        if (card.classList.contains('flipped') || this.flippedCards.length >= 2) return;
+                        this.flipCard(card);
+                        this.flippedCards.push(card);
+                        if (this.flippedCards.length === 2) {
+                            this.attempts++;
+                            this.updateStats();
+                            setTimeout(() => this.checkMatch(), 800);
+                        }
+                         if (!this.timer && this.attempts === 1) this.startTimer();
+                    }
+                    flipCard(card) {
+                        card.classList.add('flipped');
+                        card.innerHTML = card.dataset.symbol;
+                        card.classList.remove('bg-orange-400');
+                        card.classList.add('bg-orange-100', 'text-amber-800');
+                    }
+                    checkMatch() {
+                        const [card1, card2] = this.flippedCards;
+                        if (card1.dataset.symbol === card2.dataset.symbol) {
+                            card1.classList.add('matched', 'opacity-70');
+                            card2.classList.add('matched', 'opacity-70');
+                            this.matchedPairs++;
+                            if (this.matchedPairs === this.levelConfig[this.currentLevel]) {
+                                this.gameComplete();
+                            }
+                        } else {
+                            [card1, card2].forEach(c => {
+                                c.classList.remove('flipped', 'bg-orange-100', 'text-amber-800');
+                                c.classList.add('bg-orange-400');
+                                c.innerHTML = '❓';
+                            });
+                        }
+                        this.flippedCards = [];
+                        this.updateStats();
+                    }
+                    changeDifficulty(level) {
+                        document.querySelectorAll('.memory-difficulty-btn').forEach(btn => btn.classList.remove('active'));
+                        document.querySelector(`.memory-difficulty-btn[data-level="${level}"]`).classList.add('active');
+                        this.currentLevel = level;
+                        this.resetGame();
+                    }
+                    updateStats() {
+                        document.getElementById('memory-attempts').textContent = this.attempts;
+                        document.getElementById('memory-pairs').textContent = `${this.matchedPairs}/${this.levelConfig[this.currentLevel]}`;
+                    }
+                    startTimer() {
+                        let seconds = 0;
+                        this.timer = setInterval(() => {
+                            seconds++;
+                            const min = Math.floor(seconds / 60).toString().padStart(2, '0');
+                            const sec = (seconds % 60).toString().padStart(2, '0');
+                            document.getElementById('memory-timer').textContent = `${min}:${sec}`;
+                        }, 1000);
+                    }
+                    gameComplete() {
+                        clearInterval(this.timer);
+                        document.getElementById('memory-successModal').classList.remove('hidden');
+                    }
+                    resetGame() {
+                        clearInterval(this.timer);
+                        this.timer = null;
+                        this.flippedCards = [];
+                        this.matchedPairs = 0;
+                        this.attempts = 0;
+                        document.getElementById('memory-timer').textContent = '00:00';
+                        document.getElementById('memory-successModal').classList.add('hidden');
+                        this.createGame();
+                    }
+                }
+                new MemoryGame();
+            }
+            
+            // --- Lógica de Cody & Roby ---
+            if(document.getElementById('page-codyroby')){
+                class CodyRobySimulator {
+                    constructor() {
+                        this.boardSize = 8;
+                        this.currentLevel = 1;
+                        this.robotPosition = { x: 0, y: 0 };
+                        this.robotDirection = 1; // 0=N, 1=E, 2=S, 3=W
+                        this.levels = {
+                            1: { robot: {x:0, y:4}, target: {x:7, y:4}, obstacles: [] },
+                            2: { robot: {x:1, y:1}, target: {x:5, y:5}, obstacles: [{x:3, y:1}, {x:3, y:2}, {x:3, y:3}] },
+                            3: { robot: {x:0, y:7}, target: {x:7, y:0}, obstacles: [{x:2,y:2}, {x:2,y:3}, {x:2,y:4}, {x:5,y:5}, {x:5,y:4}, {x:5,y:3}] },
+                            4: { robot: {x:4, y:7}, target: {x:4, y:0}, obstacles: [] }
+                        };
+                        this.program = [];
+                        this.isExecuting = false;
+                        this.init();
+                    }
+
+                    init() {
+                        this.createBoard();
+                        this.loadLevel(this.currentLevel);
+                        this.bindEvents();
+                    }
+
+                    createBoard() {
+                        const board = document.querySelector('.codyroby-game-board');
+                        board.innerHTML = '';
+                        for (let y = 0; y < this.boardSize; y++) {
+                            for (let x = 0; x < this.boardSize; x++) {
+                                const cell = document.createElement('div');
+                                cell.className = 'board-cell bg-white border border-orange-200 rounded-sm flex items-center justify-center';
+                                cell.dataset.x = x;
+                                cell.dataset.y = y;
+                                board.appendChild(cell);
+                            }
+                        }
+                    }
+
+                    loadLevel(levelNum) {
+                        this.currentLevel = levelNum;
+                        const level = this.levels[levelNum];
+                        this.robotPosition = { ...level.robot };
+                        this.targetPosition = { ...level.target };
+                        this.obstacles = [...level.obstacles];
+                        this.robotDirection = 1; 
+                        this.clearProgram();
+                        this.updateBoard();
+
+                        document.querySelectorAll('.codyroby-level-btn').forEach(btn => {
+                            btn.classList.toggle('active', btn.dataset.level == levelNum);
+                            btn.classList.toggle('bg-orange-700', btn.dataset.level == levelNum);
+
+                        });
+                    }
+                    
+                    updateBoard() {
+                        document.querySelectorAll('.board-cell').forEach(cell => {
+                            const x = parseInt(cell.dataset.x);
+                            const y = parseInt(cell.dataset.y);
+                            cell.innerHTML = '';
+                            cell.className = 'board-cell bg-white border border-orange-200 rounded-sm flex items-center justify-center';
+
+                            if (this.obstacles.some(obs => obs.x === x && obs.y === y)) {
+                                 cell.classList.add('bg-stone-400');
+                                 cell.innerHTML = '🧱';
+                            }
+                            if (x === this.targetPosition.x && y === this.targetPosition.y) {
+                                 cell.classList.add('bg-amber-400');
+                                 cell.innerHTML = '🏁';
+                            }
+                            if (x === this.robotPosition.x && y === this.robotPosition.y) {
+                                cell.classList.add('bg-yellow-300');
+                                const robotAvatar = document.createElement('div');
+                                robotAvatar.className = 'text-2xl';
+                                robotAvatar.style.transform = `rotate(${this.robotDirection * 90 - 90}deg)`;
+                                robotAvatar.innerHTML = '🤖';
+                                cell.appendChild(robotAvatar);
+                            }
+                        });
+                    }
+                    
+                    bindEvents() {
+                        document.querySelectorAll('.command-card').forEach(card => {
+                            card.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', e.target.dataset.command));
+                        });
+
+                        const programSequence = document.querySelector('.program-sequence');
+                        programSequence.addEventListener('dragover', e => e.preventDefault());
+                        programSequence.addEventListener('drop', e => {
+                            e.preventDefault();
+                            const command = e.dataTransfer.getData('text/plain');
+                            this.addCommandToProgram(command);
+                        });
+                        
+                        document.querySelectorAll('.codyroby-level-btn').forEach(btn => {
+                            btn.addEventListener('click', () => this.loadLevel(parseInt(btn.dataset.level)));
+                        });
+
+                        document.getElementById('codyroby-executeBtn').addEventListener('click', () => this.executeProgram());
+                        document.getElementById('codyroby-clearBtn').addEventListener('click', () => this.clearProgram());
+                        document.getElementById('codyroby-resetBtn').addEventListener('click', () => this.loadLevel(this.currentLevel));
+                    }
+                    
+                    addCommandToProgram(command) {
+                        this.program.push(command);
+                        this.renderProgram();
+                    }
+
+                    renderProgram() {
+                        const sequence = document.querySelector('.program-sequence');
+                        sequence.innerHTML = '';
+                        this.program.forEach((cmd, index) => {
+                            const cmdElement = document.createElement('div');
+                            cmdElement.className = 'program-command bg-amber-200 p-1 rounded text-sm text-center flex justify-between items-center';
+                            const icons = {'forward': '⬆️ Avanzar', 'turn-left': '⬅️ Girar Izq.', 'turn-right': '➡️ Girar Der.'};
+                            cmdElement.innerHTML = `<span>${icons[cmd]}</span>`;
+                            const removeBtn = document.createElement('button');
+                            removeBtn.className = 'text-red-500 font-bold px-1';
+                            removeBtn.innerHTML = 'x';
+                            removeBtn.onclick = () => {
+                                this.program.splice(index, 1);
+                                this.renderProgram();
+                            };
+                            cmdElement.appendChild(removeBtn);
+                            sequence.appendChild(cmdElement);
+                        });
+                    }
+
+                    clearProgram() {
+                        this.program = [];
+                        this.renderProgram();
+                    }
+
+                    async executeProgram() {
+                        if (this.isExecuting) return;
+                        this.isExecuting = true;
+                        // Reset robot to start position for execution
+                        const startPos = this.levels[this.currentLevel].robot;
+                        this.robotPosition = { ...startPos };
+                        this.robotDirection = 1;
+                        this.updateBoard();
+                        await new Promise(r => setTimeout(r, 500));
+
+
+                        for (const command of this.program) {
+                            this.executeCommand(command);
+                            this.updateBoard();
+                            await new Promise(r => setTimeout(r, 500));
+                        }
+                        this.checkWinCondition();
+                        this.isExecuting = false;
+                    }
+
+                    executeCommand(command) {
+                         switch (command) {
+                            case 'forward': this.moveForward(); break;
+                            case 'turn-left': this.robotDirection = (this.robotDirection + 3) % 4; break;
+                            case 'turn-right': this.robotDirection = (this.robotDirection + 1) % 4; break;
+                        }
+                    }
+                    
+                    moveForward() {
+                        const directions = [{x:0, y:-1}, {x:1, y:0}, {x:0, y:1}, {x:-1, y:0}];
+                        const dir = directions[this.robotDirection];
+                        const newX = this.robotPosition.x + dir.x;
+                        const newY = this.robotPosition.y + dir.y;
+                        
+                        if (newX >= 0 && newX < this.boardSize && newY >= 0 && newY < this.boardSize &&
+                            !this.obstacles.some(obs => obs.x === newX && obs.y === newY)) {
+                            this.robotPosition = { x: newX, y: newY };
+                        }
+                    }
+                    
+                    checkWinCondition() {
+                        if (this.robotPosition.x === this.targetPosition.x && this.robotPosition.y === this.targetPosition.y) {
+                            alert('¡Nivel completado!');
+                            if(this.currentLevel < 4) this.loadLevel(this.currentLevel + 1);
+                        } else {
+                            alert('¡Casi! Inténtalo de nuevo.');
+                        }
+                    }
+                }
+                new CodyRobySimulator();
+            
+                 // Estilos para los botones de Cody & Roby
+                document.querySelectorAll('.codyroby-level-btn').forEach(btn => {
+                    btn.className = 'codyroby-level-btn bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-full transition';
+                    if(btn.classList.contains('active')) btn.classList.add('bg-orange-700');
+                });
+                 document.querySelectorAll('.command-card').forEach(btn => {
+                    btn.className = 'command-card inline-flex flex-col items-center justify-center w-20 h-20 m-1 p-1 bg-amber-200 border-2 border-amber-600 rounded-lg cursor-grab text-xs text-center text-amber-900 font-semibold';
+                });
+                 document.querySelectorAll('.codyroby-control-button').forEach(btn => {
+                    btn.className = 'codyroby-control-button bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-full transition';
+                });
+            }
+
+             // --- Lógica del Visualizador de Algoritmos ---
+            if(document.getElementById('page-algoritmos')){
+                class SortingVisualizer {
+                    constructor() {
+                        this.data = [64, 34, 25, 12, 22, 11, 90];
+                        this.originalData = [...this.data];
+                        this.currentAlgorithm = 'bubble';
+                        this.isRunning = false;
+                        this.speed = 300; // ms
+                        this.stats = { comparisons: 0, swaps: 0 };
+                        this.algorithmInfo = {
+                            bubble: { name: "Ordenación Burbuja", desc: "Compara elementos adyacentes e intercambia si están desordenados. Los elementos más grandes 'burbujean' hacia el final." },
+                            selection: { name: "Ordenación por Selección", desc: "Encuentra el elemento más pequeño y lo coloca al principio, luego repite con el resto." },
+                            insertion: { name: "Ordenación por Inserción", desc: "Toma cada elemento y lo inserta en su posición correcta dentro de la parte ya ordenada." }
+                        };
+                        this.init();
+                    }
+
+                    init() {
+                        this.createDataElements();
+                        this.bindEvents();
+                        this.updateAlgorithmInfo();
+                    }
+
+                    createDataElements() {
+                        const container = document.getElementById('sorting-dataContainer');
+                        container.innerHTML = '';
+                        this.data.forEach(value => {
+                            const element = document.createElement('div');
+                            element.className = 'data-item w-10 text-white font-bold rounded-t-lg transition-all duration-300 flex items-end justify-center pb-2 bg-orange-400';
+                            element.style.height = `${value * 2.5}px`;
+                            element.textContent = value;
+                            container.appendChild(element);
+                        });
+                    }
+                    
+                    bindEvents() {
+                        document.querySelectorAll('.sorting-algorithm-btn').forEach(btn => {
+                            btn.addEventListener('click', () => this.selectAlgorithm(btn.dataset.algorithm));
+                        });
+                        document.getElementById('sorting-startBtn').addEventListener('click', () => this.startSorting());
+                        document.getElementById('sorting-randomBtn').addEventListener('click', () => this.generateRandomData());
+                        document.getElementById('sorting-resetBtn').addEventListener('click', () => this.resetData());
+                    }
+
+                    selectAlgorithm(algorithm) {
+                        if (this.isRunning) return;
+                        this.currentAlgorithm = algorithm;
+                        document.querySelectorAll('.sorting-algorithm-btn').forEach(btn => {
+                            btn.classList.toggle('active', btn.dataset.algorithm === algorithm);
+                            btn.classList.toggle('bg-orange-700', btn.dataset.algorithm === algorithm);
+                        });
+                        this.updateAlgorithmInfo();
+                        this.resetData();
+                    }
+                    
+                    updateAlgorithmInfo() {
+                        const info = this.algorithmInfo[this.currentAlgorithm];
+                        document.getElementById('sorting-algorithmInfo').innerHTML = `
+                            <h3 class="text-xl font-bold text-amber-800 mb-2">${info.name}</h3>
+                            <p class="text-stone-700">${info.desc}</p>
+                        `;
+                    }
+
+                    resetData() {
+                        if (this.isRunning) return;
+                        this.data = [...this.originalData];
+                        this.createDataElements();
+                        this.resetStats();
+                    }
+
+                    generateRandomData() {
+                        if (this.isRunning) return;
+                        this.data = Array.from({length: 10}, () => Math.floor(Math.random() * 90) + 10);
+                        this.originalData = [...this.data];
+                        this.createDataElements();
+                        this.resetStats();
+                    }
+                    
+                    resetStats() {
+                        this.stats = { comparisons: 0, swaps: 0 };
+                        this.updateStats();
+                    }
+                    
+                    updateStats() {
+                        document.getElementById('sorting-comparisons').textContent = this.stats.comparisons;
+                        document.getElementById('sorting-swaps').textContent = this.stats.swaps;
+                    }
+                    
+                    async startSorting() {
+                        if (this.isRunning) return;
+                        this.isRunning = true;
+                        this.resetStats();
+                        
+                        switch (this.currentAlgorithm) {
+                            case 'bubble': await this.bubbleSort(); break;
+                            case 'selection': await this.selectionSort(); break;
+                            case 'insertion': await this.insertionSort(); break;
+                        }
+
+                        this.isRunning = false;
+                    }
+
+                    async delay() {
+                        return new Promise(resolve => setTimeout(resolve, this.speed));
+                    }
+
+                    async swap(i, j) {
+                        this.stats.swaps++;
+                        this.updateStats();
+                        const elements = document.querySelectorAll('.data-item');
+                        elements[i].classList.add('bg-red-500');
+                        elements[j].classList.add('bg-red-500');
+                        await this.delay();
+
+                        [this.data[i], this.data[j]] = [this.data[j], this.data[i]];
+                        this.createDataElements(); // Re-render to show swap
+                        
+                        const newElements = document.querySelectorAll('.data-item');
+                        newElements[i].classList.add('bg-red-500');
+                        newElements[j].classList.add('bg-red-500');
+                        await this.delay();
+
+                        newElements[i].classList.remove('bg-red-500');
+                        newElements[j].classList.remove('bg-red-500');
+                    }
+                    
+                    highlight(indices, colorClass) {
+                        const elements = document.querySelectorAll('.data-item');
+                        indices.forEach(i => elements[i].classList.add(colorClass));
+                    }
+
+                    unhighlight(indices, colorClass) {
+                        const elements = document.querySelectorAll('.data-item');
+                        indices.forEach(i => elements[i].classList.remove(colorClass));
+                    }
+
+                    async bubbleSort() {
+                        const n = this.data.length;
+                        for (let i = 0; i < n - 1; i++) {
+                            for (let j = 0; j < n - i - 1; j++) {
+                                this.highlight([j, j + 1], 'bg-yellow-400');
+                                await this.delay();
+                                this.stats.comparisons++;
+                                this.updateStats();
+
+                                if (this.data[j] > this.data[j + 1]) {
+                                    await this.swap(j, j + 1);
+                                }
+                                this.unhighlight([j, j + 1], 'bg-yellow-400');
+                            }
+                            this.highlight([n-i-1], 'bg-green-500');
+                        }
+                         this.highlight([0], 'bg-green-500');
+                    }
+
+                    async selectionSort() {
+                        const n = this.data.length;
+                        for (let i = 0; i < n - 1; i++) {
+                            let minIdx = i;
+                            this.highlight([i], 'bg-blue-500');
+                            for (let j = i + 1; j < n; j++) {
+                                this.highlight([j], 'bg-yellow-400');
+                                await this.delay();
+                                this.stats.comparisons++;
+                                this.updateStats();
+                                if (this.data[j] < this.data[minIdx]) {
+                                    this.unhighlight([minIdx], 'bg-blue-500');
+                                    minIdx = j;
+                                    this.highlight([minIdx], 'bg-blue-500');
+                                }
+                                 this.unhighlight([j], 'bg-yellow-400');
+                            }
+                            if (minIdx !== i) {
+                               await this.swap(i, minIdx);
+                            }
+                            this.unhighlight([i, minIdx], 'bg-blue-500');
+                            this.highlight([i], 'bg-green-500');
+                        }
+                         this.highlight([n-1], 'bg-green-500');
+                    }
+                    
+                    async insertionSort() {
+                        let n = this.data.length;
+                        this.highlight([0], 'bg-green-500');
+                        for (let i = 1; i < n; i++) {
+                            let key = this.data[i];
+                            let j = i - 1;
+                            this.highlight([i], 'bg-blue-500');
+                            await this.delay();
+                            
+                            while (j >= 0 && this.data[j] > key) {
+                                this.stats.comparisons++;
+                                this.updateStats();
+                                this.highlight([j, j+1], 'bg-yellow-400');
+                                await this.delay();
+                                this.data[j + 1] = this.data[j];
+                                this.stats.swaps++; // A shift is like a swap in this visualization
+                                this.updateStats();
+                                this.createDataElements();
+                                // Re-highlight sorted part and current check
+                                for(let k=0; k<=j; k++) this.highlight([k], 'bg-green-500');
+                                this.highlight([j+1], 'bg-blue-500');
+                                
+                                await this.delay();
+                                this.unhighlight([j, j+1], 'bg-yellow-400');
+                                j = j - 1;
+                            }
+                            this.data[j + 1] = key;
+                            this.createDataElements();
+                            for(let k=0; k<=i; k++) this.highlight([k], 'bg-green-500');
+                            await this.delay();
+                        }
+                    }
+                }
+                 new SortingVisualizer();
+
+                 document.querySelectorAll('.sorting-algorithm-btn, .sorting-control-btn').forEach(btn => {
+                    btn.className += ' bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-full transition';
+                });
+            }
+             // --- Lógica del Trivial ---
+            if(document.getElementById('page-trivial')){
+                class TrivialGame {
+                    constructor(){
+                        this.originalQuestions = this.getQuestionBank();
+                        this.questions = {};
+                        
+                        this.categories = ['matematicas', 'ciencias', 'tecnologia', 'social', 'logica'];
+                        this.categoryColors = {matematicas: '#f97316', ciencias: '#16a34a', tecnologia: '#2563eb', social: '#ca8a04', logica: '#eab308'};
+                        this.teams = {
+                            1: { name: 'Equipo 1', quesitos: [] },
+                            2: { name: 'Equipo 2', quesitos: [] }
+                        };
+                        this.currentTeam = 1;
+
+                        this.init();
+                    }
+
+                    getQuestionBank() {
+                        return {
+                             matematicas: [
+                                { text: "Para calcular el área total de una figura compuesta por un cuadrado de 5cm de lado y un triángulo de 5cm de base y 4cm de altura, ¿qué pasos descompondrías?", options: ["Calcular área del cuadrado, calcular área del triángulo, sumarlas", "Sumar todos los lados", "Multiplicar 5x5x5x4", "Solo calcular el área del cuadrado"], correct: 0, explanation: "Descomponemos el problema en dos partes más simples: el área de cada figura por separado, y luego las sumamos." },
+                                { text: "Quieres comprar 3 lápices a 0.50€ cada uno y 2 cuadernos a 1.20€ cada uno. ¿Cómo descompones la operación para saber el total?", options: ["Sumar 3+0.50 y 2+1.20", "Multiplicar 3x2 y 0.50x1.20", "Calcular el coste de los lápices, el de los cuadernos, y sumar ambos resultados", "Sumar todos los números"], correct: 2, explanation: "Se descompone en dos problemas más pequeños: el coste de los lápices (3 * 0.50) y el de los cuadernos (2 * 1.20), para luego sumar los totales." },
+                                { text: "Un viaje en autobús dura 4 horas. Si el autobús hace una parada de 15 minutos cada hora, ¿cómo descompones el cálculo del tiempo total del viaje?", options: ["Sumar 4 + 15", "Contar las paradas, multiplicar por 15 min, y sumarlo a las 4 horas", "Multiplicar 4 x 15", "Restar 15 minutos de 4 horas"], correct: 1, explanation: "El problema se divide en: 1) Calcular el tiempo total de las paradas (hay 3 paradas en un viaje de 4h, no al final) y 2) Sumarlo al tiempo de conducción." },
+                                { text: "Para pintar una pared de 10m de largo y 3m de alto, sabiendo que un bote de pintura cubre 12m², ¿qué dos grandes pasos debes seguir?", options: ["Comprar la pintura y luego medir", "Medir el perímetro y luego dividir", "Calcular el área de la pared y luego dividirla por el rendimiento de la pintura", "Multiplicar 10x3x12"], correct: 2, explanation: "Descomponemos en: 1) Saber cuántos m² hay que pintar (área). 2) Saber cuántos botes se necesitan para esa área (división)." },
+                                { text: "Calculas la vuelta de una compra de 7.50€ si pagas con un billete de 20€. ¿Cuál es la descomposición mental más sencilla?", options: ["Restar 20 - 7.50 directamente", "Ir de 7.50 a 8.00 (0.50€), y de 8.00 a 20.00 (12€), y sumar ambos", "Sumar 20 + 7.50", "Dividir 20 / 7.50"], correct: 1, explanation: "Descomponer la resta en pasos más pequeños (llegar a la siguiente unidad y luego a la decena) es una estrategia de cálculo mental muy eficaz." },
+                                { text: "Para saber cuántos días has vivido, ¿qué información necesitas descomponer?", options: ["Solo tu año de nacimiento", "Tu fecha de nacimiento y la fecha actual", "Solo el día actual", "El número de meses del año"], correct: 1, explanation: "Necesitas descomponer el tiempo en años completos, meses completos y días del mes actual para poder sumarlos." },
+                                { text: "Un problema dice: 'El doble de un número menos 5 es 15'. ¿Cómo lo descompones para hallar el número?", options: ["Probar números al azar", "Hacer la operación inversa: sumar 5 a 15 y luego dividir entre 2", "Restar 5 a 15 y luego multiplicar por 2", "Dividir 15 entre 2"], correct: 1, explanation: "Descomponer un problema algebraico a menudo implica realizar las operaciones inversas en el orden opuesto (primero sumar, luego dividir)." },
+                                { text: "Quieres saber cuántas baldosas de 25cm x 25cm necesitas para un suelo de 2m x 3m. ¿Qué descomposición es la correcta?", options: ["Pasar todo a cm, calcular el área del suelo, el área de una baldosa, y dividir", "Multiplicar 2x3 y dividir por 25", "Sumar 2+3 y multiplicarlo por 25", "Pasar todo a metros y sumar"], correct: 0, explanation: "El problema se descompone en: 1) Unificar unidades. 2) Calcular áreas. 3) Dividir para ver cuántas veces cabe una en la otra." },
+                                { text: "Para organizar un torneo de fútbol con 8 equipos, ¿cómo descompones el calendario de partidos si todos juegan contra todos una vez?", options: ["Multiplicar 8x8", "Hacer que cada equipo juegue 7 partidos y luego ajustar", "Dibujar un fixture y contar", "Dividir 8 entre 2"], correct: 1, explanation: "Descompones el problema total en el problema de un solo equipo (juega 7 partidos), y luego ajustas para no contar los partidos dos veces." },
+                                { text: "Tienes que dividir 153 entre 3. ¿Cuál es una buena descomposición para hacerlo mentalmente?", options: ["Buscar la respuesta en la calculadora", "Descomponer 153 en 150 + 3, dividir cada parte entre 3 y sumar los resultados", "Probar a multiplicar 3 por números hasta que dé 153", "Restar 3 repetidamente"], correct: 1, explanation: "Descomponer el número en partes más fáciles de dividir (150/3=50, 3/3=1) y sumar los cocientes (50+1=51) es una técnica clave." },
+                            ],
+                            ciencias: [
+                                { text: "Para explicar el ciclo del agua, ¿en qué tres fases principales lo descompondrías?", options: ["Lluvia, sol y nubes", "Evaporación, condensación y precipitación", "Ríos, mares y lagos", "Frío, calor y viento"], correct: 1, explanation: "Descomponer un ciclo complejo en sus fases secuenciales (evaporación, condensación, precipitación) es fundamental para entenderlo." },
+                                { text: "Quieres construir un circuito eléctrico simple para encender una bombilla. ¿Qué componentes básicos (partes) necesitas?", options: ["Solo una bombilla", "Una pila, cables y una bombilla", "Un enchufe y un interruptor", "Un motor y una pila"], correct: 1, explanation: "Se descompone el sistema en sus partes esenciales: una fuente de energía (pila), un conductor (cables) y un receptor (bombilla)." },
+                                { text: "Para entender la cadena alimentaria, ¿en qué tres roles descompones a los seres vivos?", options: ["Grandes, medianos y pequeños", "Productores, consumidores y descomponedores", "Los que vuelan, nadan y corren", "Plantas, animales y humanos"], correct: 1, explanation: "Descomponer un ecosistema en los roles funcionales de sus miembros (productores, consumidores, etc.) permite analizar cómo fluye la energía." },
+                                { text: "Si quieres investigar por qué una cometa vuela, ¿en qué fuerzas que actúan sobre ella descompondrías tu estudio?", options: ["Viento y cuerda", "Sustentación, arrastre, peso y empuje del viento", "Tela, varillas y cola", "Altura y velocidad"], correct: 1, explanation: "El problema complejo del vuelo se descompone en el análisis de las cuatro fuerzas aerodinámicas fundamentales que actúan sobre la cometa." },
+                                { text: "Para explicar cómo funciona el sistema digestivo, ¿cuál es la secuencia de partes que seguirías?", options: ["Estómago, intestino, esófago", "Boca, esófago, estómago, intestinos", "Intestinos, boca, estómago", "Boca, pulmones, corazón"], correct: 1, explanation: "La mejor manera de explicarlo es descomponer el proceso en el orden en que ocurre, siguiendo el camino del alimento a través del cuerpo." },
+                                { text: "Quieres clasificar un grupo de animales. ¿Qué criterio de descomposición te permitiría crear los grupos 'vertebrados' e 'invertebrados'?", options: ["Su tamaño", "Su color", "Si tienen o no esqueleto interno", "Si viven en el agua o en la tierra"], correct: 2, explanation: "La clasificación biológica se basa en descomponer el reino animal según características estructurales clave, como la presencia de columna vertebral." },
+                                { text: "Para entender la metamorfosis de una mariposa, ¿en qué cuatro etapas la descompones?", options: ["Pequeña, mediana, grande, voladora", "Huevo, oruga, crisálida y mariposa", "Gusano, capullo, bicho, polilla", "Bebé, niño, adulto, anciano"], correct: 1, explanation: "El ciclo de vida se descompone en sus 4 fases distintas para poder estudiar los cambios que ocurren en cada una." },
+                                { text: "Al estudiar un volcán, los geólogos descomponen su estructura en tres partes principales. ¿Cuáles son?", options: ["Cima, ladera y base", "Cráter, chimenea y cámara magmática", "Roca, lava y ceniza", "Montaña, fuego y humo"], correct: 1, explanation: "Para entender cómo funciona un volcán, se descompone en sus partes funcionales clave, desde donde se almacena el magma hasta donde sale." },
+                                { text: "Para hacer un huerto escolar, ¿cuáles son los primeros pasos en los que descompondrías el proyecto?", options: ["Comprar semillas y esperar", "Plantar directamente en el suelo", "Preparar la tierra, elegir las semillas adecuadas para la temporada, y planificar el riego", "Hacer un dibujo del huerto"], correct: 2, explanation: "Un proyecto grande como un huerto se descompone en tareas secuenciales: preparación, planificación y ejecución." },
+                                { text: "Si un experimento no sale como esperabas, ¿cuál es la mejor forma de descomponer el análisis para encontrar el error (debugging)?", options: ["Repetirlo exactamente igual", "Revisar cada paso del procedimiento uno por uno", "Abandonar el experimento", "Cambiar todos los materiales a la vez"], correct: 1, explanation: "El 'debugging' científico consiste en descomponer el proceso y revisar cada variable y paso para aislar dónde se produjo el fallo." },
+                            ],
+                            tecnologia: [
+                                { text: "Tu amigo no puede conectarse a Internet. ¿Cómo descompones el problema para ayudarle?", options: ["Reiniciar el ordenador y ya", "Llamar al técnico directamente", "Verificar si el router está encendido, si el cable está conectado, y si la contraseña del WiFi es correcta", "Comprar un ordenador nuevo"], correct: 2, explanation: "El 'debugging' de problemas tecnológicos se basa en descomponer el sistema en sus partes y verificarlas secuencialmente." },
+                                { text: "Quieres crear una presentación de diapositivas sobre tu animal favorito. ¿En qué partes la descompondrías?", options: ["Buscar solo una foto muy grande", "Escribir todo el texto en la primera diapositiva", "Hacer una portada, una introducción, desarrollar el contenido en varias diapositivas y una conclusión", "Copiar y pegar de una web"], correct: 2, explanation: "Un buen proyecto se descompone en una estructura lógica (portada, desarrollo, conclusión) para que la información sea clara." },
+                                { text: "Para programar un personaje de videojuego para que salte y coja una moneda, ¿qué dos acciones básicas debes programar?", options: ["Solo el movimiento del personaje", "El salto del personaje y la desaparición de la moneda al tocarla", "El sonido de la moneda", "El color del personaje"], correct: 1, explanation: "La tarea compleja 'coger una moneda' se descompone en dos eventos más simples: el movimiento del jugador y la reacción del objeto." },
+                                { text: "Si quieres construir un robot simple que siga una línea negra, ¿qué dos componentes principales necesitas?", options: ["Solo ruedas", "Un sensor de luz para detectar la línea y motores para las ruedas", "Una cámara y un altavoz", "Un GPS"], correct: 1, explanation: "El problema se descompone en 'ver' la línea (sensor) y 'moverse' (motores). Cada parte resuelve una pequeña parte del problema total." },
+                                { text: "El ordenador va muy lento. Para averiguar por qué, un técnico descompone las posibles causas. ¿Cuál sería un primer paso lógico?", options: ["Formatear el disco duro", "Comprobar si hay muchos programas abiertos a la vez", "Cambiar el monitor", "Limpiar el teclado"], correct: 1, explanation: "Se descompone el problema revisando las causas más probables y sencillas primero, como el consumo de recursos por programas abiertos." },
+                                { text: "Quieres hacer un vídeo corto. ¿Cuál es la mejor manera de descomponer el proceso de creación?", options: ["Grabar todo de una vez y subirlo", "Escribir un guion, grabar las escenas, editarlas y añadir sonido", "Solo añadir música a fotos", "Grabar sin pensar y luego ver qué sale"], correct: 1, explanation: "La producción de un vídeo se descompone en fases claras: pre-producción (guion), producción (grabación) y post-producción (edición)." },
+                                { text: "Para crear una página web sencilla, ¿en qué tres elementos básicos la descompondrías?", options: ["Solo texto", "Solo imágenes", "Estructura (HTML), estilo (CSS) y funcionalidad (JavaScript)", "Un único archivo muy largo"], correct: 2, explanation: "El desarrollo web profesional descompone una página en sus tres capas fundamentales: contenido, presentación e interactividad." },
+                                { text: "Un 'algoritmo' es una serie de pasos para resolver un problema. Si quieres hacer un sándwich, ¿cuál es la descomposición correcta de los pasos?", options: ["Comer el sándwich", "Poner el jamón y luego coger el pan", "Coger dos rebanadas de pan, poner los ingredientes, juntar las rebanadas", "Comprar los ingredientes"], correct: 2, explanation: "Un algoritmo requiere descomponer una tarea en una secuencia ordenada y lógica de pasos." },
+                                { text: "Si tu móvil no carga, ¿en qué partes descompones el problema para encontrar el fallo?", options: ["Comprar un móvil nuevo", "Probar con otro enchufe, probar con otro cable y probar el cable en otro dispositivo", "Agitar el móvil", "Dejarlo apagado un día"], correct: 1, explanation: "Se descompone el sistema de carga en sus componentes (enchufe, cargador, cable, móvil) y se prueba cada uno para aislar el fallo." },
+                                { text: "Para diseñar una aplicación, el primer paso es descomponer lo que debe hacer en 'historias de usuario'. ¿Cuál es un ejemplo?", options: ["'La aplicación será azul'", "'Como usuario, quiero poder iniciar sesión con mi email'", "'La aplicación será la mejor'", "'Tendrá muchos botones'"], correct: 1, explanation: "La descomposición en el diseño de software se centra en dividir las grandes funcionalidades en pequeñas acciones que el usuario necesita realizar." },
+                            ],
+                            social: [
+                                { text: "Para organizar una campaña de reciclaje en el colegio, ¿en qué tareas principales descompondrías el proyecto?", options: ["Poner un solo contenedor", "Decir a la gente que recicle", "Informar a las clases, colocar contenedores específicos y organizar la recogida", "Esperar a que alguien lo haga"], correct: 2, explanation: "Un proyecto social se descompone en fases: comunicación, logística (recursos) y acción." },
+                                { text: "Quieres entender un conflicto histórico, como una guerra. ¿Cómo lo descomponen los historiadores para estudiarlo?", options: ["Decidiendo quiénes eran los buenos y los malos", "Analizando las causas, el desarrollo de los acontecimientos y las consecuencias", "Leyendo solo la fecha de inicio y fin", "Viendo una película sobre el tema"], correct: 1, explanation: "El análisis histórico descompone eventos complejos en sus partes (causas, desarrollo, consecuencias) para comprenderlos en profundidad." },
+                                { text: "Para crear una ley, ¿cuál es la descomposición del proceso en un sistema democrático?", options: ["El presidente la decide y se aplica", "Se vota directamente por todos los ciudadanos", "Se propone, se debate en el parlamento, se vota y se publica", "Se escribe en un libro y ya está"], correct: 2, explanation: "El proceso legislativo se descompone en una serie de pasos formales que garantizan el debate y el consenso." },
+                                { text: "Si quieres planificar un viaje de fin de curso, ¿qué tres grandes áreas debes descomponer?", options: ["Solo el hotel", "Destino, transporte y alojamiento", "Comprar recuerdos", "Hacer la maleta"], correct: 1, explanation: "La planificación de un viaje se descompone en las decisiones clave que hay que tomar: dónde ir, cómo llegar y dónde dormir." },
+                                { text: "Para entender cómo funciona el ayuntamiento de tu ciudad, ¿en qué roles principales lo descompondrías?", options: ["El edificio y los coches", "El alcalde, los concejales y los funcionarios", "Los habitantes de la ciudad", "Los partidos políticos"], correct: 1, explanation: "Una institución se comprende mejor descomponiéndola en los roles y funciones de las personas que la forman." },
+                                { text: "Quieres organizar una limpieza del patio del recreo. ¿Cuál es la mejor forma de descomponer el trabajo entre los voluntarios?", options: ["Que todos hagan lo mismo a la vez", "Dividir el patio en zonas y asignar un equipo a cada zona", "Empezar todos por el mismo sitio", "Dejar que cada uno haga lo que quiera"], correct: 1, explanation: "La estrategia 'divide y vencerás' consiste en descomponer una tarea grande en partes más pequeñas y paralelas para ser más eficientes." },
+                                { text: "Para analizar una noticia y saber si es fiable, ¿qué pasos de descomposición seguirías?", options: ["Creerla si te gusta lo que dice", "Leer solo el titular", "Comprobar la fuente, buscar la misma noticia en otros medios y verificar la fecha", "Compartirla inmediatamente"], correct: 2, explanation: "El pensamiento crítico implica descomponer una noticia en sus elementos (fuente, contenido, fecha) para analizarlos por separado." },
+                                { text: "El objetivo es mejorar la convivencia en clase. ¿Cómo descompondrías este gran objetivo en acciones concretas?", options: ["Poner un cartel que diga 'Sed buenos'", "Establecer normas de respeto, crear un sistema de mediación y organizar actividades en equipo", "Castigar a quien se porte mal", "No hacer nada"], correct: 1, explanation: "Un objetivo abstracto como 'mejorar la convivencia' se debe descomponer en acciones medibles y concretas." },
+                                { text: "Para estudiar la geografía de una región como Castilla-La Mancha, ¿en qué elementos la descomponen los geógrafos?", options: ["Solo sus ciudades", "Relieve, ríos, clima y población", "Sus monumentos", "Sus carreteras"], correct: 1, explanation: "El estudio geográfico descompone un territorio en sus diferentes capas físicas y humanas para entender su conjunto." },
+                                { text: "Quieres proponer una nueva norma para el recreo. ¿Cuál es la descomposición del proceso para que sea democrático?", options: ["Imponer tu idea a los demás", "Escribir la idea, presentarla a la clase, debatirla y votarla", "Decírselo solo al profesor", "Guardarte la idea para ti"], correct: 1, explanation: "Un proceso democrático se descompone en fases que incluyen la propuesta, el diálogo y la toma de decisiones colectiva." },
+                            ],
+                             logica: [
+                                { text: "Para resolver un Sudoku, ¿cuál es la mejor estrategia de descomposición?", options: ["Rellenar números al azar", "Empezar por el número 1 y ponerlo en todas partes", "Buscar la casilla, fila o columna que tenga más números ya puestos para deducir los que faltan", "Dejarlo en blanco"], correct: 2, explanation: "Se descompone el gran problema del tablero entero en resolver el subproblema más sencillo que se pueda encontrar en cada momento." },
+                                { text: "Estás en un laberinto. ¿Qué algoritmo (serie de pasos) simple puedes seguir para asegurarte de encontrar la salida?", options: ["Correr en círculos", "Mantener siempre una mano en contacto con una de las paredes (la derecha o la izquierda)", "Ir siempre en línea recta", "Volver al principio cada vez que te chocas"], correct: 1, explanation: "Este es un algoritmo clásico que descompone el problema de 'explorar todo' en una regla simple y repetitiva." },
+                                { text: "Tienes 8 bolas de billar y una de ellas pesa un poco más. Usando una balanza de dos platos, ¿cómo descompones el problema para encontrarla en solo 2 pesadas?", options: ["Pesando una contra una hasta encontrarla", "Pesar 3 bolas contra otras 3. Si se equilibra, la pesada está en las 2 restantes. Si no, está en el grupo que más pesa.", "Adivinar cuál es", "Pesarlas todas juntas"], correct: 1, explanation: "Se descompone el grupo grande en grupos más pequeños para descartar posibilidades de forma mucho más rápida y eficiente." },
+                                { text: "Para montar un puzzle de 1000 piezas, ¿cuál es la estrategia de descomposición más efectiva?", options: ["Empezar por el centro", "Separar primero todas las piezas de los bordes y montar el marco", "Probar a juntar piezas al azar", "Mirar la caja y copiarlo"], correct: 1, explanation: "Se descompone el problema en dos partes más sencillas: primero el marco (piezas fáciles de identificar) y luego el interior." },
+                                { text: "Tienes que adivinar un número del 1 al 100. ¿Qué pregunta descompone el problema por la mitad en cada paso?", options: ["'¿Es el 50?'", "'¿Es mayor o menor que 50?'", "'¿Es un número par?'", "'¿Acaba en 0?'"], correct: 1, explanation: "Esta estrategia (búsqueda binaria) descompone el rango de posibilidades a la mitad con cada pregunta, siendo la forma más rápida de encontrar la solución." },
+                                { text: "El reto es dibujar una casa compleja. ¿Cuál es el primer paso para descomponer la tarea?", options: ["Empezar por los detalles como las flores de las ventanas", "Dibujar las formas geométricas básicas que la componen (un cuadrado para el cuerpo, un triángulo para el tejado...)", "Colorearla directamente", "Dibujar el humo de la chimenea"], correct: 1, explanation: "El dibujo artístico a menudo empieza por descomponer el objeto complejo en sus formas geométricas simples." },
+                                { text: "Tienes que memorizar un número de teléfono largo (ej: 612 345 678). ¿Cómo lo descompones para que sea más fácil?", options: ["Intentar recordarlo todo de golpe", "Agrupar los números en bloques más pequeños (612 - 345 - 678)", "Escribirlo 100 veces", "Cantarlo muy rápido"], correct: 1, explanation: "La técnica de 'chunking' consiste en descomponer una larga cadena de información en trozos más pequeños y manejables para la memoria." },
+                                { text: "Para escribir una redacción sobre 'Mis vacaciones', ¿cuál es la mejor descomposición de la estructura?", options: ["Escribir sin parar lo primero que se te ocurra", "Hacer un esquema: introducción (dónde fuiste), desarrollo (qué hiciste cada día) y conclusión (qué te pareció)", "Poner solo una lista de lugares", "Buscar una redacción en internet y copiarla"], correct: 1, explanation: "Antes de escribir, se debe descomponer el tema en una estructura lógica para organizar las ideas." },
+                                { text: "Quieres encontrar la palabra 'VIBE' en una sopa de letras. ¿Qué estrategia de descomposición es más sistemática?", options: ["Mirar la sopa de letras al azar hasta que aparezca", "Buscar solo la letra 'V', y cada vez que encuentres una, revisar las letras de su alrededor", "Leer todas las letras de izquierda a derecha", "Buscar primero la 'E'"], correct: 1, explanation: "Se descompone el problema de 'encontrar la palabra' en 'encontrar la primera letra' y luego 'verificar el resto', lo que es mucho más eficiente." },
+                                { text: "Resuelve el acertijo: 'Siempre estoy entre dos, pero nunca soy tres. Si me juntas, siempre soy uno'. ¿Cómo lo descompones?", options: ["Pensar en números", "Analizar cada frase por separado: 'entre dos', 'no soy tres', 'si me juntas soy uno'", "Buscar la respuesta en internet", "Preguntar a un amigo"], correct: 1, explanation: "Los acertijos se resuelven descomponiendo las pistas y analizándolas una por una. La respuesta es la letra 'Y' (está entre D-O-S, no en T-R-E-S, y en 'Y-O' forma uno)." },
+                            ],
+                        };
+                    }
+
+                    init(){
+                        this.bindEvents();
+                        this.resetGame();
+                    }
+                    
+                    createRoulette() {
+                        const roulette = document.getElementById('trivial-roulette');
+                        roulette.innerHTML = '';
+                        const angle = 360 / this.categories.length;
+                        // A better approach for sectors
+                        let gradient = 'conic-gradient(';
+                        this.categories.forEach((cat, i) => {
+                           gradient += `${this.categoryColors[cat]} ${i * angle}deg, ${this.categoryColors[cat]} ${(i + 1) * angle}deg${i === this.categories.length - 1 ? '' : ','}`;
+                        });
+                        gradient += ')';
+                        roulette.style.background = gradient;
+                    }
+
+                    bindEvents(){
+                        document.getElementById('trivial-spin-btn').addEventListener('click', () => this.spinRoulette());
+                        document.getElementById('trivial-play-again-btn').addEventListener('click', () => this.resetGame());
+                        document.getElementById('trivial-restart-btn').addEventListener('click', () => this.resetGame());
+                    }
+                    
+                    spinRoulette(){
+                        document.getElementById('trivial-spin-btn').disabled = true;
+                        const roulette = document.getElementById('trivial-roulette');
+                        const randomAngle = Math.floor(Math.random() * 360) + 360 * 5; // Spin at least 5 times
+                        
+                        roulette.style.transform = `rotate(${randomAngle}deg)`;
+                        
+                        setTimeout(() => {
+                            const finalAngle = randomAngle % 360;
+                            const sectorAngle = 360 / this.categories.length;
+                            const categoryIndex = Math.floor((360 - finalAngle + (sectorAngle/2)) / sectorAngle) % this.categories.length;
+                            const category = this.categories[categoryIndex];
+                            this.askQuestion(category);
+                        }, 4100); // Wait for animation to finish
+                    }
+
+                    askQuestion(category) {
+                        document.getElementById('trivial-welcome-message').classList.add('hidden');
+                        const questionArea = document.getElementById('trivial-question-area');
+                        questionArea.classList.remove('hidden');
+
+                        const questionBank = this.questions[category];
+                        if (questionBank.length === 0) {
+                            alert(`No quedan preguntas de ${category}. ¡Turno perdido!`);
+                            this.switchTurn();
+                            return;
+                        }
+                        
+                        const questionIndex = Math.floor(Math.random() * questionBank.length);
+                        const questionData = questionBank[questionIndex];
+                        this.currentQuestionData = { ...questionData, category, index: questionIndex };
+
+                        document.getElementById('trivial-category-title').textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                        document.getElementById('trivial-category-title').style.color = this.categoryColors[category];
+                        document.getElementById('trivial-question-text').textContent = questionData.text;
+
+                        const optionsContainer = document.getElementById('trivial-answer-options');
+                        optionsContainer.innerHTML = '';
+                        questionData.options.forEach((opt, index) => {
+                            const btn = document.createElement('button');
+                            btn.className = 'trivial-answer-btn p-3 bg-orange-100 border-2 border-amber-600 rounded-lg text-left hover:bg-amber-200';
+                            btn.textContent = opt;
+                            btn.onclick = () => this.checkAnswer(index === questionData.correct, questionData.explanation, btn);
+                            optionsContainer.appendChild(btn);
+                        });
+                    }
+
+                    checkAnswer(isCorrect, explanation, btn) {
+                        document.querySelectorAll('.trivial-answer-btn').forEach(b => b.disabled = true);
+                        const feedbackArea = document.getElementById('trivial-feedback-area');
+                        
+                        if (isCorrect) {
+                            btn.classList.add('bg-green-300');
+                            feedbackArea.innerHTML = `<strong>¡Correcto!</strong> ${explanation}`;
+                            const category = this.currentQuestionData.category;
+                            
+                            if (!this.teams[this.currentTeam].quesitos.includes(category)) {
+                                this.teams[this.currentTeam].quesitos.push(category);
+                                this.updateTeamsDisplay();
+                                setTimeout(() => alert(`¡El ${this.teams[this.currentTeam].name} ha ganado el quesito de ${category}!`), 100);
+                            }
+                            
+                            // Remove question from bank
+                             this.questions[category].splice(this.currentQuestionData.index, 1);
+                             
+                             if (this.teams[this.currentTeam].quesitos.length === this.categories.length) {
+                                this.winGame();
+                                return;
+                            }
+                        } else {
+                            btn.classList.add('bg-red-300');
+                            feedbackArea.innerHTML = `<strong>Incorrecto.</strong> ${explanation}`;
+                        }
+                        
+                        feedbackArea.classList.remove('hidden');
+                        const continueBtn = document.getElementById('trivial-continue-btn');
+                        continueBtn.classList.remove('hidden');
+                        continueBtn.onclick = () => {
+                            if (!isCorrect) this.switchTurn();
+                            this.endTurn();
+                        };
+                    }
+                    
+                    switchTurn(){
+                        this.currentTeam = this.currentTeam === 1 ? 2 : 1;
+                        this.updateTeamsDisplay();
+                    }
+                    
+                    endTurn() {
+                        document.getElementById('trivial-question-area').classList.add('hidden');
+                        document.getElementById('trivial-feedback-area').classList.add('hidden');
+                        document.getElementById('trivial-continue-btn').classList.add('hidden');
+                        
+                        const welcomeMessage = document.getElementById('trivial-welcome-message');
+                        welcomeMessage.classList.remove('hidden');
+                        welcomeMessage.querySelector('#trivial-current-turn').textContent = this.teams[this.currentTeam].name;
+                        
+                        document.getElementById('trivial-spin-btn').disabled = false;
+                    }
+                    
+                    updateTeamsDisplay() {
+                        for(let i = 1; i <= 2; i++){
+                            const teamDiv = document.getElementById(`trivial-team-${i}`);
+                            teamDiv.classList.remove('border-amber-700', 'bg-amber-100');
+                             if(this.currentTeam === i) {
+                                teamDiv.classList.add('border-amber-700', 'bg-amber-100');
+                            }
+                            
+                            const quesitosContainer = teamDiv.querySelector('div:last-child');
+                            quesitosContainer.innerHTML = '';
+                            this.categories.forEach(cat => {
+                                const quesito = document.createElement('div');
+                                quesito.className = 'w-4 h-4 rounded-full border border-gray-400';
+                                if (this.teams[i].quesitos.includes(cat)) {
+                                    quesito.style.backgroundColor = this.categoryColors[cat];
+                                } else {
+                                    quesito.classList.add('bg-gray-200');
+                                }
+                                quesitosContainer.appendChild(quesito);
+                            });
+                        }
+                    }
+                    
+                    winGame() {
+                        document.getElementById('trivial-winner-text').textContent = `¡El ${this.teams[this.currentTeam].name} ha ganado la partida!`;
+                        document.getElementById('trivial-win-modal').classList.remove('hidden');
+                    }
+
+                    resetGame() {
+                        this.questions = JSON.parse(JSON.stringify(this.originalQuestions));
+                        this.teams = { 1: { name: 'Equipo 1', quesitos: [] }, 2: { name: 'Equipo 2', quesitos: [] }};
+                        this.currentTeam = 1;
+                        
+                        this.createRoulette();
+                        this.updateTeamsDisplay();
+                        
+                        document.getElementById('trivial-win-modal').classList.add('hidden');
+                        this.endTurn();
+                    }
+                }
+                new TrivialGame();
+
+                 document.querySelectorAll('.trivial-team-card').forEach(btn => {
+                    btn.className = 'trivial-team-card p-4 bg-orange-100 rounded-lg cursor-pointer border-2 border-transparent hover:border-amber-700 text-center';
+                });
+                document.querySelectorAll('.trivial-category-btn, .trivial-control-btn').forEach(btn => {
+                    btn.className += ' bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg transition';
+                });
+            }
+
+            // --- Lógica del Simulador de Redes ---
+            if(document.getElementById('page-redes')){
+                 class NetworkSimulator {
+                    constructor() {
+                        this.canvas = document.getElementById('network-canvas');
+                        this.nodes = [];
+                        this.connections = [];
+                        this.selectedNodes = [];
+                        this.nextNodeId = 1;
+                        this.init();
+                    }
+
+                    init() {
+                        this.bindEvents();
+                        this.log('Simulador de red inicializado.');
+                    }
+
+                    bindEvents() {
+                        document.querySelectorAll('.network-device-item').forEach(item => {
+                            item.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', e.currentTarget.dataset.type));
+                        });
+                        this.canvas.addEventListener('dragover', e => e.preventDefault());
+                        this.canvas.addEventListener('drop', e => {
+                            e.preventDefault();
+                            const type = e.dataTransfer.getData('text/plain');
+                            const rect = this.canvas.getBoundingClientRect();
+                            const x = e.clientX - rect.left - 30;
+                            const y = e.clientY - rect.top - 30;
+                            this.addNode(type, x, y);
+                        });
+                        this.canvas.addEventListener('click', e => {
+                            if (e.target.closest('.network-node')) {
+                                this.selectNode(parseInt(e.target.closest('.network-node').dataset.nodeId));
+                            }
+                        });
+                        document.getElementById('network-sendDataBtn').addEventListener('click', () => this.simulateDataTransmission());
+                        document.getElementById('network-analyzePathBtn').addEventListener('click', () => this.analyzePath());
+                        document.getElementById('network-clearNetworkBtn').addEventListener('click', () => this.clearNetwork());
+                    }
+
+                    addNode(type, x, y) {
+                        const node = { id: this.nextNodeId++, type, x, y, name: `${type.charAt(0).toUpperCase() + type.slice(1)} ${this.nextNodeId - 1}` };
+                        this.nodes.push(node);
+                        this.render();
+                        this.log(`Añadido ${node.name}.`);
+                    }
+
+                    selectNode(nodeId) {
+                        const nodeElement = document.querySelector(`.network-node[data-node-id='${nodeId}']`);
+                        if (this.selectedNodes.includes(nodeId)) {
+                             this.selectedNodes = this.selectedNodes.filter(id => id !== nodeId);
+                             nodeElement.classList.remove('border-red-500', 'shadow-lg');
+                        } else {
+                             this.selectedNodes.push(nodeId);
+                             nodeElement.classList.add('border-red-500', 'shadow-lg');
+                        }
+
+                        if (this.selectedNodes.length === 2) {
+                            this.addConnection(this.selectedNodes[0], this.selectedNodes[1]);
+                            this.selectedNodes = [];
+                            document.querySelectorAll('.network-node').forEach(el => el.classList.remove('border-red-500', 'shadow-lg'));
+                        }
+                    }
+                    
+                    addConnection(nodeId1, nodeId2) {
+                        if (!this.connections.some(c => (c.from === nodeId1 && c.to === nodeId2) || (c.from === nodeId2 && c.to === nodeId1))) {
+                            this.connections.push({ from: nodeId1, to: nodeId2, latency: Math.floor(Math.random() * 50) + 10 });
+                            this.render();
+                            this.log(`Conexión creada entre Nodo ${nodeId1} y Nodo ${nodeId2}.`);
+                        }
+                    }
+
+                    async simulateDataTransmission() {
+                        if (this.selectedNodes.length !== 2) {
+                            alert('Por favor, selecciona exactamente dos nodos (origen y destino) para enviar datos.');
+                            return;
+                        }
+                        const [startId, endId] = this.selectedNodes;
+                        const path = this.findShortestPath(startId, endId);
+
+                        if (!path) {
+                            this.log(`No se encontró ruta entre Nodo ${startId} y Nodo ${endId}.`, 'error');
+                            return;
+                        }
+
+                        this.log(`Enviando paquete de ${startId} a ${endId}...`);
+                        let totalLatency = 0;
+
+                        for (let i = 0; i < path.length - 1; i++) {
+                            const fromNode = document.querySelector(`.network-node[data-node-id='${path[i]}']`);
+                            const toNode = document.querySelector(`.network-node[data-node-id='${path[i+1]}']`);
+                            const connEl = document.querySelector(`.network-connection[data-from='${path[i]}'][data-to='${path[i+1]}']`) || document.querySelector(`.network-connection[data-from='${path[i+1]}'][data-to='${path[i]}']`);
+                            const connData = this.connections.find(c => (c.from === path[i] && c.to === path[i+1]) || (c.from === path[i+1] && c.to === path[i]));
+
+                            fromNode.classList.add('bg-yellow-300');
+                            if(connEl) connEl.classList.add('bg-yellow-400');
+
+                            await new Promise(res => setTimeout(res, connData.latency * 5));
+                            totalLatency += connData.latency;
+
+                            fromNode.classList.remove('bg-yellow-300');
+                             if(connEl) connEl.classList.remove('bg-yellow-400');
+                             toNode.classList.add('bg-green-300');
+                             await new Promise(res => setTimeout(res, 100));
+                             toNode.classList.remove('bg-green-300');
+                        }
+
+                        this.log(`Paquete recibido en ${endId}. Latencia total: ${totalLatency}ms.`, 'success');
+                        document.getElementById('network-latencyValue').textContent = `${totalLatency}ms`;
+                        document.getElementById('network-packetsValue').textContent = parseInt(document.getElementById('network-packetsValue').textContent) + 1;
+                        this.clearSelection();
+                    }
+                    
+                     analyzePath() {
+                        if (this.selectedNodes.length !== 2) {
+                            alert("Selecciona dos nodos para analizar la ruta.");
+                            return;
+                        }
+                        const [startId, endId] = this.selectedNodes;
+                        const path = this.findShortestPath(startId, endId);
+                        if(path){
+                             let totalLatency = 0;
+                             for (let i = 0; i < path.length - 1; i++) {
+                                 const conn = this.connections.find(c => (c.from === path[i] && c.to === path[i + 1]) || (c.from === path[i + 1] && c.to === path[i]));
+                                 if (conn) totalLatency += conn.latency;
+                             }
+                             this.log(`Ruta más corta: ${path.join(' -> ')}. Latencia: ${totalLatency}ms.`, 'info');
+                        } else {
+                             this.log(`No hay ruta entre Nodo ${startId} y Nodo ${endId}.`, 'error');
+                        }
+                         this.clearSelection();
+                    }
+
+                    findShortestPath(startId, endId) {
+                        let queue = [[startId]];
+                        let visited = new Set([startId]);
+
+                        while (queue.length > 0) {
+                            let path = queue.shift();
+                            let lastNodeId = path[path.length - 1];
+
+                            if (lastNodeId === endId) return path;
+
+                            let neighbors = this.connections.filter(c => c.from === lastNodeId || c.to === lastNodeId)
+                                .map(c => c.from === lastNodeId ? c.to : c.from);
+
+                            for (let neighbor of neighbors) {
+                                if (!visited.has(neighbor)) {
+                                    visited.add(neighbor);
+                                    let newPath = [...path, neighbor];
+                                    queue.push(newPath);
+                                }
+                            }
+                        }
+                        return null; // No path found
+                    }
+
+                    clearNetwork() {
+                        this.nodes = [];
+                        this.connections = [];
+                        this.nextNodeId = 1;
+                        this.render();
+                        this.log('Red limpiada.');
+                    }
+                     clearSelection(){
+                         this.selectedNodes = [];
+                         document.querySelectorAll('.network-node').forEach(el => el.classList.remove('border-red-500', 'shadow-lg'));
+                    }
+
+                    render() {
+                        const canvas = document.getElementById('network-canvas');
+                        canvas.innerHTML = '';
+                        this.connections.forEach(conn => {
+                            const fromNode = this.nodes.find(n => n.id === conn.from);
+                            const toNode = this.nodes.find(n => n.id === conn.to);
+                            if(!fromNode || !toNode) return;
+
+                            const line = document.createElement('div');
+                            const fromX = fromNode.x + 30, fromY = fromNode.y + 30;
+                            const toX = toNode.x + 30, toY = toNode.y + 30;
+                            const length = Math.hypot(toX - fromX, toY - fromY);
+                            const angle = Math.atan2(toY - fromY, toX - fromX) * 180 / Math.PI;
+
+                            line.className = 'network-connection absolute h-1 bg-amber-600 origin-left';
+                            line.dataset.from = conn.from;
+                            line.dataset.to = conn.to;
+                            line.style.width = `${length}px`;
+                            line.style.left = `${fromX}px`;
+                            line.style.top = `${fromY}px`;
+                            line.style.transform = `rotate(${angle}deg)`;
+                            canvas.appendChild(line);
+                        });
+                        this.nodes.forEach(node => {
+                            const nodeEl = document.createElement('div');
+                            nodeEl.className = 'network-node absolute w-16 h-16 bg-orange-100 border-4 border-amber-700 rounded-lg flex flex-col items-center justify-center cursor-pointer text-xs';
+                            nodeEl.dataset.nodeId = node.id;
+                            nodeEl.style.left = `${node.x}px`;
+                            nodeEl.style.top = `${node.y}px`;
+                            const icons = { computer: '💻', server: '🖥️', router: '📡', switch: '🔌' };
+                            nodeEl.innerHTML = `<div class="text-2xl">${icons[node.type]}</div><div>${node.name}</div>`;
+                            canvas.appendChild(nodeEl);
+                        });
+                    }
+
+                    log(message, type = 'info') {
+                        const logEl = document.getElementById('network-transmissionLog');
+                        const entry = document.createElement('div');
+                        const colors = { info: 'text-gray-300', success: 'text-green-400', error: 'text-red-400' };
+                        entry.className = colors[type];
+                        entry.textContent = `> ${message}`;
+                        logEl.appendChild(entry);
+                        logEl.scrollTop = logEl.scrollHeight;
+                    }
+                }
+                 new NetworkSimulator();
+
+                document.querySelectorAll('.network-device-item').forEach(btn => {
+                    btn.className = 'network-device-item p-2 bg-amber-200 border-2 border-amber-600 rounded-lg text-center cursor-grab text-xs text-amber-900 font-semibold';
+                });
+                 document.querySelectorAll('.network-control-btn').forEach(btn => {
+                    btn.className += ' bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-3 rounded-lg transition text-sm';
+                });
+            }
+
+        });
+    </script>
+</body>
+</html>
+
