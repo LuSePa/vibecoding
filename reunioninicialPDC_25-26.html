@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misterios Escuela 4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Special+Elite&display=swap" rel="stylesheet">
+    <style>
+        /* Paleta de colores inspirada en Genially y temática de misterio */
+        :root {
+            --background: #fdf8e6; /* Pergamino claro */
+            --text-color: #3a3226; /* Marrón oscuro */
+            --header-bg: #2d2d2d; /* Gris muy oscuro casi negro */
+            --tab-bg: #c7a77b; /* Oro viejo */
+            --tab-active-bg: #ab8a5f; /* Oro viejo más oscuro */
+            --card-bg: #f9f2dd; /* Pergamino un poco más oscuro que el fondo */
+            --shadow-color: rgba(0, 0, 0, 0.7);
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-color);
+            font-family: 'Special Elite', monospace;
+            font-size: 18px; /* Aumentar el tamaño de fuente base */
+            line-height: 1.6; /* Mejorar la legibilidad */
+        }
+
+        .font-title {
+            font-family: 'Special Elite', monospace;
+        }
+        
+        /* Estilo para el título */
+        .main-title {
+            font-family: 'Special Elite', monospace;
+            text-transform: uppercase;
+            text-shadow: none; /* Asegura que no haya sombra */
+            -webkit-text-stroke: 1.5px var(--text-color); /* Borde oscuro en las letras */
+            paint-order: stroke fill;
+        }
+
+        /* Estilo para las pestañas */
+        .tab-button {
+            background-color: var(--tab-bg);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            flex-shrink: 0; /* Evita que los botones se encojan */
+        }
+        .tab-button.active, .tab-button:hover {
+            background-color: var(--tab-active-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Estilo de las cartas */
+        .mystery-card {
+            background-color: var(--card-bg);
+            border: 2px solid var(--tab-bg);
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease-in-out;
+        }
+        .mystery-card:hover {
+            transform: rotate(2deg) scale(1.05);
+            box-shadow: 8px 8px 20px rgba(0,0,0,0.3);
+        }
+        
+        /* Contenedor del reto César */
+        .caesar-challenge-container {
+            background-color: var(--card-bg);
+            border: 2px dashed var(--text-color);
+            padding: 2rem;
+        }
+        .caesar-input {
+            border: 2px solid var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
+            text-transform: uppercase;
+        }
+
+        /* Estilos para los desplegables (accordion) */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+        
+        /* Ocultar pestañas por defecto */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Estilo para botones de acción */
+        .action-button {
+            background-color: var(--tab-bg);
+            transition: background-color 0.3s ease;
+        }
+        .action-button:hover {
+            background-color: var(--tab-active-bg);
+        }
+
+        /* Ocultar la barra de desplazamiento de las pestañas */
+        .tabs-container {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .tabs-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, and Opera */
+        }
+
+        /* Estilos para el Banco de Ideas */
+        .banco-ideas-controls select, .banco-ideas-controls input {
+            border: 2px solid var(--tab-active-bg);
+            background-color: var(--background);
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+        }
+        .banco-ideas-table {
+            background-color: var(--card-bg);
+        }
+        .banco-ideas-table th {
+            background-color: var(--tab-bg);
+            color: white;
+            padding: 0.75rem;
+        }
+        .banco-ideas-table td {
+            border-bottom: 1px solid var(--tab-bg);
+            padding: 0.75rem;
+        }
+
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <header class="relative sticky top-0 z-50 text-white text-center" style="background-color: var(--header-bg);">
+        <!-- La imagen define ahora la altura de la cabecera, asegurando que se vea completa -->
+        <img src="https://i.postimg.cc/gjycnBqp/Imagen1.png" alt="Cabecera Misterios" class="w-full h-auto opacity-30 block">
+        
+        <!-- El título se superpone a la imagen -->
+        <div class="absolute inset-0 flex items-center justify-center z-10">
+            <h1 class="font-title text-4xl md:text-6xl lg:text-7xl main-title px-4">Misterios Escuela 4.0</h1>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        <!-- Navegación por pestañas con flechas -->
+        <div class="relative flex items-center">
+            <button id="scroll-left-btn" class="absolute left-0 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full shadow-md hidden" style="background-color: var(--tab-active-bg); color: white;">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <nav id="tabs-container" class="tabs-container flex items-center gap-2 md:gap-4 overflow-x-auto" style="scroll-behavior: smooth;">
+                <button class="tab-button active text-white font-bold py-2 px-4 rounded-lg" data-tab="orden">Orden del Día</button>
+                <button class="tab-button text-white font-bold py-2 px-4 rounded-lg" data-tab="plan-digital">Plan Digital</button>
+                <button class="tab-button text-white font-bold py-2 px-4 rounded-lg" data-tab="certificado">Certificado Digital</button>
+                <button class="tab-button text-white font-bold py-2 px-4 rounded-lg" data-tab="formacion-cdd">Formación CDD</button>
+                <button class="tab-button text-white font-bold py-2 px-4 rounded-lg" data-tab="modalidades-formativas">Modalidades Formativas</button>
+                <button class="tab-button text-white font-bold py-2 px-4 rounded-lg" data-tab="innovarretos">¿?</button>
+                <button class="tab-button text-white font-bold py-2 px-4 rounded-lg" data-tab="contacto">Contacto</button>
+            </nav>
+            <button id="scroll-right-btn" class="absolute right-0 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full shadow-md hidden" style="background-color: var(--tab-active-bg); color: white;">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            </button>
+        </div>
+
+        <!-- Contenido de las Pestañas -->
+        <div id="tab-content-container" class="bg-white p-6 rounded-lg shadow-xl mt-8" style="background-color: var(--card-bg); border: 1px solid var(--tab-bg);">
+            
+            <!-- Orden del Día -->
+            <div id="orden" class="tab-content active">
+                <h2 class="font-title text-3xl mb-6 text-center">Orden del Día</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="mystery-card p-6 rounded-lg text-center cursor-pointer" onclick="showTab('plan-digital')">
+                        <h3 class="font-title text-2xl mb-2">Pista 1: El Plan Secreto</h3>
+                        <p>Descubre los detalles del Plan Digital de Centro 25-26.</p>
+                    </div>
+                    <div class="mystery-card p-6 rounded-lg text-center cursor-pointer" onclick="showTab('certificado')">
+                        <h3 class="font-title text-2xl mb-2">Pista 2: La Identidad Oculta</h3>
+                        <p>Aprende a obtener el Certificado Digital Docente.</p>
+                    </div>
+                    <div class="mystery-card p-6 rounded-lg text-center cursor-pointer" onclick="showTab('formacion-cdd')">
+                        <h3 class="font-title text-2xl mb-2">Pista 3: La Competencia Clave</h3>
+                        <p>Investiga la Formación en Competencia Digital Docente.</p>
+                    </div>
+                    <div class="mystery-card p-6 rounded-lg text-center cursor-pointer" onclick="showTab('modalidades-formativas')">
+                        <h3 class="font-title text-2xl mb-2">Pista 4: El Legado 4.0</h3>
+                        <p>Explora las modalidades formativas y los itinerarios de Escuela 4.0.</p>
+                    </div>
+                    <div class="mystery-card p-6 rounded-lg text-center cursor-pointer" onclick="showTab('innovarretos')">
+                        <h3 class="font-title text-2xl mb-2">Pista 5: El Reto Final</h3>
+                        <p>Descifra el enigma para acceder a la resolución del misterio.</p>
+                    </div>
+                    <div class="mystery-card p-6 rounded-lg text-center cursor-pointer" onclick="showTab('contacto')">
+                        <h3 class="font-title text-2xl mb-2">Pista 6: Los Informantes</h3>
+                        <p>Contacta con tus enlaces DTDR para resolver cualquier duda.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Plan Digital de Centro -->
+            <div id="plan-digital" class="tab-content">
+                <h2 class="font-title text-3xl mb-6">Pista 1: El Plan Secreto</h2>
+                <p class="mb-6">Antes de desvelar los documentos clasificados, vamos a poner a prueba vuestra memoria de detectives. Repasaremos juntos los pasos cruciales para la elaboración del Plan Digital de Centro. ¡Prestad atención a cada detalle!</p>
+                
+                <div class="space-y-4">
+                    <!-- Desplegable para Dinámica de Grupo -->
+                    <div class="border rounded-lg" style="border-color: var(--tab-bg);">
+                        <button class="accordion-header w-full text-left p-4 font-bold flex justify-between items-center" style="background-color: var(--card-bg);">
+                            <span>Dinámica de Grupo: ¡Manos a la obra, detectives!</span>
+                            <span class="transform transition-transform">&#9660;</span>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-4 border-t" style="border-color: var(--tab-bg);">
+                                <p class="mb-4">Organizaos en equipos. Vuestra misión es reconstruir el proceso de creación del Plan Digital, conectando las pistas y estableciendo el orden correcto de actuación. ¡El primer equipo en resolverlo ganará el reconocimiento del claustro!</p>
+                                <div class="relative">
+                                    <img src="https://i.postimg.cc/j2DvkZrw/Investigadores-del-misterio.png" alt="Grupo de docentes investigadores" class="rounded-lg shadow-lg w-full h-auto">
+                                    <div id="timer-overlay" class="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center rounded-lg">
+                                        <div id="timer-display" class="font-title text-6xl text-white" style="text-shadow: 2px 2px 4px #000;">03:00</div>
+                                        <button id="start-timer-btn" class="mt-4 text-white font-bold py-2 px-6 rounded transition-colors action-button">Comenzar Misión</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Desplegable para Documento Guía -->
+                    <div class="border rounded-lg" style="border-color: var(--tab-bg);">
+                        <button class="accordion-header w-full text-left p-4 font-bold flex justify-between items-center" style="background-color: var(--card-bg);">
+                            <span>Documento Guía</span>
+                            <span class="transform transition-transform">&#9660;</span>
+                        </button>
+                        <div class="accordion-content">
+                             <div class="p-4 border-t" style="border-color: var(--tab-bg);">
+                                <p class="mb-6">Una vez repasados el proceso, aquí tenéis la guía completa con toda la información necesaria para vuestra misión.</p>
+                                <div class="border-4 mb-8" style="border-color: var(--tab-bg); position: relative; padding-top: 70.7%; /* Proporción A4 apaisado para el visor */">
+                                     <iframe
+                                        loading="lazy"
+                                        class="absolute top-0 left-0 w-full h-full"
+                                        src="https://www.canva.com/design/DAG1GZRFTqU/RmaJP8y-q7XA6UW_PzbDOA/view?embed"
+                                        allowfullscreen>
+                                    </iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Desplegable para Banco de Ideas -->
+                    <div class="border rounded-lg" style="border-color: var(--tab-bg);">
+                        <button class="accordion-header w-full text-left p-4 font-bold flex justify-between items-center" style="background-color: var(--card-bg);">
+                            <span>Banco Interactivo de Ideas para el Plan Digital</span>
+                            <span class="transform transition-transform">&#9660;</span>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-4 border-t" style="border-color: var(--tab-bg);">
+                                <p class="mb-4">Para ayudaros en vuestra tarea, hemos recopilado un extenso listado de ejemplos y líneas de actuación. Utilizad esta herramienta como inspiración para definir vuestros propios objetivos. Podéis filtrar por ámbito, nivel o buscar por palabra clave.</p>
+                                <div class="banco-ideas-controls flex flex-wrap gap-4 items-center mb-4">
+                                    <select id="banco-filter-ambito" class="flex-grow"></select>
+                                    <select id="banco-filter-nivel" class="flex-grow"></select>
+                                    <input type="search" id="banco-search" placeholder="Buscar palabra clave..." class="flex-grow">
+                                    <button id="banco-clear" class="text-white font-bold py-2 px-4 rounded action-button">Limpiar</button>
+                                </div>
+                                <div id="banco-ideas-container" class="overflow-auto border rounded-lg" style="border-color: var(--tab-bg); max-height: 600px;">
+                                    <table id="banco-ideas-table" class="w-full text-sm text-left banco-ideas-table">
+                                        <thead>
+                                            <!-- Headers se generan con JS -->
+                                        </thead>
+                                        <tbody>
+                                            <!-- Contenido se genera con JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formación en CDD -->
+            <div id="formacion-cdd" class="tab-content">
+                <h2 class="font-title text-3xl mb-6">Formación en Competencia Digital Docente (CDD)</h2>
+                <p class="mb-4">El desarrollo profesional en competencia digital es fundamental. La formación se estructura en diferentes niveles para adaptarse a las necesidades de cada docente.</p>
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="font-title text-2xl">Nivel B1</h3>
+                        <p>Esta formación busca consolidar y ampliar las competencias digitales docentes para una aplicación efectiva y crítica en el aula. Puedes encontrar toda la información oficial en el siguiente enlace.</p>
+                        <a href="https://centroformacionprofesorado.castillalamancha.es/comunidad/crfp/recurso/formacion-en-competencia-digital-docente-nivel-b1/83cd5fe9-c473-44bd-b48f-15fc59748371" target="_blank" class="inline-block mt-2 text-white font-bold py-2 px-4 rounded transition-colors action-button">
+                            Más información sobre Nivel B1
+                        </a>
+                    </div>
+                    <div>
+                        <h3 class="font-title text-2xl">Nivel B2</h3>
+                        <p class="text-gray-700">La convocatoria para el nivel B2 está prevista para el <strong>segundo o tercer trimestre</strong> del curso. Se recomienda estar atento a las comunicaciones oficiales para conocer los detalles y plazos de inscripción.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Certificado Digital Docente -->
+            <div id="certificado" class="tab-content">
+                <h2 class="font-title text-3xl mb-6">Certificado Digital Docente</h2>
+                <p class="mb-6">El certificado digital es una herramienta indispensable que permite la firma electrónica de documentos oficiales y el acceso seguro a plataformas de la administración. A continuación, puedes ver un video tutorial que explica el proceso de obtención paso a paso.</p>
+                <div class="relative" style="padding-top: 56.25%;">
+                    <iframe src="https://www.youtube.com/embed/SkYgvuBra_g" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"></iframe>
+                </div>
+            </div>
+
+            <!-- Modalidades Formativas -->
+            <div id="modalidades-formativas" class="tab-content">
+                <h2 class="font-title text-3xl mb-6">Modalidades Formativas Escuela 4.0</h2>
+                <p class="mb-6">La Formación Escuela 4.0 ofrece diversas modalidades para impulsar la digitalización, la robótica y el pensamiento computacional en los centros educativos. Encuentra la opción que mejor se adapte a tus necesidades.</p>
+                <div class="space-y-4">
+                    <!-- Desplegables para cada modalidad -->
+                    <div class="border rounded-lg" style="border-color: var(--tab-bg);">
+                        <button class="accordion-header w-full text-left p-4 font-bold flex justify-between items-center" style="background-color: var(--card-bg);">
+                            <span>SEMINARIO ESCUELA 4.0 (Primaria y Secundaria)</span>
+                            <span class="transform transition-transform">&#9660;</span>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-4 border-t" style="border-color: var(--tab-bg);"><p>Destinado a centros que no lo hayan realizado en cursos anteriores, para sentar las bases de la transformación digital.</p></div>
+                        </div>
+                    </div>
+                     <div class="border rounded-lg" style="border-color: var(--tab-bg);">
+                        <button class="accordion-header w-full text-left p-4 font-bold flex justify-between items-center" style="background-color: var(--card-bg);">
+                            <span>GRUPOS DE TRABAJO DE ROBÓTICA EDUCATIVA</span>
+                             <span class="transform transition-transform">&#9660;</span>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-4 border-t" style="border-color: var(--tab-bg);"><p>Para claustros que quieran profundizar en la robótica, con el acompañamiento presencial de los Dinamizadores de Transformación Digital y Robótica (DTDR) si es necesario.</p></div>
+                        </div>
+                    </div>
+                     <div class="border rounded-lg" style="border-color: var(--tab-bg);">
+                        <button class="accordion-header w-full text-left p-4 font-bold flex justify-between items-center" style="background-color: var(--card-bg);">
+                            <span>CURSOS DEL CRFP SOBRE ROBÓTICA EDUCATIVA</span>
+                             <span class="transform transition-transform">&#9660;</span>
+                        </button>
+                        <div class="accordion-content">
+                             <div class="p-4 border-t" style="border-color: var(--tab-bg);">
+                                 <ul class="list-disc list-inside space-y-2 mb-6">
+                                    <li><strong>Nivel 1:</strong> 10 horas de autoformación, común para todas las etapas educativas.</li>
+                                    <li><strong>Nivel 2:</strong> 30 horas, con contenidos diferenciados para cada etapa.</li>
+                                    <li><strong>Nivel 3:</strong> Próxima oferta.</li>
+                                </ul>
+                                <h4 class="font-title text-xl mb-4 text-center">Itinerarios Formativos Escuela 4.0</h4>
+                                <p class="mb-4 text-center">Visualiza la ruta formativa para la Transformación Digital. Estos itinerarios están diseñados para guiar al profesorado desde un nivel inicial hasta un nivel avanzado.</p>
+                                <div class="flex justify-center">
+                                    <img src="https://i.postimg.cc/KzHhM38Q/5cd4376e-635e-4af1-b585-0fa0b62fdf47.jpg" alt="Infografía de Itinerarios Formativos" class="rounded-lg shadow-xl max-w-full h-auto">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="border rounded-lg" style="border-color: var(--tab-bg);">
+                        <button class="accordion-header w-full text-left p-4 font-bold flex justify-between items-center" style="background-color: var(--card-bg);">
+                            <span>ASESORAMIENTO Y MICROFORMACIÓN A DEMANDA</span>
+                             <span class="transform transition-transform">&#9660;</span>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-4 border-t" style="border-color: var(--tab-bg);"><p>Formaciones flexibles en horario de exclusiva, reuniones de departamento, etc., sobre temas variados de digitalización, metodologías activas y robótica, a demanda de los grupos de docentes.</p></div>
+                        </div>
+                    </div>
+                    <div class="border rounded-lg" style="border-color: var(--tab-bg);">
+                        <button class="accordion-header w-full text-left p-4 font-bold flex justify-between items-center" style="background-color: var(--card-bg);">
+                            <span>CODEWEEK</span>
+                            <span class="transform transition-transform">&#9660;</span>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-4 border-t" style="border-color: var(--tab-bg);">
+                                <p>Fomentamos la participación en la Semana Europea de la Programación. Si deseáis llevar a cabo actividades en vuestro centro y necesitáis ayuda, podéis solicitar el apoyo de vuestro DTDR de referencia para recibir asesoramiento o acompañamiento en el aula.</p>
+                                <p class="mt-2">Además, al registrar vuestra actividad en la página oficial, recibiréis un diploma de participación y vuestro centro aparecerá en el mapa de eventos de toda Europa, ¡dando visibilidad a vuestro trabajo!</p>
+                                <div class="mt-4 flex flex-wrap gap-4">
+                                    <a href="https://bancoderecursos.castillalamancha.es/recursos?search=Codeweek" target="_blank" class="inline-block text-white font-bold py-2 px-4 rounded transition-colors action-button">Recursos para CodeWeek</a>
+                                    <a href="https://codeweek.eu/" target="_blank" class="inline-block text-white font-bold py-2 px-4 rounded transition-colors action-button">Página Oficial Code Week</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Innovarretos -->
+            <div id="innovarretos" class="tab-content">
+                <h2 class="font-title text-3xl mb-6 text-center">¿?</h2>
+                <div class="caesar-challenge-container">
+                    <div class="relative">
+                        <img src="https://i.postimg.cc/PqVj7W3M/Peluches.png" alt="Grupo de docentes resolviendo un enigma" class="w-full h-auto rounded-lg shadow-lg mb-8">
+                        <div id="timer-overlay-enigma" class="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center rounded-lg">
+                            <div id="timer-display-enigma" class="font-title text-6xl text-white" style="text-shadow: 2px 2px 4px #000;">02:00</div>
+                            <button id="start-timer-btn-enigma" class="mt-4 text-white font-bold py-2 px-6 rounded transition-colors action-button">Iniciar Enigma</button>
+                        </div>
+                    </div>
+                    <div id="challenge-section" class="text-center mt-8">
+                        <p class="text-lg mb-4">Este es el enigma final de nuestra sesión. Un desafío para poner a prueba vuestro ingenio deductivo. La solución desbloquea el acceso a una valiosa guía para futuras misiones de innovación.</p>
+                        <p class="font-mono text-2xl md:text-3xl tracking-widest my-6 p-4 bg-white border-2 border-gray-300 rounded max-w-md mx-auto">LQQRYD UHWRV</p>
+                        <p class="mb-4"><strong>Pista:</strong> El viejo César siempre contaba hasta tres.</p>
+                        
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                            <input type="text" id="password-input" class="caesar-input p-2 text-center text-xl w-full sm:w-auto" placeholder="CONTRASEÑA...">
+                            <button onclick="checkPassword()" class="text-white font-bold py-2 px-6 rounded transition-colors w-full sm:w-auto action-button">Desvelar</button>
+                        </div>
+                        <p id="error-message" class="text-red-600 mt-4 h-4"></p>
+                        <div class="relative mt-4">
+                             <button id="show-solution-btn" class="text-sm underline" style="color: var(--text-color);">¿No estuviste en la reunión? No te preocupes, te doy la clave</button>
+                             <div id="solution-tooltip" class="hidden absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max p-2 rounded-lg text-white text-center" style="background-color: var(--header-bg);">
+                                 La solución es: innova retos
+                                 <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent" style="border-top-color: var(--header-bg);"></div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="innovarretos-content" class="hidden mt-8">
+                    <h3 class="font-title text-2xl mb-4 text-center">¡Enigma Resuelto!</h3>
+                    <p class="mb-6 text-center">Has demostrado tu ingenio. Aquí tienes el acceso a la guía de InnovarretosCLM 2025-26.</p>
+                    <div class="relative" style="padding-top: 56.25%;">
+                         <iframe src="https://view.genially.com/68db8acf70c35f2dc3064e7c/guide-innovaretosclm-2025-26" frameborder="0" allowfullscreen class="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"></iframe>
+                    </div>
+                </div>
+            </div>
+
+             <!-- Contacto -->
+            <div id="contacto" class="tab-content">
+                <h2 class="font-title text-3xl mb-6 text-center">Pista 7: Los Informantes</h2>
+                <p class="mb-8 text-center max-w-3xl mx-auto">Si te encuentras en un callejón sin salida o necesitas una pista adicional, no dudes en contactar con nuestros agentes de campo, los Dinamizadores de Transformación Digital y Robótica (DTDR) de la zona de Alcázar de San Juan - Tomelloso.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Contacto 1 -->
+                    <div class="mystery-card p-6 rounded-lg text-center">
+                        <h3 class="font-title text-2xl mb-2">Jesús Cano</h3>
+                        <p class="break-all"><a href="mailto:jclara@jccm.es" class="hover:underline">jclara@jccm.es</a></p>
+                        <p><strong>Teams:</strong> jjcl31</p>
+                    </div>
+                    <!-- Contacto 2 -->
+                    <div class="mystery-card p-6 rounded-lg text-center">
+                        <h3 class="font-title text-2xl mb-2">Antonio Miñán</h3>
+                        <p class="break-all"><a href="mailto:antonio.minan@jccm.es" class="hover:underline">antonio.minan@jccm.es</a></p>
+                        <p><strong>Teams:</strong> aamo14</p>
+                    </div>
+                    <!-- Contacto 3 -->
+                    <div class="mystery-card p-6 rounded-lg text-center">
+                        <h3 class="font-title text-2xl mb-2">Lucía Serrano</h3>
+                        <p class="break-all"><a href="mailto:lucia.serrano@jccm.es" class="hover:underline">lucia.serrano@jccm.es</a></p>
+                        <p><strong>Teams:</strong> llsp09</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="text-center py-4 mt-8 text-sm" style="color: var(--text-color);">
+        <p>Equipo DTDR CR &mdash; Octubre 2025</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lógica para las pestañas
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            window.showTab = function(tabId) {
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                });
+                tabButtons.forEach(button => {
+                    button.classList.remove('active');
+                    if (button.dataset.tab === tabId) {
+                        button.classList.add('active');
+                    }
+                });
+                document.getElementById(tabId).classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.dataset.tab;
+                    showTab(tabId);
+                });
+            });
+
+            // Lógica para el acordeón
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    const arrow = header.querySelector('span:last-child');
+                    const isOpening = !content.style.maxHeight;
+
+                    // Cerrar todos los acordeones en el mismo grupo
+                    header.closest('.space-y-4').querySelectorAll('.accordion-content').forEach(c => {
+                        if (c !== content) {
+                            c.style.maxHeight = null;
+                            c.previousElementSibling.querySelector('span:last-child').style.transform = 'rotate(0deg)';
+                        }
+                    });
+
+                    // Abrir o cerrar el actual
+                    if (isOpening) {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        arrow.style.transform = 'rotate(180deg)';
+                    } else {
+                        content.style.maxHeight = null;
+                        arrow.style.transform = 'rotate(0deg)';
+                    }
+                });
+            });
+
+
+            // Lógica para el reto de Innovarretos
+            window.checkPassword = function() {
+                const passwordInput = document.getElementById('password-input');
+                const errorMessage = document.getElementById('error-message');
+                const challengeSection = document.getElementById('challenge-section');
+                const contentSection = document.getElementById('innovarretos-content');
+                
+                const correctPassword = "innova retos";
+                
+                if (passwordInput.value.trim().toLowerCase() === correctPassword) {
+                    errorMessage.textContent = "";
+                    challengeSection.style.display = 'none';
+                    contentSection.classList.remove('hidden');
+                } else {
+                    errorMessage.textContent = "Contraseña incorrecta. ¡Sigue intentándolo!";
+                    passwordInput.value = "";
+                }
+            }
+            
+            const showSolutionBtn = document.getElementById('show-solution-btn');
+            const solutionTooltip = document.getElementById('solution-tooltip');
+            
+            showSolutionBtn.addEventListener('click', () => {
+                solutionTooltip.classList.toggle('hidden');
+            });
+
+            // Lógica para el cronómetro
+            const startTimerBtn = document.getElementById('start-timer-btn');
+            const timerDisplay = document.getElementById('timer-display');
+            let timerInterval;
+
+            function startTimer(duration, display, intervalVar) {
+                let timer = duration, minutes, seconds;
+                
+                if(intervalVar) clearInterval(intervalVar);
+
+                intervalVar = setInterval(function () {
+                    minutes = parseInt(timer / 60, 10);
+                    seconds = parseInt(timer % 60, 10);
+
+                    minutes = minutes < 10 ? "0" + minutes : minutes;
+                    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                    display.textContent = minutes + ":" + seconds;
+
+                    if (--timer < 0) {
+                        clearInterval(intervalVar);
+                        display.textContent = "¡TIEMPO!";
+                    }
+                }, 1000);
+                return intervalVar;
+            }
+
+            startTimerBtn.addEventListener('click', function () {
+                const threeMinutes = 60 * 3;
+                timerInterval = startTimer(threeMinutes, timerDisplay, timerInterval);
+                this.style.display = 'none'; // Oculta el botón después de iniciarlo
+            });
+
+            // Lógica para el cronómetro del ENIGMA
+            const startTimerBtnEnigma = document.getElementById('start-timer-btn-enigma');
+            const timerDisplayEnigma = document.getElementById('timer-display-enigma');
+            let timerIntervalEnigma;
+
+            startTimerBtnEnigma.addEventListener('click', function () {
+                const twoMinutes = 60 * 2;
+                timerIntervalEnigma = startTimer(twoMinutes, timerDisplayEnigma, timerIntervalEnigma);
+                this.style.display = 'none';
+            });
+
+            // --- Lógica para el Banco de Ideas Interactivo ---
+            const ALL_IDEAS = [
+                {"ambito": "1. Espacios de aprendizaje virtuales", "nivel": "Inicial", "objetivo": "1. Crear y utilizar aulas virtuales básicas para el tercer ciclo.", "linea": "1.1. Configurar aulas virtuales Moodle para las áreas troncales del tercer ciclo.", "responsable": "Coordinador de Transformación Digital; tutores de 5º y 6º.", "indicador": "Al menos el 70 % del profesorado de tercer ciclo utiliza el aula virtual para compartir materiales.", "instrumento": "Revisión de aulas activas en Moodle; encuesta al profesorado.", "descripcion": "Crear aulas virtuales con contenidos básicos (documentos, enlaces, tareas) y explicar al alumnado su uso para organización y repaso."},
+                {"ambito": "1. Espacios de aprendizaje virtuales", "nivel": "Inicial", "objetivo": "1. Crear y utilizar aulas virtuales básicas para el tercer ciclo.", "linea": "1.2. Formar al profesorado en el uso básico de Moodle (subida de recursos y tareas).", "responsable": "Coordinador de Formación y Transformación Digital.", "indicador": "Participación del 80 % del profesorado en la formación.", "instrumento": "Registro de asistencia y encuesta de satisfacción.", "descripcion": "Sesión formativa breve (Teams o presencial) sobre funciones esenciales de Moodle: añadir recursos, tareas y calificaciones."},
+                {"ambito": "1. Espacios de aprendizaje virtuales", "nivel": "Intermedio", "objetivo": "2. Integrar las aulas virtuales en la práctica docente habitual.", "linea": "2.1. Incorporar actividades interactivas (cuestionarios, foros, tareas evaluables) en las aulas virtuales.", "responsable": "Docentes de área y coordinador digital.", "indicador": "El 60 % de las aulas virtuales activas incluyen actividades interactivas.", "instrumento": "Observación y revisión de aulas virtuales.", "descripcion": "Diseñar tareas con retroalimentación automática, debates o foros, favoreciendo la participación del alumnado."},
+                {"ambito": "1. Espacios de aprendizaje virtuales", "nivel": "Intermedio", "objetivo": "2. Integrar las aulas virtuales en la práctica docente habitual.", "linea": "2.2. Establecer un protocolo de uso del aula virtual para alumnado ausente o convaleciente.", "responsable": "Equipo directivo y tutores.", "indicador": "Existencia de un documento o protocolo aprobado por el claustro.", "instrumento": "Comprobación documental y revisión del aula virtual.", "descripcion": "Elaborar un protocolo para garantizar el acceso a materiales y tareas del aula virtual en caso de ausencia prolongada."},
+                {"ambito": "1. Espacios de aprendizaje virtuales", "nivel": "Avanzado", "objetivo": "3. Fomentar la innovación educativa mediante aulas virtuales colaborativas.", "linea": "3.1. Crear proyectos interdisciplinares en Moodle con participación de varios docentes.", "responsable": "Equipo docente y coordinador digital.", "indicador": "Al menos un proyecto interdisciplinar colaborativo por curso.", "instrumento": "Revisión del aula virtual del proyecto y memoria final.", "descripcion": "Diseñar proyectos globalizados en Moodle (p. ej. sostenibilidad) con recursos multimedia y evaluación compartida."},
+                {"ambito": "1. Espacios de aprendizaje virtuales", "nivel": "Avanzado", "objetivo": "3. Fomentar la innovación educativa mediante aulas virtuales colaborativas.", "linea": "3.2. Integrar herramientas externas (Genially, Padlet, Kahoot, etc.) en las aulas virtuales.", "responsable": "Docentes especialistas y coordinador digital.", "indicador": "El 50 % de las aulas virtuales activas incorporan recursos externos interactivos.", "instrumento": "Observación directa y análisis de evidencias digitales.", "descripcion": "Enlazar y embeber herramientas externas en Moodle para enriquecer las experiencias de aprendizaje."},
+                {"ambito": "2. Espacios de aprendizaje físicos", "nivel": "Inicial", "objetivo": "1. Optimizar el uso del aula de informática y los dispositivos disponibles.", "linea": "1.1. Elaborar un horario de uso compartido del aula de informática y los carros de portátiles/tablets.", "responsable": "Equipo directivo y coordinador digital.", "indicador": "Existencia y cumplimiento del horario de uso.", "instrumento": "Registro de uso y observación directa.", "descripcion": "Establecer un calendario equitativo que permita el acceso periódico a los recursos digitales a todos los grupos."},
+                {"ambito": "2. Espacios de aprendizaje físicos", "nivel": "Inicial", "objetivo": "1. Optimizar el uso del aula de informática y los dispositivos disponibles.", "linea": "1.2. Revisar el estado de funcionamiento de los equipos y organizar su mantenimiento básico.", "responsable": "Coordinador TIC o responsable de medios informáticos.", "indicador": "100 % de equipos revisados y actualizados al inicio del curso.", "instrumento": "Informe de revisión y parte de incidencias.", "descripcion": "Comprobar periódicamente el estado de los equipos y coordinar con el servicio técnico o el centro de apoyo TIC."},
+                {"ambito": "2. Espacios de aprendizaje físicos", "nivel": "Intermedio", "objetivo": "2. Reorganizar espacios del centro para fomentar metodologías activas apoyadas en tecnología.", "linea": "2.1. Crear un aula polivalente o rincón digital para aprendizaje colaborativo.", "responsable": "Equipo directivo y docentes de ciclo.", "indicador": "Creación y uso del espacio digital con una frecuencia semanal.", "instrumento": "Registro fotográfico y observación directa.", "descripcion": "Transformar un aula o espacio común en zona flexible con portátiles, panel interactivo y mobiliario móvil."},
+                {"ambito": "2. Espacios de aprendizaje físicos", "nivel": "Intermedio", "objetivo": "2. Reorganizar espacios del centro para fomentar metodologías activas apoyadas en tecnología.", "linea": "2.2. Incorporar puntos de carga y conexión a Internet en aulas clave.", "responsable": "Equipo directivo y responsable TIC.", "indicador": "Al menos 3 aulas dotadas con puntos de carga o conectividad mejorada.", "instrumento": "Informe técnico y acta de instalación.", "descripcion": "Identificar necesidades de infraestructura y coordinar pequeñas mejoras con recursos del centro o programas de innovación."},
+                {"ambito": "2. Espacios de aprendizaje físicos", "nivel": "Avanzado", "objetivo": "3. Diseñar espacios inteligentes que integren robótica y experimentación digital.", "linea": "3.1. Crear un aula de tecnología y robótica educativa equipada con recursos digitales y kits de programación.", "responsable": "Coordinador de robótica y coordinador digital.", "indicador": "Creación y uso del aula al menos una vez por ciclo o trimestre.", "instrumento": "Observación de sesiones y memoria del proyecto.", "descripcion": "Adecuar un espacio para actividades de robótica, pensamiento computacional o realidad aumentada vinculadas a proyectos del PDC."},
+                {"ambito": "2. Espacios de aprendizaje físicos", "nivel": "Avanzado", "objetivo": "3. Diseñar espacios inteligentes que integren robótica y experimentación digital.", "linea": "3.2. Implementar estaciones móviles de aprendizaje (carros tecnológicos) en distintas zonas del centro.", "responsable": "Equipo directivo y coordinador TIC.", "indicador": "Disponibilidad de estaciones móviles en uso por más del 70 % de los grupos.", "instrumento": "Registro de préstamos y observación directa.", "descripcion": "Dotar a diferentes aulas de carros móviles con portátiles, tablets o kits robóticos para favorecer el aprendizaje ubicuo."},
+                {"ambito": "3. Herramientas de gestión", "nivel": "Inicial", "objetivo": "1. Mejorar el conocimiento y uso básico de las herramientas institucionales de EducamosCLM.", "linea": "1.1. Realizar una sesión formativa sobre el uso del Cuaderno de Evaluación y los asistentes de programaciones.", "responsable": "Coordinador de Transformación Digital y equipo directivo.", "indicador": "Al menos el 70 % del profesorado participa en la sesión y comienza a usar alguna herramienta.", "instrumento": "Registro de asistencia y revisión de uso en EducamosCLM.", "descripcion": "Organizar una formación práctica para mostrar cómo usar los asistentes de EducamosCLM en evaluación y planificación."},
+                {"ambito": "3. Herramientas de gestión", "nivel": "Inicial", "objetivo": "1. Mejorar el conocimiento y uso básico de las herramientas institucionales de EducamosCLM.", "linea": "1.2. Elaborar un documento interno con enlaces y tutoriales de las herramientas más usadas.", "responsable": "Coordinador digital.", "indicador": "Documento compartido con toda la comunidad educativa.", "instrumento": "Verificación del documento y estadísticas de acceso.", "descripcion": "Crear una guía rápida o repositorio en Teams con videotutoriales o enlaces oficiales."},
+                {"ambito": "3. Herramientas de gestión", "nivel": "Intermedio", "objetivo": "2. Consolidar el uso de Microsoft Teams como herramienta de comunicación interna del centro.", "linea": "2.1. Unificar la comunicación interna mediante canales específicos en Teams para ciclos, departamentos y claustro.", "responsable": "Equipo directivo y coordinador digital.", "indicador": "El 100 % de los avisos y comunicaciones internas se realizan a través de Teams.", "instrumento": "Análisis de registros de Teams y encuesta al profesorado.", "descripcion": "Crear y organizar los canales por niveles o equipos y promover su uso para documentos y avisos del centro."},
+                {"ambito": "3. Herramientas de gestión", "nivel": "Intermedio", "objetivo": "2. Consolidar el uso de Microsoft Teams como herramienta de comunicación interna del centro.", "linea": "2.2. Impulsar el uso de OneDrive y Office 365 para la gestión documental colaborativa.", "responsable": "Coordinador digital y docentes responsables de documentos de centro.", "indicador": "Al menos 3 documentos de gestión elaborados de forma colaborativa en línea.", "instrumento": "Revisión de archivos compartidos y control de versiones.", "descripcion": "Crear carpetas compartidas por equipos y formar al profesorado en la edición simultánea de documentos en línea."},
+                {"ambito": "3. Herramientas de gestión", "nivel": "Avanzado", "objetivo": "3. Digitalizar los procesos administrativos y pedagógicos del centro.", "linea": "3.1. Implementar la gestión integral de documentos de centro en EducamosCLM (PGA, PEC, Plan Digital, etc.).", "responsable": "Equipo directivo y coordinador digital.", "indicador": "El 100 % de los documentos de centro se gestionan en EducamosCLM.", "instrumento": "Revisión de la documentación entregada y validada en la plataforma.", "descripcion": "Centralizar la gestión documental en EducamosCLM, eliminando versiones en papel y garantizando seguridad y trazabilidad."},
+                {"ambito": "3. Herramientas de gestión", "nivel": "Avanzado", "objetivo": "3. Digitalizar los procesos administrativos y pedagógicos del centro.", "linea": "3.2. Automatizar procesos internos (listados, informes, actas) mediante plantillas y formularios digitales.", "responsable": "Equipo directivo y coordinador TIC.", "indicador": "Reducción del 50 % del uso de papel y tiempo de elaboración de documentos.", "instrumento": "Comparativa de consumo de papel e informes internos.", "descripcion": "Diseñar formularios en Microsoft Forms o plantillas automáticas en Excel y Word para simplificar tareas administrativas."},
+                {"ambito": "4. Difusión e intercambio de experiencias y prácticas", "nivel": "Inicial", "objetivo": "1. Mejorar la visibilidad de las actividades del centro en entornos digitales.", "linea": "1.1. Actualizar periódicamente la web del centro con noticias, proyectos y actividades relevantes.", "responsable": "Coordinador de Transformación Digital y equipo directivo.", "indicador": "Publicación mensual de al menos 3 noticias en la web del centro.", "instrumento": "Revisión del historial de publicaciones.", "descripcion": "Establecer un calendario de publicaciones y responsables para mantener actualizada la información institucional."},
+                {"ambito": "4. Difusión e intercambio de experiencias y prácticas", "nivel": "Inicial", "objetivo": "1. Mejorar la visibilidad de las actividades del centro en entornos digitales.", "linea": "1.2. Crear o actualizar perfiles institucionales en redes sociales (X, Instagram, Facebook).", "responsable": "Coordinador digital y responsable de comunicación.", "indicador": "Existencia y uso regular de perfiles activos.", "instrumento": "Observación y registro de publicaciones.", "descripcion": "Crear perfiles oficiales del centro y difundir las actividades más destacadas con lenguaje positivo y visual."},
+                {"ambito": "4. Difusión e intercambio de experiencias y prácticas", "nivel": "Intermedio", "objetivo": "2. Fomentar la participación docente en la difusión de buenas prácticas digitales.", "linea": "2.1. Crear un canal o espacio en Teams para compartir experiencias y recursos digitales entre el profesorado.", "responsable": "Coordinador digital y profesorado participante.", "indicador": "Al menos el 50 % del profesorado comparte o consulta recursos en el canal.", "instrumento": "Análisis de actividad en Teams y encuestas.", "descripcion": "Crear un espacio colaborativo en Teams o OneNote para intercambio de materiales, tutoriales y experiencias de aula."},
+                {"ambito": "4. Difusión e intercambio de experiencias y prácticas", "nivel": "Intermedio", "objetivo": "2. Fomentar la participación docente en la difusión de buenas prácticas digitales.", "linea": "2.2. Publicar experiencias del centro en portales educativos o boletines institucionales.", "responsable": "Equipo directivo y coordinador de formación.", "indicador": "Publicación de al menos una experiencia al año en espacios institucionales.", "instrumento": "Copia o enlace de la publicación.", "descripcion": "Identificar prácticas innovadoras y difundirlas en EducamosCLM, CRFP o boletines de innovación."},
+                {"ambito": "4. Difusión e intercambio de experiencias y prácticas", "nivel": "Avanzado", "objetivo": "3. Potenciar la proyección del centro mediante la participación en redes de centros o proyectos colaborativos.", "linea": "3.1. Participar en redes o proyectos educativos de innovación (Erasmus+, Etwinning, programas regionales).", "responsable": "Coordinador de internacionalización o de innovación.", "indicador": "Participación activa en al menos un proyecto o red durante el curso.", "instrumento": "Informe final del proyecto y evidencias de participación.", "descripcion": "Integrar la difusión digital en los proyectos colaborativos, publicando avances y resultados en web y redes del centro."},
+                {"ambito": "4. Difusión e intercambio de experiencias y prácticas", "nivel": "Avanzado", "objetivo": "3. Potenciar la proyección del centro mediante la participación en redes de centros o proyectos colaborativos.", "linea": "3.2. Organizar jornadas o encuentros virtuales para compartir experiencias de transformación digital.", "responsable": "Coordinador digital y equipo directivo.", "indicador": "Realización de al menos un encuentro virtual con otros centros.", "instrumento": "Acta de la jornada y grabación de la sesión.", "descripcion": "Coordinar una jornada en línea (Teams o Zoom) para difundir experiencias destacadas del centro y fomentar la colaboración entre docentes."},
+                {"ambito": "5. Competencia Digital Docente", "nivel": "Inicial", "objetivo": "1. Diagnosticar el nivel de competencia digital del profesorado y sensibilizar sobre su mejora.", "linea": "1.1. Realizar el cuestionario de Competencia Digital Docente de EducamosCLM y analizar resultados.", "responsable": "Coordinador de Transformación Digital.", "indicador": "Participación del 100 % del profesorado en el cuestionario.", "instrumento": "Registro de participación y resultados del informe global del centro.", "descripcion": "Promover la realización del cuestionario inicial y presentar los resultados globales al claustro para detectar necesidades formativas."},
+                {"ambito": "5. Competencia Digital Docente", "nivel": "Inicial", "objetivo": "1. Diagnosticar el nivel de competencia digital del profesorado y sensibilizar sobre su mejora.", "linea": "1.2. Organizar una sesión informativa sobre el Marco de Competencia Digital Docente y sus niveles.", "responsable": "Coordinador de formación y transformación digital.", "indicador": "Al menos el 70 % del claustro participa en la sesión.", "instrumento": "Registro de asistencia y encuesta de satisfacción.", "descripcion": "Explicar los niveles del MRCDD y cómo se relacionan con la práctica docente cotidiana."},
+                {"ambito": "5. Competencia Digital Docente", "nivel": "Intermedio", "objetivo": "2. Mejorar la competencia digital del profesorado en el uso didáctico de las tecnologías.", "linea": "2.1. Planificar e implementar una formación interna sobre herramientas digitales para la enseñanza activa.", "responsable": "Coordinador de formación y profesorado mentor.", "indicador": "Al menos un 60 % del profesorado aplica en el aula alguna herramienta aprendida.", "instrumento": "Cuestionario de seguimiento y observación de prácticas en aula.", "descripcion": "Organizar microtalleres prácticos (Canva, Genially, Forms, Padlet, etc.) orientados a la aplicación directa en el aula."},
+                {"ambito": "5. Competencia Digital Docente", "nivel": "Intermedio", "objetivo": "2. Mejorar la competencia digital del profesorado en el uso didáctico de las tecnologías.", "linea": "2.2. Crear un repositorio colaborativo de recursos digitales creados por el profesorado del centro.", "responsable": "Coordinador digital y docentes colaboradores.", "indicador": "Publicación de al menos 10 recursos digitales propios en el repositorio.", "instrumento": "Revisión del repositorio y recuento de aportaciones.", "descripcion": "Crear una biblioteca digital compartida (Teams, OneDrive o Moodle) con materiales creados por docentes."},
+                {"ambito": "5. Competencia Digital Docente", "nivel": "Avanzado", "objetivo": "3. Promover el desarrollo profesional continuo del profesorado en competencia digital.", "linea": "3.1. Fomentar la participación en itinerarios formativos del CRFP o programas de certificación digital (A1–C2).", "responsable": "Coordinador de formación.", "indicador": "Al menos el 50 % del claustro realiza alguna formación certificable en competencia digital.", "instrumento": "Registro de inscripciones y certificados obtenidos.", "descripcion": "Difundir los itinerarios formativos del CRFP y acompañar al profesorado en la inscripción y seguimiento."},
+                {"ambito": "5. Competencia Digital Docente", "nivel": "Avanzado", "objetivo": "3. Promover el desarrollo profesional continuo del profesorado en competencia digital.", "linea": "3.2. Implementar una estrategia de mentoría interna entre docentes para compartir buenas prácticas digitales.", "responsable": "Coordinador digital y profesorado con nivel B1 o superior.", "indicador": "Participación de al menos 4 docentes en acciones de mentoría.", "instrumento": "Actas de seguimiento y valoraciones del profesorado implicado.", "descripcion": "Establecer un programa de acompañamiento donde docentes con mayor competencia digital asesoren a compañeros."},
+                {"ambito": "6. Competencia Digital del Alumnado", "nivel": "Inicial", "objetivo": "1. Familiarizar al alumnado con el uso básico y seguro de los dispositivos digitales del centro.", "linea": "1.1. Realizar sesiones iniciales sobre normas de uso, contraseñas y cuidado de equipos.", "responsable": "Tutores y coordinador digital.", "indicador": "El 100 % del alumnado ha recibido la formación inicial.", "instrumento": "Registro de tutorías y observación directa.", "descripcion": "Incluir en las tutorías del primer trimestre una sesión práctica sobre uso responsable de los dispositivos del centro."},
+                {"ambito": "6. Competencia Digital del Alumnado", "nivel": "Inicial", "objetivo": "1. Familiarizar al alumnado con el uso básico y seguro de los dispositivos digitales del centro.", "linea": "1.2. Utilizar aplicaciones básicas (procesador de textos, navegador, correo institucional) en tareas de aula.", "responsable": "Docentes de áreas instrumentales.", "indicador": "El 70 % del alumnado realiza tareas con herramientas digitales básicas.", "instrumento": "Revisión de trabajos digitales y observación en aula.", "descripcion": "Introducir progresivamente el uso de aplicaciones ofimáticas sencillas para redactar, buscar y enviar información."},
+                {"ambito": "6. Competencia Digital del Alumnado", "nivel": "Intermedio", "objetivo": "2. Desarrollar la competencia digital del alumnado en la búsqueda, creación y comunicación de contenidos.", "linea": "2.1. Planificar tareas que incluyan búsqueda guiada de información y elaboración de presentaciones o infografías.", "responsable": "Docentes de ciclo o área.", "indicador": "El 60 % del alumnado crea materiales digitales en sus tareas.", "instrumento": "Rúbricas de evaluación de tareas y revisión de productos finales.", "descripcion": "Incorporar proyectos o trabajos donde el alumnado use herramientas digitales (Canva, PowerPoint, Genially) para expresar ideas o resultados."},
+                {"ambito": "6. Competencia Digital del Alumnado", "nivel": "Intermedio", "objetivo": "2. Desarrollar la competencia digital del alumnado en la búsqueda, creación y comunicación de contenidos.", "linea": "2.2. Fomentar la colaboración digital mediante actividades en Teams o Moodle.", "responsable": "Coordinador digital y tutores.", "indicador": "Al menos un trabajo colaborativo por trimestre realizado en entorno virtual.", "instrumento": "Observación de las plataformas y revisión de tareas colaborativas.", "descripcion": "Diseñar actividades grupales en Teams o Moodle donde los alumnos compartan documentos y trabajen de forma conjunta."},
+                {"ambito": "6. Competencia Digital del Alumnado", "nivel": "Avanzado", "objetivo": "3. Impulsar la competencia digital avanzada a través de la programación, la robótica y el pensamiento computacional.", "linea": "3.1. Incorporar actividades de robótica o programación visual en el aula.", "responsable": "Coordinador de robótica y profesorado participante.", "indicador": "Al menos el 50 % del alumnado del centro participa en una experiencia de robótica o programación.", "instrumento": "Registro de participación y evidencias fotográficas.", "descripcion": "Desarrollar actividades con robots educativos, Scratch, MakeCode o plataformas similares en las programaciones del centro."},
+                {"ambito": "6. Competencia Digital del Alumnado", "nivel": "Avanzado", "objetivo": "3. Impulsar la competencia digital avanzada a través de la programación, la robótica y el pensamiento computacional.", "linea": "3.2. Participar en retos o eventos digitales (CodeWeek, proyectos STEAM, concursos TIC).", "responsable": "Coordinador de transformación digital y docentes de áreas STEM.", "indicador": "Participación del centro en al menos un evento o reto anual.", "instrumento": "Certificados o evidencias de participación.", "descripcion": "Fomentar la implicación del alumnado en actividades externas de programación, robótica o pensamiento computacional."},
+                {"ambito": "7. Uso responsable", "nivel": "Inicial", "objetivo": "1. Promover hábitos básicos de uso responsable y seguro de las tecnologías digitales en el alumnado.", "linea": "1.1. Realizar sesiones de tutoría sobre normas de uso de dispositivos y convivencia digital.", "responsable": "Tutores y coordinador de convivencia.", "indicador": "El 100 % de los grupos ha realizado al menos una tutoría sobre el tema.", "instrumento": "Registro de tutorías y actas de sesiones.", "descripcion": "Incorporar al plan de acción tutorial una sesión sobre uso responsable y respeto en entornos digitales."},
+                {"ambito": "7. Uso responsable", "nivel": "Inicial", "objetivo": "1. Promover hábitos básicos de uso responsable y seguro de las tecnologías digitales en el alumnado.", "linea": "1.2. Difundir entre las familias un decálogo de buenas prácticas digitales en el hogar.", "responsable": "Equipo directivo y AMPA.", "indicador": "Envío del documento a todas las familias y publicación en la web del centro.", "instrumento": "Copia del material y registro de difusión.", "descripcion": "Elaborar un decálogo visual con consejos para el uso saludable y seguro de las TIC en casa."},
+                {"ambito": "7. Uso responsable", "nivel": "Intermedio", "objetivo": "2. Sensibilizar sobre los riesgos del uso inadecuado de Internet y las redes sociales.", "linea": "2.1. Organizar charlas o talleres con especialistas sobre ciberseguridad, identidad digital o huella digital.", "responsable": "Coordinador de transformación digital y equipo de orientación.", "indicador": "Participación de al menos el 70 % del alumnado en alguna acción formativa.", "instrumento": "Registro de asistencia y valoración del alumnado.", "descripcion": "Coordinar talleres con la Policía Nacional, Guardia Civil u organizaciones especializadas en seguridad digital."},
+                {"ambito": "7. Uso responsable", "nivel": "Intermedio", "objetivo": "2. Sensibilizar sobre los riesgos del uso inadecuado de Internet y las redes sociales.", "linea": "2.2. Crear materiales audiovisuales o campañas realizadas por el alumnado sobre buen uso de las redes.", "responsable": "Docentes de Lengua o Valores y alumnado participante.", "indicador": "Creación y difusión de al menos 3 materiales de sensibilización.", "instrumento": "Publicación en web o redes del centro.", "descripcion": "Diseñar vídeos, infografías o carteles sobre respeto digital y seguridad en línea elaborados por el alumnado."},
+                {"ambito": "7. Uso responsable", "nivel": "Avanzado", "objetivo": "3. Fomentar una cultura digital ética, crítica y saludable en toda la comunidad educativa.", "linea": "3.1. Diseñar e implementar un Plan de Bienestar Digital que integre acciones para alumnado, profesorado y familias.", "responsable": "Equipo directivo y coordinador digital.", "indicador": "Plan aprobado y publicado con seguimiento anual.", "instrumento": "Revisión documental y memoria anual.", "descripcion": "Incluir medidas de prevención de tecnoestrés, gestión del tiempo digital y formación en bienestar digital."},
+                {"ambito": "7. Uso responsable", "nivel": "Avanzado", "objetivo": "3. Fomentar una cultura digital ética, crítica y saludable en toda la comunidad educativa.", "linea": "3.2. Incorporar la educación en ciudadanía digital y pensamiento crítico en proyectos de aula.", "responsable": "Coordinadores de ciclo y profesorado tutor.", "indicador": "Al menos un proyecto por ciclo con componente de ciudadanía digital.", "instrumento": "Rúbricas de proyectos y observación de aula.", "descripcion": "Integrar la reflexión sobre derechos digitales, desinformación y ética tecnológica en las programaciones didácticas."},
+                {"ambito": "8. Brecha digital y gestión de dispositivos", "nivel": "Inicial", "objetivo": "1. Conocer y organizar los recursos tecnológicos disponibles en el centro.", "linea": "1.1. Elaborar un inventario actualizado de los dispositivos digitales y su estado.", "responsable": "Coordinador TIC o de Transformación Digital.", "indicador": "Inventario completo y actualizado a inicio de curso.", "instrumento": "Revisión del inventario y registro en EducamosCLM.", "descripcion": "Crear una base de datos o hoja compartida con los equipos disponibles, ubicación y estado de funcionamiento."},
+                {"ambito": "8. Brecha digital y gestión de dispositivos", "nivel": "Inicial", "objetivo": "1. Conocer y organizar los recursos tecnológicos disponibles en el centro.", "linea": "1.2. Establecer un protocolo básico de préstamo y mantenimiento de dispositivos.", "responsable": "Equipo directivo y coordinador TIC.", "indicador": "Protocolo aprobado y aplicado durante el curso.", "instrumento": "Comprobación documental y registros de préstamo.", "descripcion": "Crear un documento interno con normas para el uso y préstamo de dispositivos a alumnado o profesorado."},
+                {"ambito": "8. Brecha digital y gestión de dispositivos", "nivel": "Intermedio", "objetivo": "2. Favorecer la equidad en el acceso a la tecnología entre el alumnado.", "linea": "2.1. Implementar un sistema de préstamo temporal de dispositivos al alumnado en situación de vulnerabilidad.", "responsable": "Equipo directivo y orientación.", "indicador": "Todos los alumnos con necesidad tienen acceso a un dispositivo.", "instrumento": "Registros de préstamo y actas de seguimiento.", "descripcion": "Diseñar un sistema de préstamo con autorización familiar y seguimiento coordinado con orientación."},
+                {"ambito": "8. Brecha digital y gestión de dispositivos", "nivel": "Intermedio", "objetivo": "2. Favorecer la equidad en el acceso a la tecnología entre el alumnado.", "linea": "2.2. Facilitar el acceso a Internet mediante acuerdos o recursos del centro.", "responsable": "Equipo directivo y AMPA.", "indicador": "Al menos el 90 % del alumnado vulnerable con acceso a conexión.", "instrumento": "Registro de beneficiarios y comprobación de uso.", "descripcion": "Explorar acuerdos con administraciones o asociaciones locales para facilitar conexión WiFi o tarjetas de datos."},
+                {"ambito": "8. Brecha digital y gestión de dispositivos", "nivel": "Avanzado", "objetivo": "3. Optimizar la gestión y el uso sostenible de los recursos tecnológicos del centro.", "linea": "3.1. Implementar un sistema digital de control y mantenimiento preventivo de equipos.", "responsable": "Coordinador TIC y responsable de mantenimiento.", "indicador": "Registro actualizado de revisiones y reparaciones.", "instrumento": "Informe anual y registros digitales de incidencias.", "descripcion": "Establecer un sistema de tickets o formulario online para reportar incidencias y realizar mantenimiento periódico."},
+                {"ambito": "8. Brecha digital y gestión de dispositivos", "nivel": "Avanzado", "objetivo": "3. Optimizar la gestión y el uso sostenible de los recursos tecnológicos del centro.", "linea": "3.2. Diseñar una estrategia de renovación y reciclaje de dispositivos obsoletos.", "responsable": "Equipo directivo y coordinador TIC.", "indicador": "Plan de renovación y reciclaje aprobado por el claustro.", "instrumento": "Revisión del plan y seguimiento de su cumplimiento.", "descripcion": "Establecer un calendario de sustitución y aprovechar programas institucionales o convenios de donación y reciclaje."},
+                {"ambito": "9. Proyectos de innovación e investigación", "nivel": "Inicial", "objetivo": "1. Conocer y aprovechar los proyectos de innovación existentes en el centro.", "linea": "1.1. Identificar los proyectos de innovación activos (PIE u otros) y sus responsables.", "responsable": "Coordinador de Transformación Digital y equipo directivo.", "indicador": "Listado de proyectos activos actualizado y difundido al claustro.", "instrumento": "Documento de registro y acta de claustro.", "descripcion": "Elaborar un inventario con los proyectos de innovación en marcha y los recursos digitales asociados."},
+                {"ambito": "9. Proyectos de innovación e investigación", "nivel": "Inicial", "objetivo": "1. Conocer y aprovechar los proyectos de innovación existentes en el centro.", "linea": "1.2. Difundir entre el claustro los recursos digitales recibidos para los proyectos PIE.", "responsable": "Coordinador de innovación y coordinador digital.", "indicador": "Presentación o sesión informativa realizada al claustro.", "instrumento": "Acta de sesión y materiales presentados.", "descripcion": "Informar al profesorado sobre el uso, custodia y aplicaciones didácticas de materiales PIE (robótica, impresoras 3D, podcast, etc.)."},
+                {"ambito": "9. Proyectos de innovación e investigación", "nivel": "Intermedio", "objetivo": "2. Integrar los recursos y materiales PIE en las programaciones didácticas del centro.", "linea": "2.1. Diseñar actividades curriculares que utilicen el material digital de los proyectos PIE.", "responsable": "Docentes participantes y coordinador digital.", "indicador": "Al menos una actividad por ciclo que incorpore el uso del material.", "instrumento": "Rúbricas de tareas y evidencias fotográficas.", "descripcion": "Planificar tareas de aula o proyectos donde se use el material recibido (por ejemplo, imprimir piezas en 3D o grabar un podcast)."},
+                {"ambito": "9. Proyectos de innovación e investigación", "nivel": "Intermedio", "objetivo": "2. Integrar los recursos y materiales PIE en las programaciones didácticas del centro.", "linea": "2.2. Coordinar sesiones de formación interna sobre el uso del material de innovación.", "responsable": "Coordinador de formación y docentes responsables de proyectos.", "indicador": "Participación de al menos el 50 % del claustro en alguna sesión.", "instrumento": "Registro de asistencia y encuesta de satisfacción.", "descripcion": "Organizar formaciones prácticas impartidas por los propios docentes del PIE (modelado 3D, radio escolar, robótica)."},
+                {"ambito": "9. Proyectos de innovación e investigación", "nivel": "Avanzado", "objetivo": "3. Promover la creación de proyectos de innovación digital de centro o en red con otros centros.", "linea": "3.1. Diseñar un nuevo proyecto de innovación vinculado a la transformación digital (PIE o similar).", "responsable": "Equipo directivo y coordinador digital.", "indicador": "Presentación y aprobación de un proyecto de innovación digital.", "instrumento": "Aprobación administrativa o acta de solicitud.", "descripcion": "Redactar y presentar un proyecto centrado en la mejora de la competencia digital del alumnado o del profesorado."},
+                {"ambito": "9. Proyectos de innovación e investigación", "nivel": "Avanzado", "objetivo": "3. Promover la creación de proyectos de innovación digital de centro o en red con otros centros.", "linea": "3.2. Difundir los resultados de los proyectos PIE mediante web, redes o jornadas educativas.", "responsable": "Coordinador de innovación y equipo PIE.", "indicador": "Publicación de al menos un producto o experiencia en medios digitales.", "instrumento": "Revisión de publicaciones y evidencias digitales.", "descripcion": "Elaborar y difundir podcasts, vídeos o artículos sobre los resultados del PIE, compartiéndolos en la web del centro o encuentros formativos."},
+                {"ambito": "10. Metodología", "nivel": "Inicial", "objetivo": "1. Introducir el uso de metodologías activas apoyadas en herramientas digitales.", "linea": "1.1. Incorporar recursos digitales sencillos (vídeos, presentaciones, formularios) en actividades de aula.", "responsable": "Docentes de todas las áreas y coordinador digital.", "indicador": "Al menos el 50 % del profesorado utiliza algún recurso digital en sus sesiones.", "instrumento": "Observación de aula y recopilación de materiales.", "descripcion": "Promover el uso básico de TIC en el aula (vídeos explicativos, cuestionarios online, presentaciones interactivas)."},
+                {"ambito": "10. Metodología", "nivel": "Inicial", "objetivo": "1. Introducir el uso de metodologías activas apoyadas en herramientas digitales.", "linea": "1.2. Formar al profesorado en metodologías activas con TIC (ABP, gamificación, flipped classroom).", "responsable": "Coordinador de formación y transformación digital.", "indicador": "Participación de al menos el 70 % del claustro en alguna sesión formativa.", "instrumento": "Registro de asistencia y encuesta de satisfacción.", "descripcion": "Ofrecer talleres introductorios sobre metodologías activas con ejemplos prácticos usando tecnología."},
+                {"ambito": "10. Metodología", "nivel": "Intermedio", "objetivo": "2. Integrar las metodologías activas digitales en la programación docente.", "linea": "2.1. Diseñar una unidad didáctica basada en aprendizaje por proyectos apoyado en tecnología.", "responsable": "Docentes de ciclo o equipo de nivel.", "indicador": "Al menos una unidad por ciclo incorpora metodologías activas con TIC.", "instrumento": "Rúbricas de unidades y evidencias de aula.", "descripcion": "Elaborar proyectos interdisciplinarios donde el alumnado use tecnología para investigar y presentar resultados."},
+                {"ambito": "10. Metodología", "nivel": "Intermedio", "objetivo": "2. Integrar las metodologías activas digitales en la programación docente.", "linea": "2.2. Incorporar herramientas de evaluación digital formativa (Forms, Kahoot, Socrative).", "responsable": "Docentes y coordinador digital.", "indicador": "El 60 % del profesorado utiliza alguna herramienta digital de evaluación formativa.", "instrumento": "Cuestionario de seguimiento y observación.", "descripcion": "Introducir herramientas de evaluación continua para obtener retroalimentación instantánea y ajustar la enseñanza."},
+                {"ambito": "10. Metodología", "nivel": "Avanzado", "objetivo": "3. Consolidar una cultura metodológica innovadora basada en el uso crítico y creativo de la tecnología.", "linea": "3.1. Implementar proyectos colaborativos interdisciplinarios con productos digitales finales (vídeos, blogs, podcasts).", "responsable": "Coordinador de innovación y docentes de distintos ciclos.", "indicador": "Al menos un proyecto interdisciplinar anual con difusión digital.", "instrumento": "Evaluación de productos y evidencias publicadas.", "descripcion": "Diseñar proyectos interdisciplinares con herramientas digitales colaborativas y difusión pública."},
+                {"ambito": "10. Metodología", "nivel": "Avanzado", "objetivo": "3. Consolidar una cultura metodológica innovadora basada en el uso crítico y creativo de la tecnología.", "linea": "3.2. Aplicar estrategias inclusivas con apoyo tecnológico (lectores de pantalla, dictado, subtítulos, apps accesibles).", "responsable": "Equipo de orientación y docentes de apoyo.", "indicador": "Uso de herramientas inclusivas en al menos 3 áreas o etapas.", "instrumento": "Observación directa y registro de adaptaciones.", "descripcion": "Promover el Diseño Universal de Aprendizaje (DUA) incorporando herramientas tecnológicas que garanticen la participación de todo el alumnado."},
+                {"ambito": "11. Recursos didácticos digitales", "nivel": "Inicial", "objetivo": "1. Localizar y organizar recursos digitales educativos accesibles para el profesorado.", "linea": "1.1. Crear un repositorio interno (Teams o OneDrive) con enlaces a recursos educativos digitales seleccionados.", "responsable": "Coordinador digital y profesorado colaborador.", "indicador": "Existencia de un repositorio activo con al menos 30 recursos.", "instrumento": "Revisión del repositorio y número de accesos.", "descripcion": "Recopilar recursos digitales clasificados por etapas o áreas (portales educativos, bancos REA, vídeos, actividades interactivas)."},
+                {"ambito": "11. Recursos didácticos digitales", "nivel": "Inicial", "objetivo": "1. Localizar y organizar recursos digitales educativos accesibles para el profesorado.", "linea": "1.2. Difundir periódicamente recursos digitales útiles a través del canal del claustro o boletín digital.", "responsable": "Coordinador de transformación digital.", "indicador": "Envío mensual o trimestral de recursos al profesorado.", "instrumento": "Registro de envíos y encuesta de satisfacción.", "descripcion": "Elaborar un boletín digital con recursos educativos destacados y enlaces a REA oficiales."},
+                {"ambito": "11. Recursos didácticos digitales", "nivel": "Intermedio", "objetivo": "2. Elaborar y compartir recursos digitales propios adaptados al DUA.", "linea": "2.1. Diseñar materiales accesibles (vídeos subtitulados, infografías, actividades multimodales).", "responsable": "Docentes de ciclo y equipo de orientación.", "indicador": "Creación de al menos 5 recursos DUA por curso.", "instrumento": "Revisión de materiales creados y observación en aula.", "descripcion": "Crear materiales inclusivos que permitan múltiples formas de representación, expresión y participación según el DUA."},
+                {"ambito": "11. Recursos didácticos digitales", "nivel": "Intermedio", "objetivo": "2. Elaborar y compartir recursos digitales propios adaptados al DUA.", "linea": "2.2. Publicar los recursos creados en espacios abiertos (EducamosCLM, Aula del Futuro, repositorios REA).", "responsable": "Coordinador digital y equipo docente.", "indicador": "Publicación de al menos 3 recursos REA durante el curso.", "instrumento": "Revisión de enlaces publicados.", "descripcion": "Compartir materiales educativos creados por el profesorado bajo licencias abiertas para fomentar la colaboración y reutilización."},
+                {"ambito": "11. Recursos didácticos digitales", "nivel": "Avanzado", "objetivo": "3. Integrar la inteligencia artificial en la creación y personalización de recursos educativos digitales.", "linea": "3.1. Utilizar herramientas de IA para generar materiales adaptados al nivel y necesidades del alumnado.", "responsable": "Coordinador digital y profesorado de apoyo.", "indicador": "Uso de IA en la creación de recursos en al menos 3 áreas o proyectos.", "instrumento": "Evidencias de materiales generados y revisión de resultados.", "descripcion": "Emplear herramientas de IA (ChatGPT, Copilot, etc.) para generar fichas, ejercicios o adaptaciones curriculares según criterios DUA."},
+                {"ambito": "11. Recursos didácticos digitales", "nivel": "Avanzado", "objetivo": "3. Integrar la inteligencia artificial en la creación y personalización de recursos educativos digitales.", "linea": "3.2. Formar al profesorado en el uso ético y responsable de la IA para la creación de REA.", "responsable": "Coordinador de formación y transformación digital.", "indicador": "Participación de al menos el 60 % del profesorado en una sesión formativa sobre IA educativa.", "instrumento": "Registro de asistencia y encuesta de valoración.", "descripcion": "Ofrecer formación práctica sobre herramientas de IA generativa, enfatizando el respeto al copyright, la privacidad y la ética digital."},
+                {"ambito": "12. Evaluación", "nivel": "Inicial", "objetivo": "1. Promover el conocimiento y uso básico del Cuaderno de Evaluación de EducamosCLM.", "linea": "1.1. Realizar una sesión formativa interna sobre el uso del Cuaderno de Evaluación y su vinculación con las programaciones.", "responsable": "Coordinador de Transformación Digital y equipo directivo.", "indicador": "Al menos el 70 % del profesorado utiliza el Cuaderno en alguna área.", "instrumento": "Registro de uso en EducamosCLM y encuestas.", "descripcion": "Organizar una sesión práctica sobre la vinculación entre criterios, instrumentos y calificaciones en el Cuaderno de EducamosCLM."},
+                {"ambito": "12. Evaluación", "nivel": "Inicial", "objetivo": "1. Promover el conocimiento y uso básico del Cuaderno de Evaluación de EducamosCLM.", "linea": "1.2. Elaborar una guía interna con orientaciones básicas para configurar y usar el Cuaderno.", "responsable": "Coordinador digital.", "indicador": "Guía compartida con todo el profesorado.", "instrumento": "Verificación documental y encuesta de utilidad.", "descripcion": "Crear una guía visual o videotutorial adaptado al centro con los pasos para configurar el cuaderno y asociar criterios."},
+                {"ambito": "12. Evaluación", "nivel": "Intermedio", "objetivo": "2. Mejorar la coherencia entre las metodologías docentes y el sistema de evaluación digital.", "linea": "2.1. Analizar las limitaciones del Cuaderno de EducamosCLM frente a metodologías activas y proponer ajustes o soluciones.", "responsable": "Comisión de coordinación pedagógica y coordinador digital.", "indicador": "Informe con propuestas consensuadas aprobado por el claustro.", "instrumento": "Actas de la CCP y documento de conclusiones.", "descripcion": "Identificar incompatibilidades del cuaderno con metodologías competenciales (ABP, rúbricas globales, coevaluación) y definir pautas comunes de adaptación."},
+                {"ambito": "12. Evaluación", "nivel": "Intermedio", "objetivo": "2. Mejorar la coherencia entre las metodologías docentes y el sistema de evaluación digital.", "linea": "2.2. Diseñar plantillas o instrumentos complementarios digitales (rúbricas, formularios, hojas de cálculo) para adaptar la evaluación.", "responsable": "Coordinador digital y docentes innovadores.", "indicador": "Creación de al menos 5 instrumentos complementarios adaptados al modelo competencial.", "instrumento": "Revisión de materiales creados y evidencias de uso.", "descripcion": "Generar instrumentos externos (Forms, Excel, rúbricas en Teams o Moodle) que complementen la evaluación cuando el cuaderno no se ajusta."},
+                {"ambito": "12. Evaluación", "nivel": "Avanzado", "objetivo": "3. Impulsar una evaluación competencial digital integrada y coherente con la normativa.", "linea": "3.1. Diseñar un modelo de evaluación de centro que combine el uso del Cuaderno de EducamosCLM con otros instrumentos digitales.", "responsable": "Equipo directivo y comisión de evaluación.", "indicador": "Modelo de evaluación consensuado y aplicado por al menos el 70 % del profesorado.", "instrumento": "Documento aprobado y seguimiento anual.", "descripcion": "Elaborar un marco de evaluación de centro que integre EducamosCLM con otros recursos digitales respetando la LOMLOE y el perfil competencial del alumnado."},
+                {"ambito": "12. Evaluación", "nivel": "Avanzado", "objetivo": "3. Impulsar una evaluación competencial digital integrada y coherente con la normativa.", "linea": "3.2. Promover la formación avanzada del profesorado en evaluación digital y uso de rúbricas competenciales.", "responsable": "Coordinador de formación y transformación digital.", "indicador": "Al menos el 50 % del claustro participa en una acción formativa sobre evaluación digital.", "instrumento": "Registro de participación y encuesta final.", "descripcion": "Ofrecer formación específica sobre evaluación competencial digital (rúbricas, evidencias, retroalimentación) para optimizar el uso del Cuaderno y herramientas complementarias."}
+            ];
+            
+            function initBancoDeIdeas() {
+                const container = document.getElementById('banco-ideas-container');
+                if (!container) return;
+
+                const filterAmbito = document.getElementById('banco-filter-ambito');
+                const filterNivel = document.getElementById('banco-filter-nivel');
+                const searchInput = document.getElementById('banco-search');
+                const clearBtn = document.getElementById('banco-clear');
+                const tableBody = document.querySelector('#banco-ideas-table tbody');
+                const tableHead = document.querySelector('#banco-ideas-table thead');
+
+                const headers = ['Ámbito', 'Nivel', 'Objetivo', 'Línea de Actuación', 'Responsable', 'Indicador', 'Descripción'];
+                tableHead.innerHTML = `<tr>${headers.map(h => `<th class="p-2">${h}</th>`).join('')}</tr>`;
+                
+                function populateFilters() {
+                    const ambitos = ['Todos los ámbitos', ...new Set(ALL_IDEAS.map(item => item.ambito))];
+                    const niveles = ['Todos los niveles', ...new Set(ALL_IDEAS.map(item => item.nivel))];
+                    
+                    filterAmbito.innerHTML = ambitos.map(a => `<option value="${a}">${a}</option>`).join('');
+                    filterNivel.innerHTML = niveles.map(n => `<option value="${n}">${n}</option>`).join('');
+                }
+
+                function renderTable() {
+                    const ambito = filterAmbito.value;
+                    const nivel = filterNivel.value;
+                    const query = searchInput.value.toLowerCase();
+
+                    const filteredData = ALL_IDEAS.filter(item => {
+                        const ambitoMatch = ambito === 'Todos los ámbitos' || item.ambito === ambito;
+                        const nivelMatch = nivel === 'Todos los niveles' || item.nivel === nivel;
+                        const queryMatch = !query || Object.values(item).some(val => String(val).toLowerCase().includes(query));
+                        return ambitoMatch && nivelMatch && queryMatch;
+                    });
+
+                    tableBody.innerHTML = filteredData.map(row => `
+                        <tr class="border-b" style="border-color: var(--tab-bg); background-color: #ffffff20;">
+                            <td class="p-2">${row.ambito}</td>
+                            <td class="p-2">${row.nivel}</td>
+                            <td class="p-2">${row.objetivo}</td>
+                            <td class="p-2">${row.linea}</td>
+                            <td class="p-2">${row.responsable}</td>
+                            <td class="p-2">${row.indicador}</td>
+                            <td class="p-2">${row.descripcion}</td>
+                        </tr>
+                    `).join('');
+                }
+                
+                filterAmbito.addEventListener('change', renderTable);
+                filterNivel.addEventListener('change', renderTable);
+                searchInput.addEventListener('input', renderTable);
+                clearBtn.addEventListener('click', () => {
+                    filterAmbito.value = 'Todos los ámbitos';
+                    filterNivel.value = 'Todos los niveles';
+                    searchInput.value = '';
+                    renderTable();
+                });
+
+                populateFilters();
+                renderTable();
+            }
+
+            // --- Lógica para el scroll de pestañas con flechas ---
+            const tabsContainer = document.getElementById('tabs-container');
+            const scrollLeftBtn = document.getElementById('scroll-left-btn');
+            const scrollRightBtn = document.getElementById('scroll-right-btn');
+
+            function updateScrollButtons() {
+                const { scrollLeft, scrollWidth, clientWidth } = tabsContainer;
+                // Pequeño umbral para evitar errores de redondeo
+                const scrollEndReached = scrollLeft + clientWidth >= scrollWidth - 2;
+
+                scrollLeftBtn.classList.toggle('hidden', scrollLeft <= 0);
+                scrollRightBtn.classList.toggle('hidden', scrollEndReached);
+            }
+
+            scrollLeftBtn.addEventListener('click', () => {
+                tabsContainer.scrollBy({ left: -250, behavior: 'smooth' });
+            });
+
+            scrollRightBtn.addEventListener('click', () => {
+                tabsContainer.scrollBy({ left: 250, behavior: 'smooth' });
+            });
+
+            tabsContainer.addEventListener('scroll', updateScrollButtons);
+            // También comprobar al cambiar el tamaño de la ventana
+            window.addEventListener('resize', updateScrollButtons);
+            
+            // Comprobación inicial
+             setTimeout(updateScrollButtons, 100);
+            
+            initBancoDeIdeas();
+        });
+    </script>
+
+</body>
+</html>
+
