@@ -222,7 +222,7 @@
                                 <p class="mb-4">Organizaos en equipos. Vuestra misión es reconstruir el proceso de creación del Plan Digital, conectando las pistas y estableciendo el orden correcto de actuación. ¡El primer equipo en resolverlo ganará el reconocimiento del claustro!</p>
                                 <div class="relative">
                                     <img src="https://i.postimg.cc/j2DvkZrw/Investigadores-del-misterio.png" alt="Grupo de docentes investigadores" class="rounded-lg shadow-lg w-full h-auto">
-                                    <div id="timer-overlay" class="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center rounded-lg">
+                                    <div id="timer-overlay" class="absolute inset-0 bg-black bg-opacity-30 flex flex-col items-center justify-center rounded-lg">
                                         <div id="timer-display" class="font-title text-6xl text-white" style="text-shadow: 2px 2px 4px #000;">03:00</div>
                                         <button id="start-timer-btn" class="mt-4 text-white font-bold py-2 px-6 rounded transition-colors action-button">Comenzar Misión</button>
                                     </div>
@@ -329,15 +329,21 @@
                                     <!-- Slides -->
                                     <div class="relative w-full overflow-hidden rounded-lg">
                                         <div class="carousel-item duration-700 ease-in-out">
-                                            <img src="https://i.postimg.cc/P5TK7GnL/Rueda-de-reconocimiento.png" class="block w-full" alt="Sospechosos de la transformación digital del centro">
+                                            <div class="relative">
+                                                <img src="https://i.postimg.cc/P5TK7GnL/Rueda-de-reconocimiento.png" class="block w-full" alt="Sospechosos de la transformación digital del centro">
+                                                <div id="timer-overlay-dinamica" class="absolute inset-0 bg-black bg-opacity-30 flex flex-col items-center justify-center rounded-lg">
+                                                    <div id="timer-display-dinamica" class="font-title text-6xl text-white" style="text-shadow: 2px 2px 4px #000;">03:00</div>
+                                                    <button id="start-timer-btn-dinamica" class="mt-4 text-white font-bold py-2 px-6 rounded transition-colors action-button">Iniciar Dinámica</button>
+                                                </div>
+                                            </div>
                                             <div class="p-4 text-center">
-                                                <p>Extraños sucesos han alterado la rutina del centro. En esta rueda de reconocimiento figuran los principales sospechosos. ¿Quiénes son los responsables?</p>
+                                                <p>Algo ha cambiado en el centro. Las rutinas de siempre ya no son las mismas. En esta rueda de reconocimiento se encuentran los principales sospechosos. ¿Quién es el instigador de esta transformación? Observe con atención.</p>
                                             </div>
                                         </div>
                                         <div class="carousel-item hidden duration-700 ease-in-out">
                                             <img src="https://i.postimg.cc/W1TSyRc4/Mejoramos-juntos.png" class="block w-full" alt="Docentes trabajando en equipo para mejorar el centro">
                                             <div class="p-4 text-center">
-                                                 <p>Pero un detective experimentado sabe que la verdad a menudo es inesperada. El cambio no fue obra de un solo individuo, sino del poder de la colaboración. ¡El misterio está resuelto!</p>
+                                                 <p>Tras un exhaustivo interrogatorio, la verdad sale a la luz. No fue un acto solitario, sino una conspiración... una conspiración para mejorar. El cambio fue obra de todos, trabajando en equipo. Caso cerrado.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -430,7 +436,7 @@
                 <div class="caesar-challenge-container">
                     <div class="relative">
                         <img src="https://i.postimg.cc/PqVj7W3M/Peluches.png" alt="Grupo de docentes resolviendo un enigma" class="w-full h-auto rounded-lg shadow-lg mb-8">
-                        <div id="timer-overlay-enigma" class="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center rounded-lg">
+                        <div id="timer-overlay-enigma" class="absolute inset-0 bg-black bg-opacity-30 flex flex-col items-center justify-center rounded-lg">
                             <div id="timer-display-enigma" class="font-title text-6xl text-white" style="text-shadow: 2px 2px 4px #000;">02:00</div>
                             <button id="start-timer-btn-enigma" class="mt-4 text-white font-bold py-2 px-6 rounded transition-colors action-button">Iniciar Enigma</button>
                         </div>
@@ -496,12 +502,12 @@
                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/></svg>
                 </button>
                 <h3 class="font-title text-2xl mb-4 text-center">Equipo: Zona Ciudad Real</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-center text-sm">
-                    <div class="mystery-card p-4"><h4 class="font-bold">Pedro Manuel Moya</h4><p class="break-all"><a href="mailto:pmgomezcaraballo@jccm.es">pmgomezcaraballo@jccm.es</a></p><p><strong>Teams:</strong> pmmg03</p></div>
-                    <div class="mystery-card p-4"><h4 class="font-bold">María Prado Merino</h4><p class="break-all"><a href="mailto:mmerinogascon@jccm.es">mmerinogascon@jccm.es</a></p><p><strong>Teams:</strong> pmg06</p></div>
-                    <div class="mystery-card p-4"><h4 class="font-bold">José García-Minguillán</h4><p class="break-all"><a href="mailto:jgarciaminguillan@jccm.es">jgarciaminguillan@jccm.es</a></p><p><strong>Teams:</strong> jjgm140</p></div>
-                    <div class="mystery-card p-4"><h4 class="font-bold">Teresa Ciudad Camacho</h4><p class="break-all"><a href="mailto:tciudadc@jccm.es">tciudadc@jccm.es</a></p><p><strong>Teams:</strong> ttcc25</p></div>
+                <div class="flex flex-wrap gap-4 justify-center text-center text-sm">
                     <div class="mystery-card p-4"><h4 class="font-bold">Jesús de Borja Sagra</h4><p class="break-all"><a href="mailto:jesusdeborja.sagra@jccm.es">jesusdeborja.sagra@jccm.es</a></p><p><strong>Teams:</strong> jdsa01</p></div>
+                    <div class="mystery-card p-4"><h4 class="font-bold">José García-Minguillán</h4><p class="break-all"><a href="mailto:jgarciaminguillan@jccm.es">jgarciaminguillan@jccm.es</a></p><p><strong>Teams:</strong> jjgm140</p></div>
+                    <div class="mystery-card p-4"><h4 class="font-bold">María Prado Merino</h4><p class="break-all"><a href="mailto:mmerinogascon@jccm.es">mmerinogascon@jccm.es</a></p><p><strong>Teams:</strong> pmg06</p></div>
+                    <div class="mystery-card p-4"><h4 class="font-bold">Pedro Manuel Moya</h4><p class="break-all"><a href="mailto:pmgomezcaraballo@jccm.es">pmgomezcaraballo@jccm.es</a></p><p><strong>Teams:</strong> pmmg03</p></div>
+                    <div class="mystery-card p-4"><h4 class="font-bold">Teresa Ciudad Camacho</h4><p class="break-all"><a href="mailto:tciudadc@jccm.es">tciudadc@jccm.es</a></p><p><strong>Teams:</strong> ttcc25</p></div>
                 </div>
             </div>
         </div>
@@ -516,8 +522,8 @@
                 <h3 class="font-title text-2xl mb-4 text-center">Equipo: Zona Alcázar - Tomelloso</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center text-sm">
                     <div class="mystery-card p-4"><h4 class="font-bold">Antonio Ángel Miñán</h4><p class="break-all"><a href="mailto:antonio.minan@jccm.es">antonio.minan@jccm.es</a></p><p><strong>Teams:</strong> aamo14</p></div>
-                    <div class="mystery-card p-4"><h4 class="font-bold">Lucía Serrano Palomo</h4><p class="break-all"><a href="mailto:lucia.serrano@jccm.es">lucia.serrano@jccm.es</a></p><p><strong>Teams:</strong> llsp09</p></div>
                     <div class="mystery-card p-4"><h4 class="font-bold">Jesús María Cano Lara</h4><p class="break-all"><a href="mailto:jclara@jccm.es">jclara@jccm.es</a></p><p><strong>Teams:</strong> jjcl31</p></div>
+                    <div class="mystery-card p-4"><h4 class="font-bold">Lucía Serrano Palomo</h4><p class="break-all"><a href="mailto:lucia.serrano@jccm.es">lucia.serrano@jccm.es</a></p><p><strong>Teams:</strong> llsp09</p></div>
                 </div>
             </div>
         </div>
@@ -546,9 +552,9 @@
                 </button>
                 <h3 class="font-title text-2xl mb-4 text-center">Equipo: Zona Manzanares - Valdepeñas</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center text-sm">
-                    <div class="mystery-card p-4"><h4 class="font-bold">Teresa Rodríguez</h4><p class="break-all"><a href="mailto:teresa.rodriguezc@jccm.es">teresa.rodriguezc@jccm.es</a></p><p><strong>Teams:</strong> ttrc03</p></div>
                     <div class="mystery-card p-4"><h4 class="font-bold">Encarnación Alises</h4><p class="break-all"><a href="mailto:ealises@jccm.es">ealises@jccm.es</a></p><p><strong>Teams:</strong> eeac42</p></div>
                     <div class="mystery-card p-4"><h4 class="font-bold">Manuel Martín Díaz</h4><p class="break-all"><a href="mailto:manmadi@jccm.es">manmadi@jccm.es</a></p><p><strong>Teams:</strong> mmmd75</p></div>
+                    <div class="mystery-card p-4"><h4 class="font-bold">Teresa Rodríguez</h4><p class="break-all"><a href="mailto:teresa.rodriguezc@jccm.es">teresa.rodriguezc@jccm.es</a></p><p><strong>Teams:</strong> ttrc03</p></div>
                 </div>
             </div>
         </div>
@@ -682,6 +688,17 @@
             startTimerBtnEnigma.addEventListener('click', function () {
                 const twoMinutes = 60 * 2;
                 timerIntervalEnigma = startTimer(twoMinutes, timerDisplayEnigma, timerIntervalEnigma);
+                this.style.display = 'none';
+            });
+            
+            // Lógica para el cronómetro de la DINAMICA 2
+            const startTimerBtnDinamica = document.getElementById('start-timer-btn-dinamica');
+            const timerDisplayDinamica = document.getElementById('timer-display-dinamica');
+            let timerIntervalDinamica;
+            
+            startTimerBtnDinamica.addEventListener('click', function () {
+                const threeMinutes = 60 * 3;
+                timerIntervalDinamica = startTimer(threeMinutes, timerDisplayDinamica, timerIntervalDinamica);
                 this.style.display = 'none';
             });
 
