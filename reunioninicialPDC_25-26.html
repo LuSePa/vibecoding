@@ -222,7 +222,7 @@
                                 <p class="mb-4">Organizaos en equipos. Vuestra misión es reconstruir el proceso de creación del Plan Digital, conectando las pistas y estableciendo el orden correcto de actuación. ¡El primer equipo en resolverlo ganará el reconocimiento del claustro!</p>
                                 <div class="relative">
                                     <img src="https://i.postimg.cc/j2DvkZrw/Investigadores-del-misterio.png" alt="Grupo de docentes investigadores" class="rounded-lg shadow-lg w-full h-auto">
-                                    <div id="timer-overlay" class="absolute inset-0 bg-black bg-opacity-30 flex flex-col items-center justify-center rounded-lg">
+                                    <div id="timer-overlay" class="absolute inset-0 bg-black bg-opacity-25 flex flex-col items-center justify-center rounded-lg">
                                         <div id="timer-display" class="font-title text-6xl text-white" style="text-shadow: 2px 2px 4px #000;">03:00</div>
                                         <button id="start-timer-btn" class="mt-4 text-white font-bold py-2 px-6 rounded transition-colors action-button">Comenzar Misión</button>
                                     </div>
@@ -340,7 +340,7 @@
                                         <div class="carousel-item duration-700 ease-in-out">
                                             <div class="relative">
                                                 <img src="https://i.postimg.cc/P5TK7GnL/Rueda-de-reconocimiento.png" class="block w-full" alt="Sospechosos de la transformación digital del centro">
-                                                <div id="timer-overlay-dinamica" class="absolute inset-0 bg-black bg-opacity-30 flex flex-col items-center justify-center rounded-lg">
+                                                <div id="timer-overlay-dinamica" class="absolute inset-0 bg-black bg-opacity-25 flex flex-col items-center justify-center rounded-lg">
                                                     <div id="timer-display-dinamica" class="font-title text-6xl text-white" style="text-shadow: 2px 2px 4px #000;">03:00</div>
                                                     <button id="start-timer-btn-dinamica" class="mt-4 text-white font-bold py-2 px-6 rounded transition-colors action-button">Iniciar Dinámica</button>
                                                 </div>
@@ -443,29 +443,35 @@
             <div id="innovarretos" class="tab-content">
                 <h2 class="font-title text-3xl mb-6 text-center">¿?</h2>
                 <div class="caesar-challenge-container">
-                    <div class="relative">
-                        <img src="https://i.postimg.cc/PqVj7W3M/Peluches.png" alt="Grupo de docentes resolviendo un enigma" class="w-full h-auto rounded-lg shadow-lg mb-8">
-                        <div id="timer-overlay-enigma" class="absolute inset-0 bg-black bg-opacity-30 flex flex-col items-center justify-center rounded-lg">
-                            <div id="timer-display-enigma" class="font-title text-6xl text-white" style="text-shadow: 2px 2px 4px #000;">02:00</div>
-                            <button id="start-timer-btn-enigma" class="mt-4 text-white font-bold py-2 px-6 rounded transition-colors action-button">Iniciar Enigma</button>
+                    <div class="flex flex-col md:flex-row gap-8 items-center">
+                        <!-- Columna Izquierda: Imagen y Cronómetro -->
+                        <div class="md:w-1/2 w-full">
+                            <div class="relative">
+                                <img src="https://i.postimg.cc/PqVj7W3M/Peluches.png" alt="Dos peluches detectivescos frente a un enigma" class="w-full h-auto rounded-lg shadow-lg">
+                                <div id="timer-overlay-enigma" class="absolute inset-0 bg-black bg-opacity-25 flex flex-col items-center justify-center rounded-lg">
+                                    <div id="timer-display-enigma" class="font-title text-6xl text-white" style="text-shadow: 2px 2px 4px #000;">02:00</div>
+                                    <button id="start-timer-btn-enigma" class="mt-4 text-white font-bold py-2 px-6 rounded transition-colors action-button">Iniciar Enigma</button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div id="challenge-section" class="text-center mt-8">
-                        <p class="text-lg mb-4">Este es el enigma final de nuestra sesión. Un desafío para poner a prueba vuestro ingenio deductivo. La solución desbloquea el acceso a una valiosa guía para futuras misiones de innovación.</p>
-                        <p class="font-mono text-2xl md:text-3xl tracking-widest my-6 p-4 bg-white border-2 border-gray-300 rounded max-w-md mx-auto">LPPRYD UHWRV</p>
-                        <p class="mb-4"><strong>Pista:</strong> El viejo César siempre contaba hasta tres.</p>
-                        
-                        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <input type="text" id="password-input" class="caesar-input p-2 text-center text-xl w-full sm:w-auto" placeholder="CONTRASEÑA...">
-                            <button onclick="checkPassword()" class="text-white font-bold py-2 px-6 rounded transition-colors w-full sm:w-auto action-button">Desvelar</button>
-                        </div>
-                        <p id="error-message" class="text-red-600 mt-4 h-4"></p>
-                        <div class="relative mt-4">
-                             <button id="show-solution-btn" class="text-sm underline" style="color: var(--text-color);">¿No estuviste en la reunión? No te preocupes, te doy la clave</button>
-                             <div id="solution-tooltip" class="hidden absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max p-2 rounded-lg text-white text-center" style="background-color: var(--header-bg);">
-                                 La solución es: immova retos
-                                 <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent" style="border-top-color: var(--header-bg);"></div>
-                             </div>
+                        <!-- Columna Derecha: Texto y Reto -->
+                        <div id="challenge-section" class="md:w-1/2 w-full text-center">
+                            <p class="text-lg mb-4">Este es el enigma final de nuestra sesión. Un desafío para poner a prueba vuestro ingenio deductivo. La solución desbloquea el acceso a una valiosa guía para futuras misiones de innovación.</p>
+                            <p class="font-mono text-2xl md:text-3xl tracking-widest my-6 p-4 bg-white border-2 border-gray-300 rounded max-w-md mx-auto">LPPRYD UHWRV</p>
+                            <p class="mb-4"><strong>Pista:</strong> El viejo César siempre contaba hasta tres.</p>
+                            
+                            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                                <input type="text" id="password-input" class="caesar-input p-2 text-center text-xl w-full sm:w-auto" placeholder="CONTRASEÑA...">
+                                <button onclick="checkPassword()" class="text-white font-bold py-2 px-6 rounded transition-colors w-full sm:w-auto action-button">Desvelar</button>
+                            </div>
+                            <p id="error-message" class="text-red-600 mt-4 h-4"></p>
+                            <div class="relative mt-4">
+                                 <button id="show-solution-btn" class="text-sm underline" style="color: var(--text-color);">¿No estuviste en la reunión? No te preocupes, te doy la clave</button>
+                                 <div id="solution-tooltip" class="hidden absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max p-2 rounded-lg text-white text-center" style="background-color: var(--header-bg);">
+                                     La solución es: innova retos
+                                     <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent" style="border-top-color: var(--header-bg);"></div>
+                                 </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -634,14 +640,14 @@
             window.checkPassword = function() {
                 const passwordInput = document.getElementById('password-input');
                 const errorMessage = document.getElementById('error-message');
-                const challengeSection = document.getElementById('challenge-section');
+                const challengeWrapper = document.getElementById('challenge-wrapper');
                 const contentSection = document.getElementById('innovarretos-content');
                 
-                const correctPassword = "immova retos";
+                const correctPassword = "innova retos";
                 
                 if (passwordInput.value.trim().toLowerCase() === correctPassword) {
                     errorMessage.textContent = "";
-                    challengeSection.style.display = 'none';
+                    challengeWrapper.style.display = 'none';
                     contentSection.classList.remove('hidden');
                 } else {
                     errorMessage.textContent = "Contraseña incorrecta. ¡Sigue intentándolo!";
