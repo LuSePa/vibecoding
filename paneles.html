@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Taller - PDI y Lumio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ------------------- */
+        /* MANUAL DE ESTILO    */
+        /* ------------------- */
+        :root {
+            --color-fondo: #FDF5E6;     /* Crema */
+            --color-titulos: #D2691E;     /* Chocolate */
+            --color-texto: #3C2A1E;       /* Café oscuro */
+            --color-acento: #E49B0F;      /* Calabaza */
+            --fuente-titulos: 'Montserrat', sans-serif;
+            --fuente-cuerpo: 'Open Sans', sans-serif;
+        }
+
+        /* ------------------- */
+        /* ESTILOS GENERALES   */
+        /* ------------------- */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: var(--fuente-cuerpo);
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+            line-height: 1.7;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--fuente-titulos);
+            color: var(--color-titulos);
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+        
+        h1 { font-size: 2.8rem; }
+        h2 { font-size: 2.2rem; margin-top: 2rem; }
+        h3 { font-size: 1.8rem; margin-top: 1.5rem; }
+        h4 { font-size: 1.4rem; color: var(--color-texto); }
+
+        p { margin-bottom: 1.25rem; }
+        a { color: var(--color-acento); font-weight: 600; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        ul, ol { padding-left: 1.5rem; margin-bottom: 1.25rem; }
+        li { margin-bottom: 0.5rem; }
+        img { max-width: 100%; height: auto; border-radius: 8px; }
+        figure { margin: 1.5rem 0; }
+        figcaption { font-size: 0.9rem; color: #6c5d53; font-style: italic; text-align: center; margin-top: 0.5rem; }
+        blockquote { border-left: 4px solid var(--color-acento); padding-left: 1.5rem; margin: 1.5rem 0; font-style: italic; }
+        table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+        th, td { border: 1px solid rgba(60, 42, 30, 0.2); padding: 0.75rem; text-align: left; }
+        th { background-color: rgba(60, 42, 30, 0.05); }
+
+        /* ------------------- */
+        /* CABECERA Y PIE      */
+        /* ------------------- */
+        header {
+            display: grid;
+            background-color: var(--color-texto); /* Fondo para espacios vacíos */
+            position: relative;
+            border-bottom: 2px solid rgba(60, 42, 30, 0.1);
+        }
+
+        header img.logo-cabecera {
+            grid-column: 1 / -1; 
+            grid-row: 1 / -1;    
+            width: 100%;
+            height: auto; /* Altura automática */
+            max-height: 350px; /* Límite de altura */
+            object-fit: cover;
+            filter: brightness(1.1);
+            align-self: start; /* Alinea la imagen arriba */
+        }
+        
+        .info-taller {
+            grid-column: 1 / -1;
+            grid-row: 1 / -1;
+            z-index: 1; 
+            width: 100%;
+            padding: 0.5rem 2.5rem; /* Padding vertical reducido */
+            
+            /* Centrado del bloque de texto */
+            display: grid;
+            align-content: center; /* Centra verticalmente */
+            justify-items: center; /* Centra horizontalmente */
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.8rem;
+            color: var(--color-acento); 
+            text-shadow: 
+                -1px -1px 0 var(--color-texto),  
+                 1px -1px 0 var(--color-texto),
+                -1px  1px 0 var(--color-texto),
+                -1px  1px 0 var(--color-texto),
+                 0 0 10px rgba(60, 42, 30, 0.7),
+                 0 0 10px rgba(60, 42, 30, 0.7);
+        }
+
+        header p {
+            margin: 0;
+            font-size: 1.1rem; /* Reducido */
+            font-weight: 600;
+            color: var(--color-fondo); 
+            text-shadow: 
+                -1px -1px 0 var(--color-texto),  
+                 1px -1px 0 var(--color-texto),
+                -1px  1px 0 var(--color-texto),
+                 1px  1px 0 var(--color-texto),
+                 0 0 8px rgba(60, 42, 30, 0.9),
+                 0 0 8px rgba(60, 42, 30, 0.9);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            margin-top: 3rem;
+            border-top: 2px solid rgba(60, 42, 30, 0.1);
+            font-size: 0.9rem;
+            color: #6c5d53;
+        }
+        footer .nombre-autor {
+            font-weight: 600;
+            color: var(--color-texto);
+        }
+        footer .ia-credit {
+            font-style: italic;
+        }
+
+        /* ------------------- */
+        /* SISTEMA DE PESTAÑAS */
+        /* ------------------- */
+        .tab-nav-wrapper {
+            background-color: var(--color-texto);
+            padding: 0 1.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .tab-nav {
+            display: flex;
+            margin: 0 auto;
+            max-width: 100%; /* Ocupa todo el ancho */
+        }
+
+        .tab-link {
+            font-family: var(--fuente-cuerpo);
+            background-color: transparent;
+            border: none;
+            padding: 1rem 0.5rem; /* Padding horizontal reducido */
+            font-size: 0.9rem; /* Fuente más pequeña */
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--color-fondo);
+            opacity: 0.7;
+            position: relative;
+            transition: opacity 0.2s ease, background-color 0.2s ease;
+            
+            /* Ajuste flexible */
+            flex-grow: 1;
+            flex-shrink: 1; /* Permite que encoja */
+            flex-basis: 0; /* Distribución equitativa */
+            
+            text-align: center;
+            line-height: 1.4;
+        }
+        
+        .tab-link:hover {
+            opacity: 1;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-link.active {
+            opacity: 1;
+            color: #fff;
+        }
+
+        .tab-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 10%; /* Ajuste para centrar la línea */
+            width: 80%; /* Ajuste para centrar la línea */
+            height: 3px;
+            background-color: var(--color-acento);
+        }
+
+        .tab-content {
+            display: none; /* Oculto por defecto */
+        }
+
+        .tab-content.active {
+            display: block; /* Visible cuando está activo */
+        }
+
+        /* --------------------------- */
+        /* PESTAÑA 1: ÍNDICE TARJETAS  */
+        /* --------------------------- */
+        .index-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            padding-top: 1rem;
+        }
+        .index-card {
+            background-color: #f7efe1;
+            border: 1px solid rgba(60, 42, 30, 0.1);
+            border-radius: 8px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-align: center; /* Centra contenido */
+
+            /* Ajuste Flex */
+            flex-grow: 1;
+            flex-basis: 250px; /* Base de tamaño */
+            max-width: 320px; /* Límite de ancho */
+            
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 150px;
+        }
+        .index-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(60, 42, 30, 0.1);
+        }
+        .index-card span {
+            font-family: var(--fuente-titulos);
+            font-size: 1.1rem;
+            color: var(--color-titulos);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: block;
+            /* Versalitas */
+            font-variant: small-caps;
+            font-size: 1.3rem; /* Ajustar tamaño para versalitas */
+            letter-spacing: 0.5px;
+        }
+        .index-card p {
+            font-size: 0.9rem;
+            color: var(--color-texto);
+            margin-bottom: 0;
+        }
+
+        /* ------------------- */
+        /* CONTENIDO DESPLEGABLE */
+        /* ------------------- */
+        details {
+            border: 1px solid rgba(60, 42, 30, 0.15);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            background-color: rgba(255, 255, 255, 0.3);
+            overflow: hidden; /* Para bordes redondeados */
+        }
+        summary {
+            font-family: var(--fuente-titulos);
+            font-size: 1.6rem;
+            color: var(--color-titulos);
+            padding: 1.25rem 1.75rem;
+            cursor: pointer;
+            outline: none;
+            transition: background-color 0.2s ease;
+            list-style: none; /* Ocultar flecha por defecto */
+            position: relative;
+        }
+        summary:hover {
+            background-color: rgba(60, 42, 30, 0.03);
+        }
+        
+        /* Icono +/- */
+        summary::before {
+            content: '+';
+            font-family: monospace;
+            font-size: 1.8rem;
+            position: absolute;
+            right: 1.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-acento);
+            font-weight: 600;
+        }
+        details[open] > summary::before {
+            content: '−';
+        }
+        /* Ocultar flecha en Chrome/Safari */
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .details-content {
+            padding: 0.5rem 1.75rem 1.75rem 1.75rem;
+            border-top: 1px solid rgba(60, 42, 30, 0.1);
+        }
+        
+        /* Desplegables anidados */
+        details details {
+             background-color: rgba(255, 255, 255, 0.4);
+             border-color: rgba(60, 42, 30, 0.1);
+             margin-top: 1rem;
+        }
+        details details summary {
+            font-size: 1.2rem;
+            color: var(--color-texto);
+            padding: 1rem 1.5rem;
+        }
+        details details .details-content {
+             padding: 0 1.5rem 1.5rem 1.5rem;
+        }
+
+        /* ------------------- */
+        /* MODAL PANTALLA COMPLETA (Restaurado) */
+        /* ------------------- */
+        body.modal-open {
+            overflow: hidden;
+        }
+        details.modal-view {
+            border: none;
+            background-color: transparent;
+        }
+        /* Estilos cuando el modal está abierto */
+        details.modal-view[open] {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 200;
+            background-color: var(--color-fondo);
+            overflow-y: auto;
+            padding: 2rem;
+        }
+        details.modal-view[open] > summary {
+            background-color: var(--color-fondo); /* Fondo crema */
+            border-bottom: 2px solid rgba(60, 42, 30, 0.1); /* Borde inferior */
+            padding: 1rem 1.5rem; /* Padding */
+            position: fixed; 
+            top: 0;
+            right: 0; 
+            left: 0; 
+            z-index: 202; 
+            
+            /* Revertir estilos de círculo */
+            font-size: 1.6rem; /* Restaurar tamaño de fuente */
+            width: 100%;
+            height: auto;
+            border-radius: 0;
+            display: flex; /* Usar flex */
+            justify-content: space-between; /* Título a la izq, X a la der */
+            align-items: center;
+            opacity: 1; /* Opacidad total */
+            color: var(--color-titulos); /* Color de título */
+            font-family: var(--fuente-titulos);
+        }
+        details.modal-view[open] > summary:hover {
+            opacity: 1; /* Sin cambio en hover */
+        }
+
+        details.modal-view[open] > summary::before {
+            content: '×'; /* Icono de cierre */
+            font-size: 3rem; 
+            color: var(--color-texto); /* Color café */
+            font-weight: 400;
+            line-height: 1;
+            /* Reseteo de posición */
+            position: static; 
+            transform: none;
+        }
+        details.modal-view[open] > summary {
+            /* Invertir el orden: Botón a la izquierda, Título a la derecha */
+            flex-direction: row-reverse;
+        }
+        details.modal-view[open] > summary::before {
+            /* Mover la X a la izquierda visualmente */
+            margin-right: 1.5rem;
+        }
+        details.modal-view[open] > .details-content {
+            border-top: none;
+            padding: 2rem 1.5rem 1.5rem 1.5rem; /* Padding normal */
+            padding-top: 6rem; /* Añadir padding superior para la barra de título fija */
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+
+        /* ------------------- */
+        /* CARRUSEL DE CONTENIDO */
+        /* ------------------- */
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            border-radius: 8px;
+            background: #fff;
+            border: 1px solid rgba(60, 42, 30, 0.1);
+        }
+        .carousel-track {
+            display: flex;
+            transition: transform 0.3s ease-in-out;
+        }
+        .carousel-slide {
+            min-width: 100%;
+            padding: 2rem;
+            visibility: hidden;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s;
+            overflow-wrap: break-word; /* Solución desbordamiento */
+        }
+        .carousel-slide.active {
+            visibility: visible;
+            display: block;
+            opacity: 1;
+        }
+        .carousel-slide h4 {
+            margin-top: 0;
+            border-bottom: 2px solid var(--color-acento);
+            padding-bottom: 0.5rem;
+        }
+        .carousel-navigation {
+            /* Vaciado - Los botones ahora son absolutos */
+        }
+        .carousel-button {
+            background-color: var(--color-texto); /* Nuevo: Café Oscuro */
+            color: var(--color-fondo);
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease, opacity 0.2s;
+            width: 2.5rem;
+            height: 2.5rem;
+            line-height: 2.5rem;
+            padding: 0;
+            text-align: center;
+
+            /* Nuevo: Posicionamiento lateral */
+            position: fixed; /* Cambiado de absolute a fixed */
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 205; /* Aumentado de 5 a 205 */
+        }
+        .carousel-button.prev {
+            left: 1.5rem; /* Aumentado de 1rem */
+        }
+        .carousel-button.next {
+            right: 1.5rem; /* Aumentado de 1rem */
+        }
+        
+        .carousel-button:hover {
+            background-color: #2a1e15; /* Nuevo: Café más oscuro */
+        }
+        .carousel-button:disabled {
+            background-color: #ccc;
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* --- NUEVO: ESTILOS DE VÍDEO EMBEBIDO --- */
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+            border-radius: 8px; /* Coincidir con el estilo de imagen */
+            margin: 1.5rem 0 1rem 0; /* Espaciado */
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .video-attribution {
+            text-align: right;
+            font-size: 0.9rem;
+            font-style: italic;
+            color: #6c5d53;
+            margin-bottom: 1.5rem;
+        }
+        .video-attribution a {
+            font-weight: 400; /* No tan fuerte como los enlaces principales */
+        }
+        /* --- FIN DE NUEVOS ESTILOS DE VÍDEO --- */
+        
+        /* ------------------- */
+        /* RECURSOS ESTILOS */
+        /* ------------------- */
+        .resource-banner {
+            background-color: var(--color-titulos);
+            color: var(--color-fondo);
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .resource-banner h3 {
+            color: var(--color-fondo);
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+        .resource-banner p {
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+        .resource-banner .btn-notebook {
+            background-color: var(--color-acento);
+            color: var(--color-texto);
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: opacity 0.2s;
+            display: inline-block;
+        }
+        .resource-banner .btn-notebook:hover {
+            opacity: 0.9;
+            text-decoration: none;
+        }
+        
+        /* Centrado de la cuadrícula de recursos */
+        .resource-grid-wrapper {
+            display: flex;
+            justify-content: center; /* Centra el contenido horizontalmente */
+            width: 100%;
+        }
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding-top: 1rem;
+            /* Se necesita max-width para centrar si la cuadrícula no llena el contenedor */
+            max-width: 1100px; /* Asegura que no se exceda el ancho principal */
+        }
+        .resource-card {
+            background-color: #fff;
+            border: 1px solid rgba(60, 42, 30, 0.1);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .resource-card h4 {
+            color: var(--color-titulos);
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        .resource-card p {
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+        .resource-card a {
+            align-self: flex-start;
+            font-size: 0.9rem;
+        }
+
+
+        /* ------------------- */
+        /* RESPONSIVE DESIGN   */
+        /* ------------------- */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            h2 { font-size: 1.8rem; }
+            main { padding: 1.5rem 1rem; }
+            
+            header p { font-size: 1rem; }
+            .info-taller { padding: 0.5rem 1.5rem; }
+
+            /* Scroll en pestañas móviles */
+            .tab-nav-wrapper {
+                padding: 0;
+            }
+            .tab-nav {
+                overflow-x: auto;
+                justify-content: flex-start;
+                -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+            }
+            .tab-link {
+                flex-grow: 0;
+                flex-shrink: 0; /* No encoger */
+                flex-basis: auto; /* Ancho basado en contenido */
+                padding: 1rem;
+                white-space: nowrap; /* Evita salto de línea */
+                font-size: 0.9rem;
+            }
+            .tab-link.active::after {
+                width: 60%;
+                left: 20%;
+            }
+
+            summary { font-size: 1.3rem; padding: 1rem 1.25rem; }
+            summary::before { right: 1.25rem; }
+            .details-content { padding: 0.5rem 1.25rem 1.25rem 1.25rem; }
+
+            /* Modal en móvil */
+            details.modal-view[open] {
+                padding: 1rem;
+            }
+            details.modal-view[open] > summary {
+                top: 0.5rem;
+                right: 0.5rem;
+            }
+            details.modal-view[open] > .details-content {
+                padding: 3rem 0.5rem 0.5rem 0.5rem;
+            }
+            
+            .carousel-slide { padding: 1.5rem; }
+            .carousel-button {
+                width: 2.2rem;
+                height: 2.2rem;
+                line-height: 2.2rem;
+                font-size: 1.2rem;
+            }
+            .carousel-button.prev { left: 0.5rem; }
+            .carousel-button.next { right: 0.5rem; }
+
+            /* Ajuste de cuadrícula de recursos en móvil */
+            .resource-grid {
+                 grid-template-columns: 1fr;
+                 gap: 1rem;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 1. CABECERA -->
+    <header>
+        <!-- Restaurado al modelo de ejemplo que funcionaba -->
+        <img class="logo-cabecera" src="https://i.postimg.cc/gjycnBqp/Imagen1.png" alt="Logo de cabecera con logos del Ministerio y Código Escuela 4.0" loading="lazy" 
+             onerror="this.onerror=null; this.src='https://placehold.co/1200x200/3C2A1E/FDF5E6?text=Error+Cargando+Imagen';">
+        
+        <div class="info-taller">
+            <h1>PDI y Lumio</h1>
+            <p>De la PDI a la nube: creando lecciones interactivas.</p>
+        </div>
+    </header>
+
+    <!-- 2. NAVEGACIÓN POR PESTAÑAS -->
+    <div class="tab-nav-wrapper">
+        <nav class="tab-nav" role="tablist">
+            <button class="tab-link active" id="tab-contenidos" data-target="#seccion-contenidos" role="tab" aria-selected="true" aria-controls="seccion-contenidos">Contenidos</button>
+            <button class="tab-link" id="tab-parte1" data-target="#seccion-parte1" role="tab" aria-selected="false" aria-controls="seccion-parte1">Paneles y SO</button>
+            <button class="tab-link" id="tab-parte2" data-target="#seccion-parte2" role="tab" aria-selected="false" aria-controls="seccion-parte2">Conectividad y perfiles</button>
+            <button class="tab-link" id="tab-parte3" data-target="#seccion-parte3" role="tab" aria-selected="false" aria-controls="seccion-parte3">Introducción a Lumio</button>
+            <button class="tab-link" id="tab-parte4" data-target="#seccion-parte4" role="tab" aria-selected="false" aria-controls="seccion-parte4">Uso didáctico de Lumio</button>
+            <button class="tab-link" id="tab-recursos" data-target="#seccion-recursos" role="tab" aria-selected="false" aria-controls="seccion-recursos">Recursos</button>
+        </nav>
+    </div>
+
+    <!-- 3. CONTENEDOR PRINCIPAL DE PESTAÑAS -->
+    <main>
+        <div class="tab-content-container">
+
+            <!-- PESTAÑA 1: CONTENIDOS (ÍNDICE) -->
+            <section id="seccion-contenidos" class="tab-content active" role="tabpanel" aria-labelledby="tab-contenidos">
+                <h2 style="text-align: center; border-bottom: none; margin-bottom: 2rem;">Índice del Taller</h2>
+                <div class="index-grid">
+                    <div class="index-card" data-target-tab="#tab-parte1">
+                        <span>Paneles y SO</span>
+                        <p>Hardware y sistema operativo iQ: uso inmediato sin dispositivos externos.</p>
+                    </div>
+                    <div class="index-card" data-target-tab="#tab-parte2">
+                        <span>Conectividad y perfiles</span>
+                        <p>Conexión por cable/inalámbrica, tinta digital y gestión de cuentas de docente.</p>
+                    </div>
+                    <div class="index-card" data-target-tab="#tab-parte3">
+                        <span>Introducción a Lumio</span>
+                        <p>Acceso, importación de recursos, juegos y herramientas de accesibilidad (Immersive Reader).</p>
+                    </div>
+                    <div class="index-card" data-target-tab="#tab-parte4">
+                        <span>Uso didáctico de Lumio</span>
+                        <p>Flujo de trabajo de sesiones, trabajo diferenciado y análisis de datos de estudiantes.</p>
+                    </div>
+                    <div class="index-card" data-target-tab="#tab-recursos">
+                        <span>Recursos</span>
+                        <p>Enlaces directos, canales de YouTube y cuaderno de Notebook LM para ampliar.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PESTAÑA 2: PARTE 1 - HARDWARE -->
+            <section id="seccion-parte1" class="tab-content" role="tabpanel" aria-labelledby="tab-parte1">
+                <h2>Paneles y SO</h2>
+                <p>Esta sección cubre el <strong>hardware</strong> físico del panel interactivo <strong>SMART Board MX-v5</strong> y el uso del sistema operativo <strong>iQ4</strong> embebido, centrándose en el modo anónimo para empezar a trabajar de inmediato.</p>
+                
+                <details class="modal-view"> <!-- Clase añadida -->
+                    <summary>Introducción al hardware del panel</summary>
+                    <div class="details-content">
+                        <div class="carousel-container">
+                            <div class="carousel-track">
+                                <!-- CONTENIDO REEMPLAZADO -->
+                                <div class="carousel-slide active">
+                                    <h4>Características y controles físicos</h4>
+                                    <p>El panel <strong>MX V5</strong> ofrece resolución <strong>4K UHD</strong> y soporta hasta 40 toques simultáneos y el uso de herramientas simultáneas. Se describen los controles frontales: Pausa/Congelar pantalla (congela la imagen del dispositivo externo), Persiana (oscurece la pantalla), Selección de fuente, y el Botón de Inicio. Incluye punteros pasivos (sin batería) y un <strong>set</strong> de micrófonos superiores con cancelación de eco acústico, además de un lector <strong>NFC</strong> para el inicio de sesión del docente.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/m4qQYN7JLvY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: TIC, TAC y más (<a href="https://www.youtube.com/watch?v=m4qQYN7JLvY&list=PLIHTrxOQrFrRbx2SJBG0TuQvIyALYJ7rL&index=2&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <div class="carousel-slide">
+                                    <h4>Encendido, apagado y gestión de energía</h4>
+                                    <p>Se explica el modo <strong>standby</strong> (reposo rápido) mediante el botón frontal, indicado por un <strong>LED</strong> rojo, ideal para el uso cotidiano. Se diferencia del interruptor físico trasero para el apagado completo y se detalla que el apagado total del sistema operativo <strong>iQ</strong> se realiza mediante el <strong>software</strong>, deslizando hacia abajo en la pantalla principal para seleccionar la opción "Apagar".</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/jH0LFSlOIuE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: TIC, TAC y más (<a href="https://www.youtube.com/watch?v=jH0LFSlOIuE&list=PLIHTrxOQrFrRbx2SJBG0TuQvIyALYJ7rL&index=3&pp=iAQB0gcJCQYKAYcqIYzv" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <!-- FIN DE CONTENIDO REEMPLAZADO -->
+                            </div>
+                            <!-- Botones movidos fuera de 'navigation' -->
+                            <button class="carousel-button prev" aria-label="Anterior">&lt;</button>
+                            <button class="carousel-button next" aria-label="Siguiente">&gt;</button>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="modal-view"> <!-- Clase añadida -->
+                    <summary>Uso del sistema operativo iQ embebido (modo anónimo)</summary>
+                    <div class="details-content">
+                        <div class="carousel-container">
+                             <div class="carousel-track">
+                                <!-- CONTENIDO REEMPLAZADO -->
+                                <div class="carousel-slide active">
+                                    <h4>Interacción básica y espacio de trabajo</h4>
+                                    <p>El funcionamiento básico de la pizarra incluye escribir con el puntero, mover el espacio de trabajo o los objetos con el dedo, y borrar el contenido con la palma de la mano. La pizarra es un espacio de trabajo ampliable (<strong>expandable canvas</strong>) que permite moverse por el entorno a medida que se añade contenido.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/oi7rWnc9PKQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: TIC, TAC y más (<a href="https://www.youtube.com/watch?v=oi7rWnc9PKQ&list=PLIHTrxOQrFrRbx2SJBG0TuQvIyALYJ7rL&index=8&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <div class="carousel-slide">
+                                    <h4>Herramientas de la pizarra y texto digital</h4>
+                                    <p>Se pueden seleccionar diferentes colores y grosores del rotulador. Se explica cómo la pizarra puede transformar el texto manuscrito en texto digital y las opciones para activar la escritura con el dedo. Además, se muestra cómo añadir nuevas páginas y usar organizadores gráficos (plantillas estáticas).</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/xPjURXsjhnw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: TIC, TAC y más (<a href="https://www.youtube.com/watch?v=xPjURXsjhnw&list=PLIHTrxOQrFrRbx2SJBG0TuQvIyALYJ7rL&index=9&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <div class="carousel-slide">
+                                    <h4>Inserción de multimedia y plantillas</h4>
+                                    <p>Se permite la búsqueda e inserción de imágenes <strong>Creative Commons</strong> directamente. También se pueden buscar e insertar vídeos de <strong>YouTube</strong> sin necesidad de abrir el navegador, garantizando que no contendrán publicidad. Se pueden añadir medios didácticos (plantillas dinámicas), como manipulativos de monedas.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/u6vXC40WR5s" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: TIC, TAC y más (<a href="https://www.youtube.com/watch?v=u6vXC40WR5s&list=PLIHTrxOQrFrRbx2SJBG0TuQvIyALYJ7rL&index=10&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                 <div class="carousel-slide">
+                                    <h4>Herramientas de productividad (Matemáticas)</h4>
+                                    <p>Desde el menú contextual de la pizarra se accede a herramientas matemáticas como la regla y el compás.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/T3QFzS1hBdc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: TIC, TAC y más (<a href="https://www.youtube.com/watch?v=T3QFzS1hBdc&list=PLIHTrxOQrFrRbx2SJBG0TuQvIyALYJ7rL&index=11&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                 <div class="carousel-slide">
+                                    <h4>Funciones de productividad (Pantalla dividida)</h4>
+                                    <p>Se utiliza el icono de aplicaciones abiertas para activar la pantalla dividida (<strong>split screen</strong>), permitiendo trabajar simultáneamente con dos aplicaciones (ej., la pizarra y el navegador) y redimensionar el espacio de cada una.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/vSn0-VQlBQM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: TIC, TAC y más (<a href="https://www.youtube.com/watch?v=vSn0-VQlBQM&list=PLIHTrxOQrFrRbx2SJBG0TuQvIyALYJ7rL&index=15&pp=iAQB0gcJCQYKAYcqIYzv" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                 <div class="carousel-slide">
+                                    <h4>Grabación de pantalla</h4>
+                                    <p>El sistema <strong>iQ</strong> incluye una grabadora de pantalla integrada, accesible desde la caja de herramientas. Permite configurar si se grabará el audio del micrófono (la voz del docente usando los micrófonos del panel) y el audio del dispositivo. También se puede seleccionar la opción de mostrar los toques en pantalla. El vídeo grabado se almacena en el panel y puede compartirse.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/X3rbQpzbDZk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: TIC, TAC y más (<a href="https://www.youtube.com/watch?v=X3rbQpzbDZk&list=PLIHTrxOQrFrRbx2SJBG0TuQvIyALYJ7rL&index=16&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <!-- FIN DE CONTENIDO REEMPLAZADO -->
+                            </div>
+                            <!-- Botones movidos fuera de 'navigation' -->
+                            <button class="carousel-button prev" aria-label="Anterior">&lt;</button>
+                            <button class="carousel-button next" aria-label="Siguiente">&gt;</button>
+                        </div>
+                    </div>
+                </details>
+
+            </section>
+
+            <!-- PESTAÑA 3: PARTE 2 - CONECTIVIDAD -->
+            <section id="seccion-parte2" class="tab-content" role="tabpanel" aria-labelledby="tab-parte2">
+                <h2>Conectividad y perfiles</h2>
+
+                 <details class="modal-view"> <!-- Clase añadida -->
+                    <summary>Perfil del docente y sincronización</summary>
+                    <div class="details-content">
+                        <!-- PÁRRAFO INTRODUCTORIO AÑADIDO -->
+                        <p>Esta subsección cubre la personalización de la experiencia del usuario docente en el panel <strong>iQ4</strong> mediante el inicio de sesión.</p>
+                        
+                        <div class="carousel-container">
+                            <div class="carousel-track">
+                                <!-- CONTENIDO REEMPLAZADO -->
+                                <div class="carousel-slide active">
+                                    <h4>Inicio de sesión seguro (QR/NFC) y persistencia</h4>
+                                    <p>La personalización de la interfaz y la garantía de que los contenidos generados "viajan con el perfil del docente" requieren el inicio de sesión en <strong>iQ</strong>. El método recomendado es utilizar un dispositivo externo para escanear el código <strong>QR</strong> y así introducir las credenciales (<strong>Google</strong>/<strong>Office 365</strong>) y la contraseña sin que se visualice en pantalla.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/hW5eT0hhi2U" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: TIC, TAC y más (<a href="https://www.youtube.com/watch?v=hW5eT0hhi2U&list=PLIHTrxOQrFrRbx2SJBG0TuQvIyALYJ7rL&index=6&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <div class="carousel-slide">
+                                    <h4>Administración de archivos y nube (iQ)</h4>
+                                    <p>La Biblioteca de Archivos diferencia entre archivos públicos (creados sin sesión) y los archivos guardados asociados a la cuenta del usuario. Al iniciar sesión, se habilita la sincronización y el acceso a servicios en la nube como <strong>Google Drive</strong> u <strong>Office 365</strong>.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/959VOhdzuis" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: TIC, TAC y más (<a href="https://www.youtube.com/watch?v=959VOhdzuis&list=PLIHTrxOQrFrRbx2SJBG0TuQvIyALYJ7rL&index=13&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <div class="carousel-slide">
+                                    <h4>Instalación y uso de apps (iQ)</h4>
+                                    <p>Las aplicaciones se pueden instalar de forma remota por un administrador o mediante <strong>Google Play Store</strong>. Se recomienda iniciar sesión primero en el sistema operativo <strong>iQ</strong> (no en <strong>Play Store</strong> directamente) para que las credenciales de las aplicaciones queden securizadas y se eliminen al cerrar la sesión.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/JknO_PoyeTk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: TIC, TAC y más (<a href="https://www.youtube.com/watch?v=JknO_PoyeTk&list=PLIHTrxOQrFrRbx2SJBG0TuQvIyALYJ7rL&index=14&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <!-- FIN DE CONTENIDO REEMPLAZADO -->
+                            </div>
+                            <!-- Botones movidos fuera de 'navigation' -->
+                            <button class="carousel-button prev" aria-label="Anterior">&lt;</button>
+                            <button class="carousel-button next" aria-label="Siguiente">&gt;</button>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="modal-view"> <!-- Clase añadida -->
+                    <summary>Conexión de dispositivos externos y tinta digital</summary>
+                    <div class="details-content">
+                        <!-- PÁRRAFO INTRODUCTORIO AÑADIDO -->
+                        <p>Esta subsección detalla la conectividad por cable y el uso avanzado de la tinta digital (<strong>SMART Ink</strong>) en un ordenador externo.</p>
+
+                        <div class="carousel-container">
+                             <div class="carousel-track">
+                                <!-- CONTENIDO REEMPLAZADO -->
+                                <div class="carousel-slide active">
+                                    <h4>Conexión por cable (General/OPS)</h4>
+                                    <p>El panel puede utilizarse con un ordenador <strong>OPS (Open Pluggable Specification)</strong>, el cual se inserta en una ranura lateral y no necesita cables adicionales, ofreciendo una experiencia con sistema operativo <strong>Windows</strong> o similar.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/DE5bTXz3Bd8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: TIC, TAC y más (<a href="https://www.youtube.com/watch?v=DE5bTXz3Bd8&list=PLIHTrxOQrFrRbx2SJBG0TuQvIyALYJ7rL&index=18&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <div class="carousel-slide">
+                                    <h4>Conexión HDMI/USB-B</h4>
+                                    <p>Al conectar un ordenador por <strong>HDMI</strong>, se transmite vídeo y audio. Para habilitar la funcionalidad táctil (el toque en el panel), es necesario conectar adicionalmente un cable <strong>USB-B</strong> de toque desde el panel al ordenador, asegurándose de que el puerto <strong>USB-B</strong> utilizado esté asociado al puerto <strong>HDMI</strong>.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/Mt8jdS8h8UM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: TIC, TAC y más (<a href="https://www.youtube.com/watch?v=Mt8jdS8h8UM&list=PLIHTrxOQrFrRbx2SJBG0TuQvIyALYJ7rL&index=19&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <div class="carousel-slide">
+                                    <h4>Conexión USB-C</h4>
+                                    <p>La conexión <strong>USB-C</strong> es la más versátil, ya que transmite simultáneamente vídeo, audio, datos (tactilidad) y carga el dispositivo conectado, todo con un único cable. El panel <strong>MX V5</strong> ofrece diferentes potencias de carga según el puerto (ej. 27W frontal y 65W lateral).</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/TgSz3AssVUg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: TIC, TAC y más (<a href="https://www.youtube.com/watch?v=TgSz3AssVUg&list=PLIHTrxOQrFrRbx2SJBG0TuQvIyALYJ7rL&index=20&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <div class="carousel-slide">
+                                    <h4>Instalación y aspectos principales de SMART Ink</h4>
+                                    <p>Para usar la tinta digital en el ordenador conectado, es necesario instalar el <strong>software</strong> <strong>SMART Notebook</strong> (que incluye los <strong>drivers</strong>). La herramienta <strong>SMART Ink</strong> se indica con un icono azul flotante; si no hay nada conectado, el icono aparece con una 'x' roja.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/7vxlmxbGTTs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: TIC, TAC y más (<a href="https://www.youtube.com/watch?v=7vxlmxbGTTs&list=PLIHTrxOQrFrRbx2SJBG0TuQvIyALYJ7rL&index=21&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <div class="carousel-slide">
+                                    <h4>Uso de SMART Ink en aplicaciones externas</h4>
+                                    <p><strong>SMART Ink</strong> permite realizar anotaciones en cualquier aplicación del ordenador (ej., explorador de archivos, documentos <strong>PDF</strong> o presentaciones de <strong>PowerPoint</strong>). La tinta se fusiona con el documento o la aplicación y puede guardarse junto con el archivo original.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/xayZOBRkBSI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: TIC, TAC y más (<a href="https://www.youtube.com/watch?v=xayZOBRkBSI&list=PLIHTrxOQrFrRbx2SJBG0TuQvIyALYJ7rL&index=22&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <div class="carousel-slide">
+                                    <h4>Grabación de contenido con SMART Recorder (PC)</h4>
+                                    <p><strong>SMART Recorder</strong> (parte del <strong>software</strong> M) permite grabar videos de la actividad en el escritorio del <strong>PC</strong>. El usuario puede seleccionar un área específica a grabar, pausar, continuar y utilizar el micrófono del panel.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/kRXL5Jhusao" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: TIC, TAC y más (<a href="https://www.youtube.com/watch?v=kRXL5Jhusao&list=PLIHTrxOQrFrRbx2SJBG0TuQvIyALYJ7rL&index=23&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <!-- FIN DE CONTENIDO REEMPLAZADO -->
+                            </div>
+                            <!-- Botones movidos fuera de 'navigation' -->
+                            <button class="carousel-button prev" aria-label="Anterior">&lt;</button>
+                            <button class="carousel-button next" aria-label="Siguiente">&gt;</button>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="modal-view"> <!-- Clase añadida -->
+                    <summary>Compartir pantalla inalámbrica (SMART Mirror)</summary>
+                    <div class="details-content">
+                        <!-- PÁRRAFO INTRODUCTORIO AÑADIDO -->
+                        <p>Esta subsección se enfoca en la aplicación <strong>SMART Mirror</strong> para la proyección inalámbrica desde dispositivos de estudiantes y docentes.</p>
+                        
+                        <div class="carousel-container">
+                             <div class="carousel-track">
+                                <!-- CONTENIDO REEMPLAZADO -->
+                                <div class="carousel-slide active">
+                                    <h4>Proyección inalámbrica nativa y avanzada</h4>
+                                    <p>Compartir de forma nativa (<strong>AirPlay</strong>, <strong>Google Cast</strong>, <strong>Miracast</strong>) requiere que el panel y el dispositivo estén en la misma red y que esta no tenga un <strong>firewall</strong> restrictivo. La opción <strong>Smart Mirror Link</strong> (usando un <strong>ID</strong> de sesión) permite conectar dispositivos que no están en la misma red. El docente siempre puede moderar la conexión y dar paso a los dispositivos. Una ventaja en <strong>Windows</strong>/<strong>Mac</strong> (usando la aplicación) es el control inalámbrico del ordenador (<strong>Touchback</strong>), no disponible en tabletas.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/RMhgitOni4o" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: TIC, TAC y más (<a href="https://www.youtube.com/watch?v=RMhgitOni4o&list=PLIHTrxOQrFrRbx2SJBG0TuQvIyALYJ7rL&index=17&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <!-- FIN DE CONTENIDO REEMPLAZADO -->
+                            </div>
+                            <!-- Botones movidos fuera de 'navigation' -->
+                            <button class="carousel-button prev" aria-label="Anterior">&lt;</button>
+                            <button class="carousel-button next" aria-label="Siguiente">&gt;</button>
+                        </div>
+                    </div>
+                </details>
+            </section>
+
+            <!-- PESTAÑA 4: PARTE 3 - LUMIO FUNDAMENTOS -->
+            <section id="seccion-parte3" class="tab-content" role="tabpanel" aria-labelledby="tab-parte3">
+                <h2>Introducción a Lumio</h2>
+                <!-- PÁRRAFO INTRODUCTORIO AÑADIDO -->
+                <p>Esta sección introduce la plataforma <strong>Lumio</strong>, sus métodos de acceso, la creación de lecciones interactivas a partir de recursos existentes, y el uso de herramientas avanzadas y de accesibilidad.</p>
+
+                <details class="modal-view"> <!-- Clase añadida -->
+                    <summary>Acceso e interfaz de Lumio</summary>
+                    <div class="details-content">
+                        <div class="carousel-container">
+                             <div class="carousel-track">
+                                <!-- CONTENIDO REEMPLAZADO -->
+                                <div class="carousel-slide active">
+                                    <h4>Plataforma, ID de clase y modos de acceso (Docente/Estudiante)</h4>
+                                    <p><strong>Lumio</strong> es una plataforma basada en <strong>web</strong> (golumio.com). Cada docente tiene un <strong>ID</strong> de clase único. Los estudiantes se unen vía <strong>hellosmart.com</strong> y pueden hacerlo iniciando sesión con cuentas educativas (para que el trabajo se guarde) o como invitados (acceso rápido, pero con riesgo de anonimato en el trabajo si no se desactiva).</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/JcMkrxOxn3E" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <!-- AUTORÍA CAMBIADA A LUMIO -->
+                                    <p class="video-attribution">Autoría: Lumio (<a href="https://www.youtube.com/watch?v=JcMkrxOxn3E&list=PLh4jfQLkSKSGH5sVWX-YLfPIxuM6gPukt&index=1&t=4s&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <!-- FIN DE CONTENIDO REEMPLAZADO -->
+                            </div>
+                            <!-- Botones movidos fuera de 'navigation' -->
+                            <button class="carousel-button prev" aria-label="Anterior">&lt;</button>
+                            <button class="carousel-button next" aria-label="Siguiente">&gt;</button>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="modal-view"> <!-- Clase añadida -->
+                    <summary>Creación y mejora de lecciones interactivas</summary>
+                     <div class="details-content">
+                        <div class="carousel-container">
+                             <div class="carousel-track">
+                                <!-- CONTENIDO NUEVO -->
+                                <div class="carousel-slide active">
+                                    <h4>Importación y combinación de recursos (PDF, Google Slides)</h4>
+                                    <p><strong>Lumio</strong> permite importar y combinar diferentes tipos de archivos (<strong>PDF</strong>, <strong>PowerPoint</strong>, <strong>Google Slides</strong>, archivos de <strong>Notebook</strong>) en una única lección. Al importar, se puede elegir que el texto sea editable y compatible con el <strong>Lector Inmersivo (Immersive Reader)</strong>.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/jA2WurwvwFU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <!-- AUTORÍA CAMBIADA A LUMIO -->
+                                    <p class="video-attribution">Autoría: Lumio (<a href="https://www.youtube.com/watch?v=jA2WurwvwFU&list=PLh4jfQLkSKSGH5sVWX-YLfPIxuM6gPukt&index=2&t=1s&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <div class="carousel-slide">
+                                    <h4>Adición de elementos dinámicos y juegos</h4>
+                                    <p>Se pueden crear actividades gamificadas como <strong>Super Sort</strong> y <strong>Monster Quiz</strong>. <strong>Lumio</strong> ofrece <strong>AI Assist</strong> (asistencia de <strong>Inteligencia Artificial</strong>) para generar preguntas y actividades de juego automáticamente a partir de un tema y nivel, aunque siempre se recomienda la revisión docente.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/bfDpR6UhJcY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <!-- AUTORÍA CAMBIADA A LUMIO -->
+                                    <p class="video-attribution">Autoría: Lumio (<a href="https://www.youtube.com/watch?v=bfDpR6UhJcY&list=PLh4jfQLkSKSGH5sVWX-YLfPIxuM6gPukt&index=13&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <div class="carousel-slide">
+                                    <h4>Integración con otras herramientas (Canva y Book Creator)</h4>
+                                    <p><strong>Lumio</strong> permite incrustar contenido de otras plataformas. Se menciona la integración con <strong>Canva for Education</strong> (los diseños pueden exportarse a <strong>Lumio</strong>) y <strong>Book Creator</strong> (los libros pueden incrustarse en la lección).</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/i0jhU54hyrs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <!-- AUTORÍA CAMBIADA A LUMIO -->
+                                    <p class="video-attribution">Autoría: Lumio (<a href="https://www.youtube.com/watch?v=i0jhU54hyrs&list=PLh4jfQLkSKSGH5sVWX-YLfPIxuM6gPukt&index=9&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <!-- FIN CONTENIDO NUEVO -->
+                            </div>
+                            <!-- Botones movidos fuera de 'navigation' -->
+                            <button class="carousel-button prev" aria-label="Anterior">&lt;</button>
+                            <button class="carousel-button next" aria-label="Siguiente">&gt;</button>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="modal-view"> <!-- Clase añadida -->
+                    <summary>Herramientas avanzadas y de accesibilidad</summary>
+                     <div class="details-content">
+                        <!-- PÁRRAFO INTRODUCTORIO AÑADIDO -->
+                        <p>Esta subsección detalla las funcionalidades avanzadas y de accesibilidad disponibles en la plataforma <strong>Lumio</strong> para enriquecer las lecciones.</p>
+                        <div class="carousel-container">
+                             <div class="carousel-track">
+                                <div class="carousel-slide active">
+                                    <h4>Soporte de audio instructivo y para estudiantes</h4>
+                                    <p>Los docentes pueden grabar hasta cinco minutos de audio y adjuntarlo a cualquier página para proporcionar instrucciones de audio. Los estudiantes también pueden adjuntar grabaciones de audio a páginas u objetos en actividades de entrega individual o colaborativas.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/B_go-F4ILMQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <!-- AUTORÍA CAMBIADA A LUMIO -->
+                                    <p class="video-attribution">Autoría: Lumio (<a href="https://www.youtube.com/watch?v=B_go-F4ILMQ&list=PLh4jfQLkSKSGH5sVWX-YLfPIxuM6gPukt&index=21&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <div class="carousel-slide">
+                                    <h4>Vídeos sin publicidad</h4>
+                                    <p>La funcionalidad de <strong>YouTube</strong> en <strong>Lumio</strong> permite al docente incrustar videos que se reproducirán sin anuncios, asegurando que los estudiantes no se distraigan.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/ozdvpyv30Jk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <!-- AUTORÍA CAMBIADA A LUMIO -->
+                                    <p class="video-attribution">Autoría: Lumio (<a href="https://www.youtube.com/watch?v=ozdvpyv30Jk&list=PLh4jfQLkSKSGH5sVWX-YLfPIxuM6gPukt&index=4&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <div class="carousel-slide">
+                                    <h4>Calculadora Desmos y Gráficos</h4>
+                                    <p><strong>Lumio</strong> integra la <strong>Calculadora Gráfica Desmos</strong>. El docente puede añadir expresiones, y los estudiantes pueden interactuar con las gráficas, añadir datos y explorar funciones, siendo completamente interactiva en el modo de entrega.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/wWWQIHfsJNE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <!-- AUTORÍA CAMBIADA A LUMIO -->
+                                    <p class="video-attribution">Autoría: Lumio (<a href="https://www.youtube.com/watch?v=wWWQIHfsJNE&list=PLh4jfQLkSKSGH5sVWX-YLfPIxuM6gPukt&index=27&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <div class="carousel-slide">
+                                    <h4>Simulaciones PhET</h4>
+                                    <p>El docente puede añadir simulaciones interactivas de <strong>PhET</strong> (de física, química, matemáticas, etc.). Se buscan mediante filtros y se integran en la lección. No son editables, sino que se entregan listas para la exploración y el descubrimiento.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/OwfPdmMKQr0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <!-- AUTORÍA CAMBIADA A LUMIO -->
+                                    <p class="video-attribution">Autoría: Lumio (<a href="https://www.youtube.com/watch?v=OwfPdmMKQr0&list=PLh4jfQLkSKSGH5sVWX-YLfPIxuM6gPukt&index=25&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <div class="carousel-slide">
+                                    <h4>Lector Inmersivo (Immersive Reader)</h4>
+                                    <p>Esta herramienta de accesibilidad permite a los estudiantes escuchar el texto leído en voz alta, ajustar la apariencia del texto (tamaño, fuente, color), identificar partes del discurso, usar un diccionario de imágenes y traducir el documento a más de 100 idiomas.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/e7b4UkUkb2s" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <!-- AUTORÍA CAMBIADA A LUMIO -->
+                                    <p class="video-attribution">Autoría: Lumio (<a href="https://www.youtube.com/watch?v=e7b4UkUkb2s&list=PLh4jfQLkSKSGH5sVWX-YLfPIxuM6gPukt&index=33&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                            </div>
+                            <!-- Botones movidos fuera de 'navigation' -->
+                            <button class="carousel-button prev" aria-label="Anterior">&lt;</button>
+                            <button class="carousel-button next" aria-label="Siguiente">&gt;</button>
+                        </div>
+                    </div>
+                </details>
+            </section>
+
+            <!-- PESTAÑA 5: PARTE 4 - LUMIO FLUJO DE TRABAJO -->
+            <section id="seccion-parte4" class="tab-content" role="tabpanel" aria-labelledby="tab-parte4">
+                <h2>Uso didáctico de Lumio</h2>
+
+                <details class="modal-view"> <!-- Clase añadida -->
+                    <summary>Flujo de trabajo con sesiones de clase</summary>
+                    <div class="details-content">
+                        <!-- PÁRRAFO INTRODUCTORIO AÑADIDO -->
+                        <p>Esta sección se centra en la aplicación de <strong>Lumio</strong> en el aula, con énfasis en el flujo de trabajo basado en <strong>Sesiones de Clase</strong>, el manejo de diferentes modos de trabajo y la gestión de los datos de rendimiento.</p>
+
+                        <div class="carousel-container">
+                             <div class="carousel-track">
+                                <div class="carousel-slide active">
+                                    <h4>Gestión de sesiones (Master vs. Sesión) y creación de copias</h4>
+                                    <p>La copia <strong>maestra</strong> del contenido permanece en <strong>Mi Biblioteca</strong>. Cada vez que se usa "Iniciar nuevo", <strong>Lumio</strong> crea una <strong>Sesión de Clase</strong> separada (ej., "Quinto A", "Quinto B"). Esto permite almacenar y separar los datos y el trabajo de los estudiantes por grupo/periodo.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/RPyZUclRUss" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <!-- AUTORÍA CAMBIADA A LUMIO -->
+                                    <p class="video-attribution">Autoría: Lumio (<a href="https://www.youtube.com/watch?v=RPyZUclRUss" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <div class="carousel-slide">
+                                    <h4>Edición espontánea de lecciones en vivo</h4>
+                                    <p>En el modo de entrega, el docente puede usar el botón "más" (+) para añadir contenido sobre la marcha, como una pizarra blanca en blanco para una lluvia de ideas o una actividad de <strong>¡Exprésate!</strong> (<strong>Shout it Out!</strong>), lo que facilita aprovechar momentos de aprendizaje espontáneo.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/hTNVXEvFGI4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <!-- AUTORÍA CAMBIADA A LUMIO -->
+                                    <p class="video-attribution">Autoría: Lumio (<a href="https://www.youtube.com/watch?v=hTNVXEvFGI4&list=PLh4jfQLkSKSGH5sVWX-YLfPIxuM6gPukt&index=35&pp=iAQB" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <div class="carousel-slide">
+                                    <h4>Uso de la aplicación nativa Lumio en paneles iQ</h4>
+                                    <p>Para los paneles con <strong>iQ4</strong> (versión 4.6 o posterior), existe una aplicación nativa de <strong>Lumio</strong>. La gran ventaja es que permite al docente escribir directamente en la pantalla con los punteros, ya que la funcionalidad es nativa y no una superposición.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/ReVigtvqiHU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <!-- AUTORÍA CAMBIADA A LUMIO -->
+                                    <p class="video-attribution">Autoría: Lumio (<a href="https://www.youtube.com/watch?v=ReVigtvqiHU" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                            </div>
+                            <!-- Botones movidos fuera de 'navigation' -->
+                            <button class="carousel-button prev" aria-label="Anterior">&lt;</button>
+                            <button class="carousel-button next" aria-label="Siguiente">&gt;</button>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="modal-view"> <!-- Clase añadida -->
+                    <summary>Modos de trabajo y revisión</summary>
+                    <div class="details-content">
+                        <!-- INTRODUCCIÓN AÑADIDA -->
+                        <p>Esta subsección detalla las herramientas pedagógicas avanzadas de <strong>Lumio</strong>, enfocándose en cómo el docente puede diferenciar la instrucción, gestionar el ritmo de la clase, introducir interacciones espontáneas y analizar el rendimiento de los estudiantes.</p>
+                        <div class="carousel-container">
+                             <div class="carousel-track">
+                                 <!-- CONTENIDO NUEVO -->
+                                <div class="carousel-slide active">
+                                    <h4>Trabajo Diferenciado (Individual y Grupal)</h4>
+                                    <p>Este epígrafe se enfoca en cómo transformar contenido en experiencias personalizadas (<strong>Handouts</strong>) o colaborativas (<strong>Group Workspace</strong>), y cómo la funcionalidad permite al docente ofrecer retroalimentación formativa y supervisión en tiempo real.</p>
+                                    <p>Cualquier página de una lección (incluyendo archivos importados como <strong>PDF</strong> o <strong>Google Slides</strong>) puede convertirse en una Actividad de entrega individual (<strong>Handout</strong>) o un Espacio de trabajo colaborativo (<strong>Group Workspace</strong>). Los <strong>Handouts</strong> envían una copia digital a cada estudiante para que trabaje de forma independiente.</p>
+                                    <p>El docente puede abrir el trabajo de un estudiante (<strong>Handout</strong>) para darle un vistazo rápido. Durante esta revisión, el docente puede dar retroalimentación inmediata y personalizada al estudiante usando tinta (escribiendo o dibujando) o añadiendo <strong>stickers</strong>. El estudiante ve este <strong>feedback</strong> en su pantalla en tiempo real.</p>
+                                    <p>El docente puede configurar actividades (como los juegos) para que los estudiantes puedan reiniciar y repetir los ejercicios, proporcionando un <strong>feedback</strong> inmediato del programa sobre las respuestas correctas e incorrectas.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/eAOT5TceP3w" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: Lumio (<a href="https://www.youtube.com/watch?v=eAOT5TceP3w&pp=ygUvUmV0aGluayB0aGUgTGVzc29uOiBMdW1pbyArIEZlZWRiYWNrIFRoYXQgV29ya3M%3D" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                                <div class="carousel-slide">
+                                    <h4>Gestión de Sesiones y Revisión de Datos Asíncronos</h4>
+                                    <p>El panel de <strong>Sesiones de Clase</strong> (<strong>Class Sessions</strong>) indica si una sesión está en vivo (ícono verde, "<strong>Green means go</strong>") o en modo revisión (<strong>Review Mode</strong>) (ícono amarillo, "<strong>caution mode</strong>").</p>
+                                    <p>El modo revisión permite al docente analizar el progreso y los datos (resultados de juegos o actividades evaluativas) de una clase anterior. El docente puede revisar los datos sin necesidad de "iniciar la lección". Además, el docente puede tener múltiples sesiones asíncronas abiertas al mismo tiempo para su revisión.</p>
+                                    <p>Para el contenido que se abrió en la Pizarra Blanca <strong>iQ</strong> o archivos de <strong>Lumio</strong> que se utilizaron antes de la implementación de <strong>Sesiones de Clase</strong> (aproximadamente antes de junio de 2023), los datos se encuentran en la función <strong>Legacy Review</strong>. Esta opción se accede a través del menú de tres puntos del archivo en la biblioteca.</p>
+                                    <p>Para evitar la creación innecesaria de nuevos archivos, el docente puede reciclar y reutilizar la misma sesión antigua de un grupo. En lugar de crear una copia nueva, puede volver a la pestaña de <strong>Sesiones de Clase</strong> y seleccionar "<strong>Iniciar en vivo de nuevo</strong>" para continuar con la sesión anterior.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/DPb3qFue2bg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: Lumio (<a href="https://www.youtube.com/watch?v=DPb3qFue2bg&t=14s&pp=ygU7TWFuYWdlIGxlc3NvbnMgYW5kIGFzc2lnbm1lbnRzIHdpdGggQ2xhc3MgU2Vzc2lvbnMgaW4gTHVtaW8%3D" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                            </div>
+                            <!-- Botones movidos fuera de 'navigation' -->
+                            <button class="carousel-button prev" aria-label="Anterior">&lt;</button>
+                            <button class="carousel-button next" aria-label="Siguiente">&gt;</button>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="modal-view"> <!-- Clase añadida -->
+                    <summary>Exportación y revisión de datos</summary>
+                    <div class="details-content">
+                        <p>Esta sección detalla cómo los docentes pueden monitorizar el progreso de los estudiantes en tiempo real y revisar el trabajo completado en sesiones anteriores.</p>
+                        <div class="carousel-container">
+                             <div class="carousel-track">
+                                <div class="carousel-slide active">
+                                    <h4>Exportación y revisión de datos</h4>
+                                    <p><strong>Dashboard de Actividad</strong>: Muchas actividades de <strong>Lumio</strong>, incluidas las actividades basadas en juegos (como <strong>Monster Quiz</strong> o <strong>Team Quiz</strong>) y los folletos individuales (<strong>Individual Handouts</strong>), tienen un Panel de Actividad (<strong>Activity Dashboard</strong>). Este panel permite a los profesores ver un resumen de la clase, el progreso individual de los estudiantes, el tiempo dedicado a la actividad, y las respuestas correctas e incorrectas.</p>
+                                    <p><strong>Revisión de Sesiones (Revisión Asíncrona)</strong>: El trabajo de los estudiantes se almacena de forma segura en las <strong>Sesiones de Clase</strong> específicas. Al seleccionar el botón "<strong>Revisar</strong>" (<strong>Review</strong>) en una sesión, el docente puede examinar el progreso del grupo y proporcionar <strong>feedback</strong> personalizado directamente en la página del estudiante, incluso de forma asíncrona. Al estar en modo revisión, los estudiantes que estén conectados a la clase permanecerán en la sala de espera, lo que garantiza que la revisión de datos no interfiera con una lección en vivo.</p>
+                                    <p><strong>Exportación de Resultados</strong>: <strong>Lumio</strong> facilita la evaluación formativa y sumativa permitiendo la exportación de resultados a una hoja de cálculo (<strong>CSV</strong> o <strong>Excel</strong>). Esta función es crucial para recopilar datos de actividades como <strong>Response</strong> (evaluaciones) o cuestionarios basados en juegos, lo que simplifica la entrada de las calificaciones en el libro de notas.</p>
+                                    <p><strong>Integración con LMS</strong>: <strong>Lumio</strong> se integra sin problemas con plataformas <strong>LMS</strong> como <strong>Canvas</strong>, <strong>Schoology</strong> y <strong>D2L Brightspace</strong>. Cuando se asigna una actividad asíncrona a través de estas plataformas (usando la opción <strong>Assign new</strong> o Compartir tarea), el docente puede revisar el trabajo de los estudiantes abriendo la asignación o el material directamente dentro del <strong>LMS</strong>. Esto garantiza que las lecciones de <strong>Lumio</strong> se conviertan en una parte natural del flujo de trabajo del curso.</p>
+                                    <div class="video-wrapper">
+                                        <iframe src="https://www.youtube.com/embed/OyR6RZgnndM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <p class="video-attribution">Autoría: Lumio (<a href="https://www.youtube.com/watch?v=OyR6RZgnndM&pp=ygU2RXZhbHVhdGUgc3R1ZGVudCBwcm9ncmVzcyB3aXRoIHRoZSBBY3Rpdml0eSBEYXNoYm9hcmQr" target="_blank" rel="noopener noreferrer">enlace directo</a>)</p>
+                                </div>
+                            </div>
+                            <!-- Botones movidos fuera de 'navigation' -->
+                            <button class="carousel-button prev" aria-label="Anterior">&lt;</button>
+                            <button class="carousel-button next" aria-label="Siguiente">&gt;</button>
+                        </div>
+                    </div>
+                </details>
+            </section>
+
+            <!-- PESTAÑA 6: RECURSOS -->
+            <section id="seccion-recursos" class="tab-content" role="tabpanel" aria-labelledby="tab-recursos">
+                <h2>Recursos</h2>
+
+                <div class="resource-banner">
+                    <h3>Cuaderno del Taller en Notebook LM</h3>
+                    <p>Accede a todos los materiales ampliados, notas y recursos de este taller en un único cuaderno de Notebook LM.</p>
+                    <a href="https://notebooklm.google.com/notebook/72ebd726-9732-4f29-a609-387204374a3b?authuser=0" class="btn-notebook" id="notebook-link" target="_blank" rel="noopener noreferrer">Acceder al Cuaderno</a>
+                </div>
+                
+                <h3>Enlaces y Canales de Referencia</h3>
+                <div class="resource-grid-wrapper">
+                    <div class="resource-grid" id="resource-grid-container">
+                        
+                        <!-- Tarjetas ordenadas alfabéticamente por título -->
+                        <div class="resource-card">
+                            <h4>Canal YouTube: Lumio</h4>
+                            <p>Canal oficial con guías y novedades sobre la plataforma Lumio y sus funcionalidades para la creación de lecciones interactivas.</p>
+                            <a href="https://www.youtube.com/@Lumiosocial" target="_blank" rel="noopener noreferrer">Ir al canal &rarr;</a>
+                        </div>
+                        
+                        <div class="resource-card">
+                            <h4>Canal YouTube: TIC, TAC y más</h4>
+                            <p>Canal con tutoriales en español de herramientas digitales para docentes, incluyendo la mayor parte de los vídeos sobre la PDI SMART Board e iQ de este taller.</p>
+                            <a href="https://www.youtube.com/@tictacymas" target="_blank" rel="noopener noreferrer">Ir al canal &rarr;</a>
+                        </div>
+                        
+                        <div class="resource-card">
+                            <h4>Documentación Oficial: Plataforma Lumio</h4>
+                            <p>Página oficial para explorar características, planes y documentación detallada de la plataforma interactiva Lumio.</p>
+                            <a href="https://www.smarttech.com/es-es/lumio" target="_blank" rel="noopener noreferrer">Ir al recurso &rarr;</a>
+                        </div>
+
+                        <div class="resource-card">
+                            <h4>Documentación Oficial: Serie MX de SMART Board</h4>
+                            <p>Información técnica sobre los paneles interactivos SMART Board MX, incluyendo la serie V5.</p>
+                            <a href="https://www.smarttech.com/es-es/education/products/interactive-displays/mx-series" target="_blank" rel="noopener noreferrer">Ir al recurso &rarr;</a>
+                        </div>
+                        
+                        <div class="resource-card">
+                            <h4>Portal Educamos CLM: Dotación Informática</h4>
+                            <p>Información oficial del portal Educamos CLM sobre la dotación informática y el material digital en los centros educativos.</p>
+                            <a href="https://educamosclm.castillalamancha.es/portal/dotacion-informatica" target="_blank" rel="noopener noreferrer">Ir al recurso &rarr;</a>
+                        </div>
+                        
+                        <div class="resource-card">
+                            <h4>Tutoriales del CTAE</h4>
+                            <p>Artículos y tutoriales del CTAE sobre el uso y configuración avanzada de paneles interactivos.</p>
+                            <a href="https://www.ctae.es/index.php/tutoriales/paneles-interativos" target="_blank" rel="noopener noreferrer">Ir al recurso &rarr;</a>
+                        </div>
+                        
+                    </div>
+                </div>
+            </section>
+
+        </div><!-- .tab-content-container -->
+    </main>
+
+    <!-- 4. PIE DE PÁGINA -->
+    <footer>
+        <p><span class="nombre-autor">Lucía Serrano Palomo</span></p>
+        <p class="ia-credit">Realizado con la asistencia de IA (vibe coding)</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- RECURSOS DINÁMICOS (LISTA ANTERIOR ELIMINADA Y REEMPLAZADA EN HTML) ---
+            
+            // Reemplazo de la función updateResourceList, ya que los recursos ahora están estáticos en el HTML.
+            // Se mantiene una versión mínima para compatibilidad si fuera necesario, pero la cuadrícula es estática.
+            const resourceGrid = document.getElementById('resource-grid-container');
+            if (resourceGrid.querySelector('#no-resources-msg')) {
+                resourceGrid.querySelector('#no-resources-msg').remove();
+            }
+
+
+            // --- SISTEMA DE PESTAÑAS ---
+            const tabNav = document.querySelector('.tab-nav');
+            const tabContentsContainer = document.querySelector('.tab-content-container');
+            const tabLinks = Array.from(tabNav.querySelectorAll('.tab-link'));
+            const indexCards = document.querySelectorAll('.index-card');
+            const tabNavWrapper = document.querySelector('.tab-nav-wrapper'); // Añadido para scroll
+
+            function switchTab(targetId) {
+                // 1. Cerrar todos los desplegables (modals) abiertos
+                document.querySelectorAll('details.modal-view[open]').forEach(details => {
+                    details.removeAttribute('open');
+                });
+                // 2. Resetear todos los carruseles (reinicializándolos)
+                document.querySelectorAll('.carousel-container').forEach(initializeCarousel);
+
+                // Ocultar todos los contenidos
+                tabContentsContainer.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                // Desactivar todos los enlaces
+                tabLinks.forEach(link => {
+                    link.classList.remove('active');
+                    link.setAttribute('aria-selected', 'false');
+                });
+
+                // Mostrar el contenido objetivo
+                const targetContent = document.querySelector(targetId);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+                
+                // Activar el enlace objetivo
+                const targetLink = tabNav.querySelector(`[data-target="${targetId}"]`);
+                if (targetLink) {
+                    targetLink.classList.add('active');
+                    targetLink.setAttribute('aria-selected', 'true');
+                }
+            }
+
+            // Clic en las pestañas de navegación
+            tabLinks.forEach(link => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const targetId = link.getAttribute('data-target');
+                    switchTab(targetId);
+                });
+            });
+
+            // Clic en las tarjetas del índice
+            indexCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const targetId = card.getAttribute('data-target-tab');
+                    switchTab(targetId);
+                    // Opcional: scroll suave a la barra de pestañas
+                    tabNavWrapper.scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+            
+            // Activar la primera pestaña por defecto
+            // (Ya está hecho en el HTML con la clase 'active')
+
+
+            // --- FUNCIONALIDAD DEL CARRUSEL ---
+            function initializeCarousel(container) {
+                const track = container.querySelector('.carousel-track');
+                if (!track) return; // Salir si no hay track
+
+                const slides = Array.from(track.querySelectorAll('.carousel-slide'));
+                const nextButton = container.querySelector('.carousel-button.next');
+                const prevButton = container.querySelector('.carousel-button.prev');
+                let currentIndex = 0;
+
+                function updateButtons() {
+                    if (prevButton) prevButton.disabled = (currentIndex === 0);
+                    if (nextButton) nextButton.disabled = (currentIndex === slides.length - 1);
+                }
+
+                function goToSlide(index) {
+                    if (index < 0 || index >= slides.length) return;
+                    
+                    // Ocultar slide actual
+                    if (slides[currentIndex]) {
+                         slides[currentIndex].classList.remove('active');
+                    }
+                   
+                    // Mostrar nueva slide
+                    currentIndex = index;
+                    if (slides[currentIndex]) {
+                        slides[currentIndex].classList.add('active');
+                    }
+                    
+                    updateButtons();
+                }
+
+                if (nextButton) {
+                    nextButton.addEventListener('click', () => {
+                        goToSlide(currentIndex + 1);
+                    });
+                }
+                
+                if (prevButton) {
+                    prevButton.addEventListener('click', () => {
+                        goToSlide(currentIndex - 1);
+                    });
+                }
+
+                // Inicializar estado
+                goToSlide(0);
+            }
+
+            // Inicializar todos los carruseles de la página
+            document.querySelectorAll('.carousel-container').forEach(initializeCarousel);
+
+            // --- FUNCIONALIDAD MODAL (Restaurada) ---
+            function initializeModalDetails() {
+                const detailsElements = document.querySelectorAll('details.modal-view');
+
+                detailsElements.forEach(details => {
+                    details.addEventListener('toggle', (event) => {
+                        if (details.open) {
+                            // Cuando se abre
+                            document.body.classList.add('modal-open');
+                            // Scroll al inicio del modal
+                            details.scrollTop = 0;
+                        } else {
+                            // Cuando se cierra
+                            document.body.classList.remove('modal-open');
+                        }
+                    });
+                });
+            }
+            initializeModalDetails(); // Llamada a la función
+
+            
+            // --- NUEVO: MANEJO DEL BOTÓN "ATRÁS" DEL NAVEGADOR (BFCACHE) ---
+            window.addEventListener('pageshow', (event) => {
+                // event.persisted es true si la página se restauró del cache (botón "atrás")
+                if (event.persisted) {
+                    // 1. Cerrar todos los desplegables (modals)
+                    document.querySelectorAll('details.modal-view[open]').forEach(details => {
+                        details.removeAttribute('open');
+                    });
+                    // 2. Resetear todos los carruseles
+                    document.querySelectorAll('.carousel-container').forEach(initializeCarousel);
+                    
+                    // 3. Forzar el regreso a la pestaña de Contenidos
+                    switchTab('#seccion-contenidos');
+                }
+            });
+
+        });
+    </script>
+
+</body>
+</html>
