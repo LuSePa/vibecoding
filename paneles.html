@@ -137,14 +137,33 @@
             border-top: 2px solid rgba(60, 42, 30, 0.1);
             font-size: 0.9rem;
             color: #6c5d53;
+            line-height: 1.4; /* Reducir interlineado */
         }
-        footer .nombre-autor {
+        footer .autor-info {
+            font-size: 1rem;
             font-weight: 600;
             color: var(--color-texto);
+            margin-bottom: 0.5rem; /* Pequeño margen debajo de la línea principal */
         }
         footer .ia-credit {
             font-style: italic;
+            margin-top: 0; /* Eliminar margen superior del crédito IA */
+            font-size: 0.9rem;
+            line-height: 1.4;
         }
+        footer .nombre-autor {
+            font-weight: 700;
+        }
+        .contacto-email {
+            color: var(--color-titulos); /* Color Chocolate */
+            font-style: italic;
+            font-weight: 600;
+            text-decoration: none; /* Asegurar que no tenga subrayado */
+        }
+        .contacto-email:hover {
+            text-decoration: underline;
+        }
+
 
         /* ------------------- */
         /* SISTEMA DE PESTAÑAS */
@@ -1252,7 +1271,9 @@
 
     <!-- 4. PIE DE PÁGINA -->
     <footer>
-        <p><span class="nombre-autor">Lucía Serrano Palomo</span></p>
+        <p class="autor-info">
+            <span class="nombre-autor">Lucía Serrano Palomo</span> - <a href="mailto:lucia.serrano@jccm.es" class="contacto-email">lucia.serrano@jccm.es</a>
+        </p>
         <p class="ia-credit">Realizado con la asistencia de IA (vibe coding)</p>
     </footer>
 
