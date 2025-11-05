@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro Educativo [Nombre del Centro]</title>
+    
+    <!-- Carga de Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Carga de Google Fonts para Montserrat y Momo Signature --><link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Momo+Signature&display=swap" rel="stylesheet">
+    
+    <!-- Configuración de Tailwind para usar la nueva paleta de colores y fuentes --><script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#7D8FBF', // Azul pastel
+                        secondary: '#898760', // Verde/marrón pastel
+                        light: '#E0E7EB', // Gris claro pastel
+                        dark: '#3F485C', // Azul oscuro (para texto contrastante)
+                        accent: '#F2D3AC', // Tostado pastel (opcional para acentos)
+                    },
+                    fontFamily: {
+                        heading: ['"Momo Signature"', 'cursive'],
+                        body: ['Montserrat', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+    
+    <style>
+        .font-heading {
+            font-family: 'Momo Signature', cursive;
+        }
+
+        /* Estilos para las pestañas */
+        .tab-button.active {
+            background-color: theme('colors.secondary');
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* --- NUEVO: Estilos para el carrusel --- */
+        .carousel-container {
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch; /* para iOS */
+        }
+        .carousel-item {
+            scroll-snap-align: center;
+        }
+        /* Ocultar la barra de scroll */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE y Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        /* --- FIN NUEVO --- */
+    </style>
+</head>
+<body class="bg-light font-body text-dark">
+
+    <!-- ==== Cabecera y Navegación ==== --><header class="bg-primary shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo o Nombre del Centro con Imagen --><div class="flex items-center flex-shrink-0">
+                    <img src="https://blogger.googleusercontent.com/img/a/AVvXsEjxsX6CWO5ccCWtYPsNXcsb1RfgYkVTrnkN28_nKNJZgD0J5fAeU9SjGiYXQNonFMQ1C2H4eqDJBcCaGwmv6B5WBI-P6Fd16DbZN3VKgBgpTXiwntClq6EYCfV5LowWPtwSVf299Rn-4b74C06998hEv75H7ZHlOzSX1A-yi1rElq5jEFYHfyL83oGxgjo=s384" alt="Logo del Centro" class="h-10 w-auto mr-3">
+                    <a href="#" class="text-3xl font-heading text-white">
+                        Centro Educativo
+                    </a>
+                </div>
+                
+                <!-- Navegación Principal (Escritorio) --><div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#inicio" class="text-white hover:text-light px-3 py-2 rounded-md text-sm font-body transition-colors">Inicio</a>
+                        <a href="#otras-secciones" class="text-white hover:text-light px-3 py-2 rounded-md text-sm font-body transition-colors">Otras Secciones</a>
+                        <a href="#contacto" class="bg-secondary text-white hover:bg-opacity-80 px-4 py-2 rounded-md text-sm font-body transition-colors shadow-sm">Contacto</a>
+                    </div>
+                </div>
+                
+                <!-- Botón de Menú Móvil --><div class="-mr-2 flex md:hidden">
+                    <button id="menu-btn" type="button" class="bg-primary inline-flex items-center justify-center p-2 rounded-md text-white hover:text-light hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-inset focus:ring-light" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Abrir menú principal</span>
+                        <!-- Icono Hamburguesa --><svg id="menu-icon-open" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <!-- Icono 'X' (cerrar) --><svg id="menu-icon-close" class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Menú Móvil (se muestra/oculta con JS) --><div class="md:hidden hidden bg-primary" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#inicio" class="mobile-menu-link text-white hover:bg-secondary block px-3 py-2 rounded-md text-base font-body transition-colors">Inicio</a>
+                <a href="#otras-secciones" class="mobile-menu-link text-white hover:bg-secondary block px-3 py-2 rounded-md text-base font-body transition-colors">Otras Secciones</a>
+                <a href="#contacto" class="mobile-menu-link bg-secondary text-white hover:bg-opacity-80 block px-3 py-2 rounded-md text-base font-body transition-colors shadow-sm">Contacto</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==== Contenido Principal ==== --><main>
+        
+        <!-- ==== NUEVO: Sección Carrusel de Noticias ==== -->
+        <section id="noticias-carrusel" class="py-16 sm:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl font-heading text-center text-dark mb-12">
+                    Últimas Noticias
+                </h2>
+                
+                <!-- === Copiado de Carrusel === -->
+                <div class="relative w-full">
+                    <!-- Contenedor del Carrusel -->
+                    <div id="carousel-container" class="carousel-container flex overflow-x-auto no-scrollbar space-x-6 p-2 -mx-2">
+                        
+                        <!-- Noticia 1: Bomberos -->
+                        <div class="carousel-item flex-none w-full sm:w-1/2 lg:w-1/3">
+                            <article class="bg-white p-6 rounded-lg shadow-sm h-full flex flex-col justify-between border border-gray-100">
+                                <div>
+                                    <img src="https://placehold.co/600x400/DC3545/FFFFFF?text=Visita+Bomberos&font=montserrat" alt="Visita a los bomberos" class="w-full h-48 object-cover rounded-md mb-4">
+                                    <h4 class="text-xl font-heading text-dark mb-2">Visita a los bomberos</h4>
+                                    <p class="text-gray-700 font-body text-sm">Los alumnos de 2º de Primaria aprendieron sobre prevención de incendios y se montaron en el camión. ¡Una experiencia inolvidable!</p>
+                                </div>
+                                <a href="#" class="mt-3 inline-block text-primary font-body font-semibold hover:text-dark transition-colors text-sm">Leer más &rarr;</a>
+                            </article>
+                        </div>
+
+                        <!-- Noticia 2: Excursión Infantil 1 -->
+                        <div class="carousel-item flex-none w-full sm:w-1/2 lg:w-1/3">
+                            <article class="bg-white p-6 rounded-lg shadow-sm h-full flex flex-col justify-between border border-gray-100">
+                                <div>
+                                    <img src="https://placehold.co/600x400/28A745/FFFFFF?text=Excursión+Granja&font=montserrat" alt="Excursión de Infantil" class="w-full h-48 object-cover rounded-md mb-4">
+                                    <h4 class="text-xl font-heading text-dark mb-2">Infantil visita la Granja Escuela</h4>
+                                    <p class="text-gray-700 font-body text-sm">Los más pequeños disfrutaron de un día en la naturaleza, dando de comer a los animales y aprendiendo sobre el huerto.</p>
+                                </div>
+                                <a href="#" class="mt-3 inline-block text-primary font-body font-semibold hover:text-dark transition-colors text-sm">Leer más &rarr;</a>
+                            </article>
+                        </div>
+
+                        <!-- Noticia 3: Excursión Infantil 2 -->
+                        <div class="carousel-item flex-none w-full sm:w-1/2 lg:w-1/3">
+                            <article class="bg-white p-6 rounded-lg shadow-sm h-full flex flex-col justify-between border border-gray-100">
+                                <div>
+                                    <img src="https://placehold.co/600x400/FDB813/333333?text=Museo+Infantil&font=montserrat" alt="Excursión al museo" class="w-full h-48 object-cover rounded-md mb-4">
+                                    <h4 class="text-xl font-heading text-dark mb-2">Tarde en el museo</h4>
+                                    <p class="text-gray-700 font-body text-sm">Los alumnos de 5 años de Infantil exploraron el Museo de Ciencias Naturales en una visita llena de fósiles y diversión.</p>
+                                </div>
+                                <a href="#" class="mt-3 inline-block text-primary font-body font-semibold hover:text-dark transition-colors text-sm">Leer más &rarr;</a>
+                            </article>
+                        </div>
+
+                        <!-- Noticia 4: Teatro -->
+                        <div class="carousel-item flex-none w-full sm:w-1/2 lg:w-1/3">
+                            <article class="bg-white p-6 rounded-lg shadow-sm h-full flex flex-col justify-between border border-gray-100">
+                                <div>
+                                    <img src="https://placehold.co/600x400/6F42C1/FFFFFF?text=Día+del+Teatro&font=montserrat" alt="Teatro escolar" class="w-full h-48 object-cover rounded-md mb-4">
+                                    <h4 class="text-xl font-heading text-dark mb-2">¡Se levanta el telón!</h4>
+                                    <p class="text-gray-700 font-body text-sm">El grupo de teatro de 4º de ESO representó "La Barca sin Pescador" con gran éxito de crítica y público. ¡Enhorabuena, artistas!</p>
+                                </div>
+                                <a href="#" class="mt-3 inline-block text-primary font-body font-semibold hover:text-dark transition-colors text-sm">Leer más &rarr;</a>
+                            </article>
+                        </div>
+
+                        <!-- Noticia 5: Simulacro -->
+                        <div class="carousel-item flex-none w-full sm:w-1/2 lg:w-1/3">
+                            <article class="bg-white p-6 rounded-lg shadow-sm h-full flex flex-col justify-between border border-gray-100">
+                                <div>
+                                    <img src="https://placehold.co/600x400/898760/FFFFFF?text=Simulacro&font=montserrat" alt="Simulacro de evacuación" class="w-full h-48 object-cover rounded-md mb-4">
+                                    <h4 class="text-xl font-heading text-dark mb-2">Simulacro de evacuación</h4>
+                                    <p class="text-gray-700 font-body text-sm">Realizamos con éxito el simulacro de seguridad trimestral, evacuando el edificio en tiempo récord. ¡La seguridad es lo primero!</p>
+                                </div>
+                                <a href="#" class="mt-3 inline-block text-primary font-body font-semibold hover:text-dark transition-colors text-sm">Leer más &rarr;</a>
+                            </article>
+                        </div>
+
+                    </div>
+
+                    <!-- Botones de Navegación del Carrusel -->
+                    <button id="carousel-prev" class="absolute top-1/2 left-0 transform -translate-y-1/2 bg-secondary text-white p-2 rounded-full shadow-lg opacity-75 hover:opacity-100 transition-opacity -ml-4 z-10">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                    </button>
+                    <button id="carousel-next" class="absolute top-1/2 right-0 transform -translate-y-1/2 bg-secondary text-white p-2 rounded-full shadow-lg opacity-75 hover:opacity-100 transition-opacity -mr-4 z-10">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                    </button>
+                </div>
+                <!-- === FIN: Carrusel === -->
+            </div>
+        </section>
+        <!-- ==== FIN: Sección Carrusel de Noticias ==== -->
+
+        <!-- ==== Sección Principal (Inicio) - Tarjetas en Cuadrícula ==== --><section id="inicio" class="py-16 sm:py-24 bg-light">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-4xl font-heading text-dark mb-12">Bienvenido a Nuestro Centro</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
+                    
+                    <!-- Tarjeta: Noticias --><a href="#noticias-carrusel" class="block bg-white rounded-xl shadow-lg p-8 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl w-full max-w-sm">
+                        <div class="flex items-center justify-center h-20 w-20 bg-primary text-white rounded-full mx-auto mb-6">
+                            <svg class="h-10 w-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v2m-7 13v-2.5a2.5 2.5 0 015 0V20m-5-9h6m-6 4h6m-6-8h.01M16 16.5a2.5 2.5 0 005 0V14a2 2 0 00-2-2h-3a2 2 0 00-2 2v2.5z"/></svg>
+                        </div>
+                        <h3 class="text-2xl font-heading text-dark mb-3">Noticias</h3>
+                        <p class="text-gray-600 font-body">Mantente al día con los últimos eventos y anuncios del centro.</p>
+                    </a>
+
+                    <!-- Tarjeta: Recursos --><a href="#otras-secciones" data-tab="recursos" class="tab-card block bg-white rounded-xl shadow-lg p-8 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl w-full max-w-sm">
+                        <div class="flex items-center justify-center h-20 w-20 bg-secondary text-white rounded-full mx-auto mb-6">
+                            <svg class="h-10 w-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13.496M16.253 12H7.747M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
+                        </div>
+                        <h3 class="text-2xl font-heading text-dark mb-3">Recursos</h3>
+                        <p class="text-gray-600 font-body">Encuentra material de estudio, plataformas y herramientas educativas.</p>
+                    </a>
+
+                    <!-- Tarjeta: Documentación --><a href="#otras-secciones" data-tab="documentacion" class="tab-card block bg-white rounded-xl shadow-lg p-8 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl w-full max-w-sm">
+                        <div class="flex items-center justify-center h-20 w-20 bg-accent text-dark rounded-full mx-auto mb-6">
+                            <svg class="h-10 w-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        </div>
+                        <h3 class="text-2xl font-heading text-dark mb-3">Documentación</h3>
+                        <p class="text-gray-600 font-body">Accede a documentos oficiales, políticas y formularios importantes.</p>
+                    </a>
+                    
+                </div>
+            </div>
+        </section>
+
+        <!-- ==== Sección "Otras Secciones" con Pestañas ==== --><section id="otras-secciones" class="py-16 sm:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl font-heading text-center text-dark mb-12">
+                    Explora Más
+                </h2>
+
+                <!-- Controles de Pestañas --><div class="flex flex-wrap justify-center mb-8 border-b border-gray-200">
+                    <button class="tab-button active px-6 py-3 text-lg font-body font-medium transition-colors duration-200 ease-in-out border-b-2 border-transparent hover:border-primary-light hover:text-primary-dark" data-tab-target="recursos">Recursos</button>
+                    <button class="tab-button px-6 py-3 text-lg font-body font-medium transition-colors duration-200 ease-in-out border-b-2 border-transparent hover:border-primary-light hover:text-primary-dark" data-tab-target="documentacion">Documentación</button>
+                    <button class="tab-button px-6 py-3 text-lg font-body font-medium transition-colors duration-200 ease-in-out border-b-2 border-transparent hover:border-primary-light hover:text-primary-dark" data-tab-target="youtube">YouTube</button>
+                </div>
+
+                <!-- Contenido de Pestañas --><div class="p-8 bg-light rounded-xl shadow-inner">
+                    <!-- Contenido de Noticias (Eliminado, movido arriba) --><div id="noticias" class="tab-content">
+                        <!-- Este div se mantiene vacío por si la lógica JS lo referencia, pero ya no es 'active' -->
+                    </div>
+
+                    <!-- Contenido de Recursos --><div id="recursos" class="tab-content active">
+                        <h3 class="text-3xl font-heading text-dark mb-6">Nuestros Recursos Educativos</h3>
+                        <!-- === MODIFICADO: Genially Embebido === -->
+                        <div class="relative w-full overflow-hidden rounded-lg shadow-md" style="padding-top: 56.25%;"> <!-- 16:9 Aspect Ratio -->
+                            <iframe class="absolute top-0 left-0 w-full h-full" src="https://view.genially.com/68cbb6a6d5f0013705eb76d7" title="Presentación Genially" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                        <!-- === FIN MODIFICADO === -->
+                    </div>
+
+                    <!-- Contenido de Documentación --><div id="documentacion" class="tab-content">
+                        <h3 class="text-3xl font-heading text-dark mb-6">Documentos Importantes</h3>
+                        <!-- === MODIFICADO: Canva Embebido === -->
+                        <div class="relative w-full overflow-hidden rounded-lg shadow-md" style="padding-top: 56.25%;"> <!-- 16:9 Aspect Ratio -->
+                            <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.canva.com/design/DAG0V2ksPBk/JY0nJcf89yzJPvIVqHyM8A/view?embed" title="Presentación Canva" frameborder="0" allow="fullscreen; autoplay" allowfullscreen></iframe>
+                        </div>
+                        <!-- === FIN MODIFICADO === -->
+                    </div>
+
+                    <!-- ==== NUEVO: Contenido de YouTube ==== -->
+                    <div id="youtube" class="tab-content">
+                        <h3 class="text-3xl font-heading text-dark mb-6">Canal Educativo</h3>
+                        
+                        <div class="bg-white p-6 rounded-lg shadow-sm flex items-center justify-between mb-8">
+                            <span class="text-lg font-body font-medium text-dark">Canal de YouTube Teveras</span>
+                            <a href="https://www.youtube.com/@teverastelevision246" target="_blank" rel="noopener noreferrer" class="bg-secondary text-white hover:bg-opacity-80 px-4 py-2 rounded-md text-sm font-body transition-colors">Visitar Canal</a>
+                        </div>
+
+                        <h4 class="text-2xl font-heading text-dark mb-4">Vídeo Destacado</h4>
+                        
+                        <!-- === MODIFICADO: Fallback para vídeo embebido === -->
+                        <!-- 
+                            El error 153 de YouTube suele ocurrir cuando el vídeo tiene deshabilitada la inserción 
+                            o cuando la página se ve en un entorno (como un iframe) que YouTube no permite.
+                            Cambiamos el iframe por un enlace directo al vídeo con una miniatura.
+                        -->
+                        <a href="https://youtu.be/pN2HAEfVvLk" target="_blank" rel="noopener noreferrer" class="relative block w-full bg-black rounded-lg shadow-md overflow-hidden group">
+                            <!-- Usamos padding-top 56.25% para mantener el ratio 16:9 -->
+                            <div class="relative" style="padding-top: 56.25%;">
+                                <!-- Imagen de fondo (placeholder) -->
+                                <img src="https://placehold.co/1280x720/3F485C/FFFFFF?text=Ver+Vídeo+Destacado&font=montserrat" alt="Ver Vídeo Destacado" class="absolute top-0 left-0 w-full h-full object-cover">
+                                
+                                <!-- Capa semitransparente -->
+                                <div class="absolute inset-0 bg-black opacity-40 group-hover:opacity-60 transition-opacity"></div>
+
+                                <!-- Icono de Play -->
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <svg class="h-16 w-16 text-white opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all transform" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                                </div>
+                            </div>
+                        </a>
+                        <!-- === FIN MODIFICADO === -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <!-- ==== Pie de Página ==== --><footer class="bg-dark text-light py-12">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="font-body">&copy; 2025 [Nombre del Centro]. Todos los derechos reservados.</p>
+            <p class="mt-2 text-sm font-body">Dirección del Centro, Ciudad, País</p>
+        </div>
+    </footer>
+
+    <!-- ==== JavaScript para el menú móvil y las pestañas ==== --><script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // === Menú Móvil ===
+            const menuBtn = document.getElementById('menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuIconOpen = document.getElementById('menu-icon-open');
+            const menuIconClose = document.getElementById('menu-icon-close');
+            const mobileMenuLinks = document.querySelectorAll('.mobile-menu-link');
+
+            const toggleMenu = () => {
+                mobileMenu.classList.toggle('hidden');
+                menuIconOpen.classList.toggle('hidden');
+                menuIconClose.classList.toggle('hidden');
+            };
+
+            menuBtn.addEventListener('click', toggleMenu);
+
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        toggleMenu();
+                    }
+                });
+            });
+
+            // === Pestañas ===
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const tabCards = document.querySelectorAll('.tab-card'); // Las tarjetas de la sección principal
+
+            const activateTab = (tabId) => {
+                // Desactivar todos los botones y contenidos
+                tabButtons.forEach(button => {
+                    button.classList.remove('active', 'bg-secondary', 'text-white');
+                    button.classList.add('text-dark', 'hover:border-primary-light', 'hover:text-primary-dark');
+                    button.style.borderBottomColor = 'transparent'; // Reiniciar el color del borde
+                });
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                // Activar el botón y contenido de la pestaña seleccionada
+                const activeButton = document.querySelector(`.tab-button[data-tab-target="${tabId}"]`);
+                const activeContent = document.getElementById(tabId);
+
+                if (activeButton) {
+                    activeButton.classList.add('active', 'bg-secondary', 'text-white');
+                    activeButton.classList.remove('text-dark', 'hover:border-primary-light', 'hover:text-primary-dark');
+                    activeButton.style.borderBottomColor = 'white'; // O el color deseado para el borde activo
+                }
+                if (activeContent) {
+                    activeContent.classList.add('active');
+                }
+            };
+
+            // Event listener para los botones de las pestañas
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.dataset.tabTarget;
+                    activateTab(tabId);
+                });
+            });
+
+            // Event listener para las tarjetas de la sección principal
+            tabCards.forEach(card => {
+                card.addEventListener('click', (event) => {
+                    event.preventDefault(); // Evitar el salto de ancla por defecto
+                    const tabId = card.dataset.tab;
+                    activateTab(tabId);
+                    // Desplazarse a la sección de pestañas después de activar la pestaña
+                    document.getElementById('otras-secciones').scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+
+            // Activar la primera pestaña por defecto al cargar
+            if (tabButtons.length > 0) {
+                activateTab(tabButtons[0].dataset.tabTarget);
+            }
+
+            // === NUEVO: Lógica del Carrusel ===
+            const carouselContainer = document.getElementById('carousel-container');
+            const prevButton = document.getElementById('carousel-prev');
+            const nextButton = document.getElementById('carousel-next');
+
+            if (carouselContainer && prevButton && nextButton) {
+                const scrollStep = () => {
+                    // Moverse el ancho de un item (o un porcentaje)
+                    // Usar clientWidth del contenedor es una buena aproximación
+                    return carouselContainer.clientWidth * 0.75; // Moverse 75% del ancho visible
+                };
+
+                nextButton.addEventListener('click', () => {
+                    carouselContainer.scrollBy({
+                        left: scrollStep(),
+                        behavior: 'smooth'
+                    });
+                });
+
+                prevButton.addEventListener('click', () => {
+                    carouselContainer.scrollBy({
+                        left: -scrollStep(),
+                        behavior: 'smooth'
+                    });
+                });
+            }
+            // === FIN: Lógica del Carrusel ===
+        });
+    </script>
+
+</body>
+</html>
