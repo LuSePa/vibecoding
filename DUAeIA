@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOOC DUA e IA – Itinerario</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --color-crema: #fdfaf5;
+            --color-crema-luz: #fffefc;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --bg-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='40' viewBox='0 0 80 40'%3E%3Cpath d='M0 40c4.5-5 10.5-8 17.5-8s13 3 17.5 8H0zm40 0c4.5-5 10.5-8 17.5-8s13 3 17.5 8H40zM17.5 28c5.8 0 10.8 2.5 14.2 6.5C28.2 30.5 23.2 28 17.5 28zM57.5 28c5.8 0 10.8 2.5 14.2 6.5C68.2 30.5 63.2 28 57.5 28zM17.5 24c4.5 0 8.5 1.5 11.5 4-3-2.5-7-4-11.5-4s-8.5 1.5-11.5 4c3-2.5 7-4 11.5-4zm40 0c4.5 0 8.5 1.5 11.5 4-3-2.5-7-4-11.5-4s-8.5 1.5-11.5 4c3-2.5 7-4 11.5-4z' fill='%23e67e22' fill-opacity='0.03'/%3E%3C/svg%3E");
+        }
+
+        body {
+            background-color: var(--color-crema);
+            background-image: var(--bg-pattern);
+            color: #2c1e1e;
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Banner washi tape (Séxtuple capa) */
+        .washi-banner-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1; 
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .washi-layer {
+            position: absolute;
+            width: 120%;
+            left: -10%;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.2));
+            opacity: 1;
+        }
+
+        /* Patrones */
+        .pattern-waves { background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 20c2 0 5 3 5 7s-3 7-5 7-5-3-5-7 3-7 5-7z' fill='%23ffffff' fill-opacity='0.2'/%3E%3Cpath d='M70 60c4-4 8-2 8 2s-4 10-8 10-8-6-8-10 4-2 8-2z' fill='%23ffffff' fill-opacity='0.2'/%3E%3C/svg%3E"); }
+        .pattern-leaves { background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 20l3 7h7l-5 4 2 7-7-4-7 4 2-7-5-4h7z' fill='%23ffffff' fill-opacity='0.3'/%3E%3Ccircle cx='60' cy='50' r='2' fill='%23ffffff' fill-opacity='0.4'/%3E%3C/svg%3E"); }
+        .pattern-lines { background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 30c5 0 8-5 8-5s3 5 8 5-8 5-8 5-3-5-8-5z' fill='%23ffffff' fill-opacity='0.2'/%3E%3C/svg%3E"); }
+        .pattern-dots { background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='2' fill='%23ffffff' fill-opacity='0.3'/%3E%3C/svg%3E"); }
+
+        /* --- PALETAS --- */
+        .theme-bosque .washi-layer-1 { background-color: #2D4232; }
+        .theme-bosque .washi-layer-2 { background-color: #6B705C; }
+        .theme-bosque .washi-layer-3 { background-color: #B58463; }
+        .theme-bosque .washi-layer-4 { background-color: #D08C60; }
+        .theme-bosque .washi-layer-5 { background-color: #99582A; }
+        .theme-bosque .washi-layer-6 { background-color: #432818; }
+
+        .theme-atardecer .washi-layer-1 { background-color: #9B8594; }
+        .theme-atardecer .sub-1 { background-color: #A47166; }
+        .theme-atardecer .sub-2 { background-color: #E09F3E; }
+        .theme-atardecer .sub-3 { background-color: #9E2A2B; }
+        .theme-atardecer .sub-4 { background-color: #540B0E; }
+        .theme-atardecer .sub-5 { background-color: #FFF3B0; }
+
+        .theme-cosecha .washi-layer-1 { background-color: #4A2545; }
+        .theme-cosecha .sub-1 { background-color: #8E412E; }
+        .theme-cosecha .sub-2 { background-color: #D4A373; }
+        .theme-cosecha .sub-3 { background-color: #E9EDC9; }
+        .theme-cosecha .sub-4 { background-color: #CCD5AE; }
+        .theme-cosecha .sub-5 { background-color: #582F0E; }
+
+        .theme-niebla .washi-layer-1 { background-color: #405D72; }
+        .theme-niebla .sub-1 { background-color: #758694; }
+        .theme-niebla .sub-2 { background-color: #F7E7CE; }
+        .theme-niebla .sub-3 { background-color: #B68D40; }
+        .theme-niebla .sub-4 { background-color: #D6955B; }
+        .theme-niebla .sub-5 { background-color: #272829; }
+
+        .theme-especias .washi-layer-1 { background-color: #E2B144; }
+        .theme-especias .sub-1 { background-color: #D47124; }
+        .theme-especias .sub-2 { background-color: #B13D21; }
+        .theme-especias .sub-3 { background-color: #6F2232; }
+        .theme-especias .sub-4 { background-color: #3D2317; }
+
+        .theme-jardin .washi-layer-1 { background-color: #1B3022; }
+        .theme-jardin .sub-1 { background-color: #4F772D; }
+        .theme-jardin .sub-2 { background-color: #9F86C0; }
+        .theme-jardin .sub-3 { background-color: #5E548E; }
+        .theme-jardin .sub-4 { background-color: #231942; }
+        .theme-jardin .sub-5 { background-color: #E0C3FC; }
+        .theme-jardin .sub-6 { background-color: #1B3022; }
+
+        /* Capas */
+        header .washi-layer-1, .card-header .washi-layer-1 { top: 5%; height: 25%; transform: rotate(-1.5deg); clip-path: polygon(0% 8%, 100% 0%, 98% 92%, 2% 100%); }
+        header .washi-layer-2, .card-header .washi-layer-2 { top: 20%; height: 25%; transform: rotate(1.2deg); clip-path: polygon(2% 0%, 98% 10%, 100% 100%, 0% 90%); }
+        header .washi-layer-3, .card-header .washi-layer-3 { top: 35%; height: 20%; transform: rotate(-0.8deg); clip-path: polygon(0% 15%, 100% 5%, 97% 85%, 3% 95%); }
+        header .washi-layer-4, .card-header .washi-layer-4 { top: 50%; height: 20%; transform: rotate(0.6deg); clip-path: polygon(1% 5%, 99% 0%, 100% 95%, 0% 85%); }
+        header .washi-layer-5, .card-header .washi-layer-5 { top: 65%; height: 18%; transform: rotate(-0.4deg); clip-path: polygon(0% 10%, 100% 20%, 95% 90%, 5% 100%); }
+        header .washi-layer-6, .card-header .washi-layer-6 { top: 78%; height: 15%; transform: rotate(0.3deg); clip-path: polygon(2% 0%, 98% 5%, 100% 95%, 0% 100%); }
+
+        header { display: flex; align-items: center; justify-content: center; text-align: center; min-height: 280px; padding: 20px; position: relative; z-index: 1; }
+        header h1 { color: #2c1e1e; font-size: 3.8rem; margin: 0; font-weight: 900; position: relative; z-index: 5; text-shadow: 0 0 25px white, 0 0 15px white, 0 0 10px white, 1px 1px 3px rgba(0,0,0,0.2); line-height: 1.1; }
+
+        .welcome-box { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 12px 40px rgba(0,0,0,0.04); margin-top: 20px; margin-bottom: 35px; border: 1px solid rgba(111, 78, 55, 0.15); position: relative; z-index: 2; }
+        .meta-notice { background: rgba(111, 78, 55, 0.05); border: 1px solid #6f4e37; padding: 15px; border-radius: 12px; font-size: 0.95rem; color: #432818; display: flex; align-items: flex-start; gap: 12px; text-align: left; }
+
+        .tabs-nav { display: flex; justify-content: center; gap: 8px; margin-bottom: 30px; flex-wrap: wrap; position: relative; z-index: 2; }
+        .tab-trigger { padding: 12px 18px; border: none; background: white; color: #6f4e37; font-weight: bold; font-size: 0.85rem; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: all 0.3s; border-bottom: 3px solid transparent; }
+        .tab-trigger.active { background: #6f4e37; color: white; border-bottom: 3px solid #2c1e1e; }
+
+        .block-content { display: none; animation: fadeIn 0.4s ease; }
+        .block-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card { background: white; border-radius: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.03); border: 1px solid rgba(111, 78, 55, 0.08); margin-bottom: 25px; overflow: visible; }
+        .card-header { display: flex; align-items: center; justify-content: center; position: relative; min-height: 200px; padding: 20px 35px; border-bottom: 1px solid rgba(111, 78, 55, 0.1); border-top-left-radius: 25px; border-top-right-radius: 25px; text-align: center; z-index: 1; }
+        .card-header h2 { color: #2c1e1e; font-size: 2.2rem; margin: 0; font-weight: 800; position: relative; z-index: 5; text-shadow: 0 0 15px white, 0 0 10px white, 0 0 5px white, 1px 1px 3px rgba(0,0,0,0.1); }
+        .card-body { padding: 35px; position: relative; z-index: 2; }
+
+        /* Subsecciones con washi tape */
+        summary.section-header {
+            padding: 20px 25px;
+            background: #fff;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #2c1e1e;
+            font-size: 1.1rem;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        summary.section-header:hover { background: var(--color-crema-luz); }
+        summary.section-header .title-wrapper { position: relative; z-index: 10; display: flex; align-items: center; justify-content: space-between; width: 100%; text-shadow: 0 0 15px white, 0 0 10px white, 0 0 5px white; }
+        .section-tape { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-0.5deg); height: 38px; width: 90%; z-index: 1; border-radius: 4px; clip-path: polygon(0% 10%, 100% 0%, 98% 90%, 2% 100%); opacity: 0.85; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.1)); }
+        summary.section-header::-webkit-details-marker { display: none; }
+        .section-body { padding: 20px 25px 25px 25px; background: #fff; border-top: 1px solid #f9f9f9; }
+
+        /* Glosario */
+        .glossary-term { color: #2c1e1e; font-weight: bold; background-color: rgba(181, 132, 99, 0.1); padding: 0 4px; border-radius: 4px; text-decoration: underline dotted #B58463; cursor: help; position: relative; z-index: 10; }
+        .glossary-term:hover { background-color: #B58463; color: white; z-index: 1000; }
+        .glossary-term:hover::after { content: attr(data-definition); position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%); background: #432818; color: white; padding: 12px 18px; border-radius: 12px; font-size: 0.85rem; width: 280px; box-shadow: 0 8px 20px rgba(0,0,0,0.4); font-weight: normal; animation: popIn 0.2s ease-out; white-space: normal; }
+        @keyframes popIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+        /* Tablas */
+        .table-container { overflow-x: auto; margin-top: 20px; border-radius: 12px; border: 1px solid #ddd; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: white; }
+        .data-table th { background-color: #efebe9; color: #2c1e1e; text-align: left; padding: 12px; border-bottom: 2px solid #ddd; }
+        .data-table td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: top; }
+        .pilar-label { font-weight: bold; display: block; margin-bottom: 4px; }
+        .concept-cloud { font-style: italic; color: #6f4e37; font-size: 0.8rem; }
+        .prompt-text { font-family: 'Courier New', Courier, monospace; background: #fdfaf5; padding: 4px; border-radius: 4px; font-size: 0.8rem; color: #333; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="theme-bosque">
+        <div class="washi-banner-container">
+            <div class="washi-layer washi-layer-1 pattern-waves"></div>
+            <div class="washi-layer washi-layer-2 pattern-leaves"></div>
+            <div class="washi-layer washi-layer-3 pattern-lines"></div>
+            <div class="washi-layer washi-layer-4 pattern-dots"></div>
+            <div class="washi-layer washi-layer-5 pattern-waves"></div>
+            <div class="washi-layer washi-layer-6 pattern-leaves"></div>
+        </div>
+        <h1>NOOC DUA e IA</h1>
+    </header>
+
+    <div class="welcome-box">
+        <p class="welcome-text">Bienvenida, Patricia. Esta página pretende ser una presentación de mis ideas para el NOOC, en un formato que te permita hacerte una idea rápida y poder guiarme en este viaje.</p>
+        <div class="meta-notice">
+            <i data-lucide="info"></i>
+            <span>Este curso se está diseñando desde los principios del DUA, por lo que va a incluir múltiples formas de expresión, representación e implicación: actividades multinivel, multimodal y multiformato.</span>
+        </div>
+    </div>
+
+    <nav class="tabs-nav">
+        <button class="tab-trigger active" onclick="showTab(0)">Bases legales</button>
+        <button class="tab-trigger" onclick="showTab(1)">DUA e IA</button>
+        <button class="tab-trigger" onclick="showTab(2)">El arte de preguntar</button>
+        <button class="tab-trigger" onclick="showTab(3)">Reflexión y recursos</button>
+        <button class="tab-trigger" onclick="showTab(4)">Producto final</button>
+    </nav>
+
+    <!-- BLOQUE 1: ATARDECER DE OCTUBRE -->
+    <div id="block-0" class="block-content active">
+        <div class="card glossary-target theme-atardecer">
+            <div class="card-header">
+                <div class="washi-banner-container">
+                    <div class="washi-layer washi-layer-1 pattern-waves"></div>
+                    <div class="washi-layer washi-layer-2 pattern-leaves"></div>
+                    <div class="washi-layer washi-layer-3 pattern-lines"></div>
+                    <div class="washi-layer washi-layer-4 pattern-dots"></div>
+                    <div class="washi-layer washi-layer-5 pattern-waves"></div>
+                    <div class="washi-layer washi-layer-6 pattern-leaves"></div>
+                </div>
+                <h2>Bloque 1 - Bases legales</h2>
+            </div>
+            <div class="card-body">
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>1.1. ¿Qué vamos a aprender en este bloque?</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-1"></div>
+                    </summary>
+                    <div class="section-body">
+                        <p>Estableceremos los cimientos legales y éticos que dan seguridad a nuestra función docente. Aprenderás a:</p>
+                        <ul class="content-list">
+                            <li><b>Fundamentar tu práctica:</b> Conocerás el respaldo legal que obliga al Diseño Universal para el Aprendizaje (DUA) como motor de inclusión.</li>
+                            <li><b>Garantizar la privacidad:</b> Identificación de datos sensibles bajo la normativa vigente.</li>
+                            <li><b>Operar con seguridad jurídica:</b> Uso de herramientas institucionales como blindaje legal ante el uso de nuevas tecnologías.</li>
+                            <li><b>Ejercer el criterio profesional:</b> Responsabilidad ética de la supervisión humana frente a los sistemas automatizados.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>1.2. Normativa nacional: la base del derecho inclusivo</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-2"></div>
+                    </summary>
+                    <div class="section-body">
+                        <ul class="content-list">
+                            <li><b>LOMLOE y el mandato DUA:</b> Artículo 4 sobre educación inclusiva y la diferencia legal entre "adaptación" (reactiva para unos pocos) e "diseño" (proactivo para todos).</li>
+                            <li><b>LOPDGDD y la protección del menor:</b> Principio de minimización de datos y bases jurídicas por misión de interés público.</li>
+                            <li><b>DigComp 3.0:</b> Evaluación de la fiabilidad de fuentes y gestión de información sensible (salud, NEAE).</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>1.3. Normativa regional y herramientas corporativas</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-3"></div>
+                    </summary>
+                    <div class="section-body">
+                        <ul class="content-list">
+                            <li><b>Decretos de currículo:</b> El DUA como motor de las medidas de inclusión ordinarias.</li>
+                            <li><b>Herramientas corporativas:</b> Entornos blindados (Copilot/Gemini) que garantizan la privacidad según el RGPD.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>1.4. Normativa sobre inteligencia artificial</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-4"></div>
+                    </summary>
+                    <div class="section-body">
+                        <ul class="content-list">
+                            <li><b>Reglamento europeo de IA (AI Act):</b> Sistemas de alto riesgo y transparencia.</li>
+                            <li><b>Human-in-the-loop:</b> La decisión pedagógica es responsabilidad docente indelegable.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>1.5. Perfil de salida del bloque</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-5"></div>
+                    </summary>
+                    <div class="section-body">
+                        <p>Al finalizar este bloque, el docente identificará los fundamentos legales básicos que sustentan el DUA y conocerá la importancia de utilizar exclusivamente herramientas institucionales para proteger la privacidad de su alumnado.</p>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+
+    <!-- BLOQUE 2: COSECHA Y TIERRA -->
+    <div id="block-1" class="block-content">
+        <div class="card glossary-target theme-cosecha">
+            <div class="card-header">
+                <div class="washi-banner-container">
+                    <div class="washi-layer washi-layer-1 pattern-waves"></div>
+                    <div class="washi-layer washi-layer-2 pattern-leaves"></div>
+                    <div class="washi-layer washi-layer-3 pattern-lines"></div>
+                    <div class="washi-layer washi-layer-4 pattern-dots"></div>
+                    <div class="washi-layer washi-layer-5 pattern-waves"></div>
+                    <div class="washi-layer washi-layer-6 pattern-leaves"></div>
+                </div>
+                <h2>Bloque 2 - DUA e IA</h2>
+            </div>
+            <div class="card-body">
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>2.1. ¿Qué vamos a aprender en este bloque?</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-1"></div>
+                    </summary>
+                    <div class="section-body">
+                        <p>Analizaremos la lógica interna de nuestras herramientas de trabajo:</p>
+                        <ul class="content-list">
+                            <li>Entender el modelo social de la discapacidad.</li>
+                            <li>Mantener un espíritu crítico frente al realismo pedagógico.</li>
+                            <li>Desmitificar la IA como motor estadístico de tokens.</li>
+                            <li>Identificar la alianza estratégica entre pautas CAST e IA.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>2.2. El universo DUA y la accesibilidad universal</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-2"></div>
+                    </summary>
+                    <div class="section-body">
+                        <ul class="content-list">
+                            <li><b>Modelo social:</b> La discapacidad es el resultado de un entorno mal diseñado, no una deficiencia del individuo.</li>
+                            <li><b>Marco legal:</b> Mandato de utilizabilidad por todos sin discriminación.</li>
+                            <li><b>CAST:</b> Marco pedagógico para la variabilidad humana.</li>
+                            <li><b>Críticas al modelo:</b> 
+                                <div class="sub-item">Riesgo de aplicarlo como una "lista de tareas" mecánica que desdibuja la intención pedagógica.</div>
+                                <div class="sub-item">La alta demanda de recursos y tiempo que exige la planificación inicial al docente.</div>
+                                <div class="sub-item">La necesidad de mayor evidencia empírica en entornos presenciales sin apoyo tecnológico masivo.</div>
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>2.3. Anatomía de la IA generativa</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-3"></div>
+                    </summary>
+                    <div class="section-body">
+                        <ul class="content-list">
+                            <li><b>Tokens y probabilidad:</b> La IA predice el siguiente token (pedazo de texto) basándose en inmensos patrones estadísticos, no tiene comprensión real de la pedagogía ni del mundo.</li>
+                            <li><b>Alucinaciones:</b> Capacidad de generar información falsa con total apariencia de coherencia gramatical y seguridad.</li>
+                            <li><b>Sesgos algorítmicos:</b> Riesgo de perpetuar estereotipos o barreras si el docente no supervisa críticamente el resultado generado.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>2.4. Pilares y pautas del CAST</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-4"></div>
+                    </summary>
+                    <div class="section-body">
+                        <p>Las redes neuronales del aprendizaje requieren opciones variadas para activarse correctamente. El marco CAST propone 9 pautas fundamentales:</p>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead><tr><th>Red</th><th>Pauta</th><th>Acción DUA</th></tr></thead>
+                                <tbody>
+                                    <tr><td rowspan="3"><b>Afectiva</b> (El porqué)</td><td>1. Interés</td><td>Optimizar la elección individual y la relevancia con la vida real.</td></tr>
+                                    <tr><td>2. Esfuerzo</td><td>Variar niveles de exigencia y fomentar el aprendizaje colaborativo.</td></tr>
+                                    <tr><td>3. Autorregulación</td><td>Proporcionar andamiajes para gestionar emociones y frustraciones.</td></tr>
+                                    <tr><td rowspan="3"><b>Reconocimiento</b> (El qué)</td><td>4. Percepción</td><td>Ofrecer alternativas para la información visual y auditiva.</td></tr>
+                                    <tr><td>5. Lenguaje y símbolos</td><td>Clarificar vocabulario, sintaxis y apoyar la decodificación.</td></tr>
+                                    <tr><td>6. Comprensión</td><td>Activar conocimientos previos y guiar el procesamiento de la información.</td></tr>
+                                    <tr><td rowspan="3"><b>Estratégica</b> (El cómo)</td><td>7. Acción física</td><td>Variar los métodos de respuesta, navegación e interacción.</td></tr>
+                                    <tr><td>8. Expresión</td><td>Usar múltiples medios para la comunicación y la construcción.</td></tr>
+                                    <tr><td>9. Funciones ejecutivas</td><td>Apoyar la planificación, el establecimiento de metas y el progreso.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>2.5. Perfil de salida del bloque</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-5"></div>
+                    </summary>
+                    <div class="section-body">
+                        <p>Al finalizar este bloque, el docente diferenciará entre el modelo social y médico de la discapacidad, y comprenderá el funcionamiento básico de la IA para supervisar de forma crítica sus primeros resultados automatizados.</p>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+
+    <!-- BLOQUE 3: NIEBLA EN LA MONTAÑA -->
+    <div id="block-2" class="block-content">
+        <div class="card glossary-target theme-niebla">
+            <div class="card-header">
+                <div class="washi-banner-container">
+                    <div class="washi-layer washi-layer-1 pattern-waves"></div>
+                    <div class="washi-layer washi-layer-2 pattern-leaves"></div>
+                    <div class="washi-layer washi-layer-3 pattern-lines"></div>
+                    <div class="washi-layer washi-layer-4 pattern-dots"></div>
+                    <div class="washi-layer washi-layer-5 pattern-waves"></div>
+                    <div class="washi-layer washi-layer-6 pattern-leaves"></div>
+                </div>
+                <h2>Bloque 3 - El arte de preguntar: prompts</h2>
+            </div>
+            <div class="card-body">
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>3.1. ¿Qué vamos a aprender en este bloque?</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-1"></div>
+                    </summary>
+                    <div class="section-body">
+                        <p>Diseñarás la estrategia previa a la interacción con la tecnología. Aprenderás a:</p>
+                        <ul class="content-list">
+                            <li><b>Dominar la comunicación:</b> Estructurar peticiones profesionales vinculando el DUA con R-I-T-A.</li>
+                            <li><b>Mapear tu aula:</b> Recoger la variabilidad sin comprometer la privacidad.</li>
+                            <li><b>Diseñar en capas:</b> Estructurar actividades con retos y apoyos graduados.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>3.2. Ingeniería de prompts: el modelo R-I-T-A aplicado al DUA</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-2"></div>
+                    </summary>
+                    <div class="section-body">
+                        <p>El modelo <b>R-I-T-A</b> (Rol, Información, Tarea, Adaptabilidad) permite guiar a la IA para que actúe como asesor pedagógico, pidiendo ella misma los datos necesarios antes de actuar:</p>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead><tr><th>Pauta DUA</th><th>Tipo de actividad</th><th>Prompt R-I-T-A sugerido</th></tr></thead>
+                                <tbody>
+                                    <tr><td>1. Interés</td><td>Reto inicial motivador</td><td class="prompt-text">(R) Mentor creativo DUA. (I) Antes de empezar, pregúntame el nivel e intereses de mi clase. (T) Diseña 3 retos iniciales. (A) Pregunta cualquier dato extra necesario.</td></tr>
+                                    <tr><td>2. Esfuerzo</td><td>Aprendizaje cooperativo</td><td class="prompt-text">(R) Experto en docencia compartida e inclusión. (I) Pregúntame el tamaño del grupo y la materia. (T) Crea 4 roles para un equipo de trabajo. (A) Sugiere preguntas para ajustar las funciones.</td></tr>
+                                    <tr><td>3. Autorregulación</td><td>Checklist emocional</td><td class="prompt-text">(R) Asesor psicopedagógico. (I) Pregúntame qué conductas queremos mejorar. (T) Diseña un checklist de progreso. (A) Ajusta las preguntas según mi respuesta inicial.</td></tr>
+                                    <tr><td>4. Percepción</td><td>Guion podcast inclusivo</td><td class="prompt-text">(R) Experto en accesibilidad sensorial. (I) Pregúntame el contenido del texto a describir. (T) Redacta un guion para un podcast. (A) Sugiere formatos alternativos de salida.</td></tr>
+                                    <tr><td>5. Lenguaje</td><td>Glosario con iconos</td><td class="prompt-text">(R) Logopeda escolar. (I) Pídeme la lista de términos complejos. (T) Crea un glosario con iconos explicativos. (A) Pregúntame si necesito traducciones específicas.</td></tr>
+                                    <tr><td>6. Comprensión</td><td>Mapa conceptual guiado</td><td class="prompt-text">(R) Diseñador instruccional DUA. (I) Pregúntame los conceptos previos de mis alumnos. (T) Resume este tema en un mapa conceptual. (A) Propón ideas para conectar temas anteriores.</td></tr>
+                                    <tr><td>7. Acción física</td><td>Respuesta alternativa</td><td class="prompt-text">(R) Tecnólogo educativo. (I) Pregúntame los dispositivos disponibles. (T) Propón 3 formas de responder sin teclado. (A) Consulta por limitaciones físicas específicas.</td></tr>
+                                    <tr><td>8. Expresión</td><td>Vídeo-ensayo inclusivo</td><td class="prompt-text">(R) Especialista en comunicación multimedia. (I) Pídeme los objetivos de evaluación. (T) Diseña una estructura para un vídeo-ensayo. (A) Sugiere herramientas de edición sencillas.</td></tr>
+                                    <tr><td>9. Funciones ejec.</td><td>Planificador de hitos</td><td class="prompt-text">(R) Tutor de aula. (I) Pregúntame la duración total del proyecto. (T) Desglosa el trabajo en hitos semanales. (A) Pregunta por las fechas clave del centro.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>3.3. Cómo diseñar el mapa de tu clase para aplicar DUA</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-3"></div>
+                    </summary>
+                    <div class="section-body">
+                        <ul class="content-list">
+                            <li><b>Perfil de variabilidad:</b> Descripción cualitativa de las fortalezas y desafíos reales de tu grupo.</li>
+                            <li><b>Identificación de barreras:</b> Análisis de qué elementos del diseño (materiales, espacios, tiempos) impiden la participación plena.</li>
+                            <li><b>Anonimización estricta:</b> Garantía de privacidad utilizando perfiles genéricos de aprendizaje, nunca nombres reales ni diagnósticos clínicos.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>3.4. Diseño multinivel y apoyos (andamiajes)</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-4"></div>
+                    </summary>
+                    <div class="section-body">
+                        <ul class="content-list">
+                            <li><b>Graduación de la complejidad:</b> Diseño de tareas en tres niveles (Básico, Intermedio, Avanzado) que comparten el mismo objetivo final.</li>
+                            <li><b>Beneficiarios primarios y secundarios:</b> Comprender que los apoyos para un alumno benefician a menudo a todo el grupo.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>3.5. Perfil de salida del bloque</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-5"></div>
+                    </summary>
+                    <div class="section-body">
+                        <p>Al finalizar este bloque, el docente habrá practicado la comunicación con la IA mediante R-I-T-A, identificado barreras básicas en su mapa de clase y planteado un primer diseño con apoyos sencillos.</p>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+
+    <!-- BLOQUE 4: ESPECIAS DE OTOÑO -->
+    <div id="block-3" class="block-content">
+        <div class="card glossary-target theme-especias">
+            <div class="card-header">
+                <div class="washi-banner-container">
+                    <div class="washi-layer washi-layer-1 pattern-waves"></div>
+                    <div class="washi-layer washi-layer-2 pattern-leaves"></div>
+                    <div class="washi-layer washi-layer-3 pattern-lines"></div>
+                    <div class="washi-layer washi-layer-4 pattern-dots"></div>
+                    <div class="washi-layer washi-layer-5 pattern-waves"></div>
+                    <div class="washi-layer washi-layer-6 pattern-leaves"></div>
+                </div>
+                <h2>Bloque 4 - Reflexión final y para saber más</h2>
+            </div>
+            <div class="card-body">
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>4.1. ¿Qué vamos a aprender en este bloque?</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-1"></div>
+                    </summary>
+                    <div class="section-body">
+                        <p>Consolidaremos el aprendizaje mediante la visión crítica. Aprenderás a:</p>
+                        <ul class="content-list">
+                            <li><b>Analizar el impacto:</b> Cómo la IA puede cerrar o ampliar brechas educativas.</li>
+                            <li><b>Humanidad aumentada:</b> El docente como diseñador y guía ético.</li>
+                            <li><b>Biblioteca personal:</b> Recursos institucionales y redes de apoyo.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>4.2. Ética, inclusión y brecha digital</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-2"></div>
+                    </summary>
+                    <div class="section-body">
+                        <ul class="content-list">
+                            <li><b>La paradoja de la IA:</b> Capacidad de democratizar el aprendizaje mediante apoyos DUA frente al riesgo de ampliar brechas.</li>
+                            <li><b>Sesgos algorítmicos:</b> La necesidad de supervisar activamente la neutralidad de las máquinas.</li>
+                            <li><b>Privacidad como valor ético:</b> Protección de la huella digital del menor.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>4.3. La IA como asistente eficaz</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-3"></div>
+                    </summary>
+                    <div class="section-body">
+                        <p>Comprenderemos el concepto de <b>Humanidad aumentada</b>: delegar en la tecnología las tareas mecánicas y repetitivas para que el docente recupere tiempo de calidad para el acompañamiento emocional directo.</p>
+                    </div>
+                </details>
+
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>4.4. Perfil de salida del bloque</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-4"></div>
+                    </summary>
+                    <div class="section-body">
+                        <p>Al finalizar este bloque, el docente reconocerá los posibles sesgos de la IA en el aula y dispondrá de una lista inicial de recursos institucionales para consultar dudas éticas básicas.</p>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+
+    <!-- BLOQUE 5: JARDÍN DE NOVIEMBRE -->
+    <div id="block-4" class="block-content">
+        <div class="card glossary-target theme-jardin">
+            <div class="card-header">
+                <div class="washi-banner-container">
+                    <div class="washi-layer washi-layer-1 pattern-waves"></div>
+                    <div class="washi-layer washi-layer-2 pattern-leaves"></div>
+                    <div class="washi-layer washi-layer-3 pattern-lines"></div>
+                    <div class="washi-layer washi-layer-4 pattern-dots"></div>
+                    <div class="washi-layer washi-layer-5 pattern-waves"></div>
+                    <div class="washi-layer washi-layer-6 pattern-leaves"></div>
+                </div>
+                <h2>Bloque 5 - Producto final</h2>
+            </div>
+            <div class="card-body">
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>5.1. ¿Qué vamos a aprender en este bloque?</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-1"></div>
+                    </summary>
+                    <div class="section-body">
+                        <p>En este bloque final pondremos a prueba nuestra competencia diseñando una propuesta pedagógica real que aplique la ingeniería de prompts y el marco DUA para eliminar barreras reales de aprendizaje detectadas en nuestro contexto habitual.</p>
+                    </div>
+                </details>
+
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>5.2. Tarea final: el reto</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-2"></div>
+                    </summary>
+                    <div class="section-body">
+                        <p>Diseño de una propuesta pedagógica escalable mediante IA corporativa. <b>Puedes realizar cualquiera de las tres actividades</b> propuestas según tus necesidades, conocimientos y apetencias personales del momento.</p>
+                    </div>
+                </details>
+
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>5.3. Estructura de la propuesta (opciones de diseño)</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-3"></div>
+                    </summary>
+                    <div class="section-body">
+                        <ul class="content-list">
+                            <li><b>Nivel 1 (Adaptación de actividad):</b> Diseño de una tarea puntual aplicando al menos dos pautas DUA para eliminar barreras de acceso (ej. simplificación de texto, apoyos visuales o alternativas de respuesta).</li>
+                            <li><b>Nivel 2 (Diseño de sesión):</b> Planificación de 60 minutos que incluya: secuencia de tiempos, estrategias de agrupación y andamiajes para el desarrollo de la competencia.</li>
+                            <li><b>Nivel 3 (Proyecto ApS):</b> Líneas maestras de un proyecto de Aprendizaje-Servicio. Debe incluir: necesidad social detectada, servicio a prestar y vinculación con los objetivos curriculares.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>5.4. Formato y requisitos de entrega</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-4"></div>
+                    </summary>
+                    <div class="section-body">
+                        <p>Se puede entregar en el formato deseado, con las siguientes limitaciones técnicas:</p>
+                        <ul class="content-list">
+                            <li><b>Audiovisual:</b> Máximo 5 minutos explicando el diseño técnico realizado.</li>
+                            <li><b>Documento/infografía:</b> En formato PDF o mediante una URL pública accesible.</li>
+                            <li><b>Contenido obligatorio:</b>
+                                <div class="sub-item">1. Descripción del proceso de elaboración del mapa de variabilidad.</div>
+                                <div class="sub-item">2. Los prompts R-I-T-A utilizados y la descripción de sus iteraciones.</div>
+                                <div class="sub-item">3. El material diseñado (la actividad, la sesión o las líneas del proyecto ApS).</div>
+                                <div class="sub-item">4. Reflexión ética y técnica sobre el resultado obtenido de la IA.</div>
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>5.5. Elementos a evaluar (evaluación por pares)</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-5"></div>
+                    </summary>
+                    <div class="section-body">
+                        <p>Tus compañeros evaluarán la presencia y calidad de los siguientes elementos:</p>
+                        <ul class="content-list">
+                            <li>Integridad de la entrega (Mapa, Prompts, Material y Reflexión).</li>
+                            <li>Escalabilidad y coherencia pedagógica del diseño propuesto.</li>
+                            <li>Trazabilidad del diseño mediante el uso de prompts R-I-T-A iterados.</li>
+                            <li>Aplicación visible de pautas DUA y diseño de andamiajes.</li>
+                            <li>Cumplimiento estricto del formato y tiempos de comunicación.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="content-section">
+                    <summary class="section-header">
+                        <div class="title-wrapper"><span>5.6. Perfil de salida de la tarea</span><i data-lucide="chevron-down"></i></div>
+                        <div class="section-tape pattern-leaves sub-6"></div>
+                    </summary>
+                    <div class="section-body">
+                        <p>Al finalizar esta tarea, el docente habrá diseñado una propuesta sencilla apoyada por IA y habrá realizado una autorreflexión básica sobre su propio diseño curricular inclusivo.</p>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    lucide.createIcons();
+
+    const glossary = {
+        "Anonimización": "Proceso técnico que rompe la posibilidad de identificar a una persona física.",
+        "Dato sensible": "Categoría especial de datos (salud, creencias) con máxima protección legal.",
+        "Descriptores operativos": "Definiciones concretas de lo que debe saber hacer el alumno al finalizar una etapa.",
+        "Human-in-the-loop": "Concepto ético que exige que un ser humano supervise y valide el resultado de una máquina.",
+        "Misión de interés público": "Base legal que permite a los docentes tratar datos para fines educativos sin consentimiento constante.",
+        "Minimización de datos": "Principio que obliga a usar la menor cantidad posible de información personal.",
+        "Accesibilidad universal": "Condición que garantiza que los materiales sean utilizables por todos con autonomía.",
+        "Alucinación": "Error de la IA en el que genera información falsa con apariencia de seguridad.",
+        "Barrera de aprendizaje": "Obstáculo en el diseño del entorno que impide acceder al conocimiento.",
+        "Modelo social": "Perspectiva donde la discapacidad es el resultado de un entorno mal diseñado.",
+        "Pauta DUA": "Estrategia de diseño para activar las redes neuronales del aprendizaje.",
+        "Token": "Unidad mínima de texto que la IA utiliza para procesar información.",
+        "Andamiaje": "Apoyo temporal y ajustable para realizar tareas complejas.",
+        "R-I-T-A": "Acrónimo pedagógico para educación donde la IA pregunta los datos necesarios antes de actuar.",
+        "Brecha digital": "Desigualdad en el acceso o impacto de las tecnologías entre grupos sociales.",
+        "Humanidad aumentada": "Uso de la tecnología para potenciar capacidades humanas en lugar de reemplazarlas.",
+        "Sesgo de confirmación": "Tendencia a favorecer la información que confirma las propias creencias.",
+        "Soberanía del dato": "Derecho a mantener el control sobre los propios datos frente a terceros."
+    };
+
+    function applyGlossary() {
+        const targets = document.querySelectorAll('.glossary-target');
+        const sortedTerms = Object.keys(glossary).sort((a, b) => b.length - a.length);
+
+        targets.forEach(container => {
+            const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null, false);
+            const nodesToReplace = [];
+            while (walker.nextNode()) {
+                if (!walker.currentNode.parentNode.classList.contains('glossary-term')) {
+                    nodesToReplace.push(walker.currentNode);
+                }
+            }
+            nodesToReplace.forEach(node => {
+                let text = node.nodeValue;
+                let modified = false;
+                let tempHtml = text;
+                sortedTerms.forEach(term => {
+                    const regex = new RegExp(`\\b(${term})\\b`, 'gi');
+                    if (regex.test(tempHtml)) {
+                        tempHtml = tempHtml.replace(regex, (match) => {
+                            modified = true;
+                            return `<span class="glossary-term" data-definition="${glossary[term]}">${match}</span>`;
+                        });
+                    }
+                });
+                if (modified) {
+                    const span = document.createElement('span');
+                    span.innerHTML = tempHtml;
+                    node.parentNode.replaceChild(span, node);
+                }
+            });
+        });
+    }
+
+    function showTab(index) {
+        document.querySelectorAll('.tab-trigger').forEach((btn, i) => {
+            btn.classList.toggle('active', i === index);
+        });
+        document.querySelectorAll('.block-content').forEach((block, i) => {
+            block.classList.toggle('active', i === index);
+        });
+        lucide.createIcons();
+    }
+
+    window.onload = () => {
+        applyGlossary();
+        lucide.createIcons();
+    };
+</script>
+
+</body>
+</html>
