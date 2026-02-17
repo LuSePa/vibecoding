@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de datos con IA para centros educativos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ------------------- */
+        /* MANUAL DE ESTILO    */
+        /* ------------------- */
+        :root {
+            --color-fondo: #FDF5E6;     /* Crema */
+            --color-titulos: #D2691E;     /* Chocolate */
+            --color-texto: #3C2A1E;       /* Café oscuro */
+            --color-acento: #E49B0F;      /* Calabaza */
+            --fuente-titulos: 'Montserrat', sans-serif;
+            --fuente-cuerpo: 'Open Sans', sans-serif;
+            
+            --color-personal: #e57373;    
+            --color-microsoft: #2e7d32;   
+            --color-google: #1976d2;      
+        }
+
+        /* ------------------- */
+        /* ESTILOS GENERALES   */
+        /* ------------------- */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: var(--fuente-cuerpo);
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+            line-height: 1.8;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        /* ------------------- */
+        /* CABECERA 100% ANCHO */
+        /* ------------------- */
+        .header-full {
+            width: 100%;
+            position: relative;
+            background-color: var(--color-texto);
+            border-bottom: 5px solid var(--color-acento);
+            line-height: 0; 
+        }
+
+        .header-full img.logo-cabecera {
+            width: 100%;
+            height: auto; 
+            display: block;
+            filter: brightness(0.9); 
+        }
+        
+        .header-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 2rem;
+            background: rgba(0, 0, 0, 0.15); 
+        }
+
+        .header-overlay h1 {
+            margin: 0;
+            font-size: clamp(1.1rem, 4vw, 2.3rem);
+            color: var(--color-acento);
+            /* Resaltado blanco con 50% de opacidad */
+            background: rgba(255, 255, 255, 0.5);
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            display: inline-block;
+            text-shadow: 
+                0 0 10px #fff, 
+                2px 2px 5px rgba(0,0,0,0.2);
+            max-width: 90%;
+            font-family: var(--fuente-titulos);
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .header-overlay p {
+            margin: 1rem 0 0 0;
+            font-size: clamp(0.8rem, 1.8vw, 1.1rem);
+            font-weight: 600;
+            color: var(--color-texto); 
+            /* Resaltado blanco con 50% de opacidad */
+            background: rgba(255, 255, 255, 0.5);
+            padding: 0.3rem 1rem;
+            border-radius: 6px;
+            display: inline-block;
+            text-shadow: 0 0 5px #fff;
+        }
+
+        /* ------------------- */
+        /* NAVEGACIÓN          */
+        /* ------------------- */
+        .nav-sticky {
+            width: 100%;
+            background-color: var(--color-texto);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-container {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .nav-container::-webkit-scrollbar { display: none; }
+
+        .tab-link {
+            padding: 1.2rem 1rem;
+            background: transparent;
+            border: none;
+            color: var(--color-fondo);
+            font-family: var(--fuente-titulos);
+            font-weight: 600;
+            cursor: pointer;
+            opacity: 0.7;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            position: relative;
+            flex-grow: 1;
+            font-size: 0.85rem;
+        }
+
+        .tab-link.active { opacity: 1; color: #fff; }
+        .tab-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 10%;
+            width: 80%;
+            height: 4px;
+            background-color: var(--color-acento);
+        }
+
+        /* ------------------- */
+        /* CUERPO PRINCIPAL    */
+        /* ------------------- */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: var(--fuente-titulos);
+            color: var(--color-titulos); 
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .index-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .index-card {
+            background: #fdfaf3;
+            padding: 2.5rem 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(210, 105, 30, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 180px;
+        }
+
+        .index-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--color-acento);
+            box-shadow: 0 8px 15px rgba(60, 42, 30, 0.1);
+        }
+
+        details {
+            border: 1px solid rgba(60, 42, 30, 0.1);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            background-color: #fff;
+            overflow: hidden;
+        }
+
+        summary {
+            padding: 1.25rem;
+            cursor: pointer;
+            font-family: var(--fuente-titulos);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--color-titulos);
+            list-style: none;
+            position: relative;
+            transition: background-color 0.3s;
+        }
+
+        summary:hover { background-color: rgba(228, 155, 15, 0.05); }
+
+        summary::after {
+            content: '+';
+            position: absolute;
+            right: 1.5rem;
+            color: var(--color-acento);
+            font-size: 1.5rem;
+        }
+
+        details[open] summary {
+            border-bottom: 2px solid var(--color-acento);
+            background-color: #fff;
+        }
+
+        details[open] summary::after { content: '−'; }
+
+        .details-inner { padding: 2rem; }
+
+        .block-explanation {
+            background-color: rgba(228, 155, 15, 0.08);
+            border-left: 4px solid var(--color-acento);
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .block-explanation span {
+            display: block;
+            font-weight: 700;
+            color: var(--color-titulos);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .comparison-item {
+            padding: 1.5rem;
+            border-radius: 8px;
+            background: #fdfaf3;
+            border-top: 6px solid #ccc;
+        }
+
+        .personal { border-top-color: var(--color-personal); }
+        .corporate { border-top-color: var(--color-microsoft); }
+        .google-center { border-top-color: var(--color-google); }
+
+        .tutorial-block {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid #eee;
+            background: #fafafa;
+        }
+
+        .stat-highlight {
+            color: var(--color-acento);
+            font-weight: 700;
+            cursor: help;
+            border-bottom: 1.5px dotted var(--color-acento);
+            position: relative;
+            display: inline-block;
+        }
+
+        .stat-highlight .tooltip-text {
+            visibility: hidden;
+            width: 300px;
+            background-color: var(--color-texto);
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 12px;
+            position: absolute;
+            z-index: 100;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -150px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85rem;
+            font-weight: 400;
+            line-height: 1.5;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            font-style: normal;
+        }
+
+        .stat-highlight:hover .tooltip-text { visibility: visible; opacity: 1; }
+
+        .step-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: var(--color-acento);
+            font-weight: 700;
+            text-decoration: none;
+            border-bottom: 1px dashed var(--color-acento);
+        }
+
+        footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            border-top: 1px solid rgba(60, 42, 30, 0.1);
+            background-color: #fff;
+        }
+
+        .contacto-email { color: var(--color-titulos); text-decoration: none; font-weight: 600; }
+        .ia-credit { font-style: italic; font-size: 0.85rem; color: #6c5d53; margin-top: 0.5rem; }
+    </style>
+</head>
+<body>
+
+    <div class="header-full">
+        <img class="logo-cabecera" src="https://i.postimg.cc/gjycnBqp/Imagen1.png" alt="Análisis de datos con IA">
+        <div class="header-overlay">
+            <h1>Análisis de datos con <em>IA</em> para centros educativos</h1>
+            <p>Estrategias de gestión basadas en evidencias para el equipo directivo y orientación.</p>
+        </div>
+    </div>
+
+    <div class="nav-sticky">
+        <div class="nav-container">
+            <button class="tab-link active" data-target="#tab-home">Contenidos</button>
+            <button class="tab-link" data-target="#tab-gobernanza">Gobernanza y ética</button>
+            <button class="tab-link" data-target="#tab-tecnica">Técnicas de datos</button>
+            <button class="tab-link" data-target="#tab-orientacion">Labor de orientación</button>
+            <button class="tab-link" data-target="#tab-recursos">Repositorio técnico</button>
+        </div>
+    </div>
+
+    <main>
+        <!-- SECCIÓN: CONTENIDOS (ÍNDICE) -->
+        <section id="tab-home" class="tab-content active">
+            <h2 style="text-align: center; border: none; margin-bottom: 2.5rem;">Panel de control del taller</h2>
+            <div class="index-grid">
+                <div class="index-card" onclick="document.querySelector('[data-target=\'#tab-gobernanza\']').click()">
+                    <h3>Gobernanza y ética</h3>
+                    <p>Definición del marco de soberanía digital y seguridad en el análisis de archivos de centro.</p>
+                </div>
+                <div class="index-card" onclick="document.querySelector('[data-target=\'#tab-tecnica\']').click()">
+                    <h3>Técnicas de datos</h3>
+                    <p>Flujo técnico de limpieza y estructuración de hojas <em>XLS</em> institucionales mediante <em>IA</em>.</p>
+                </div>
+                <div class="index-card" onclick="document.querySelector('[data-target=\'#tab-orientacion\']').click()">
+                    <h3>Labor de orientación</h3>
+                    <p>Uso de analítica avanzada para la prevención de riesgos y el clima escolar en Primaria.</p>
+                </div>
+                <div class="index-card" onclick="document.querySelector('[data-target=\'#tab-recursos\']').click()">
+                    <h3>Repositorio técnico</h3>
+                    <p>Acceso a manuales oficiales, guías de seudonimización y normativas vigentes.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: GOBERNANZA Y ÉTICA -->
+        <section id="tab-gobernanza" class="tab-content">
+            <h2>Gobernanza y ética del centro</h2>
+            <div class="block-explanation">
+                Establecer una política de centro sobre el tratamiento del dato es la primera labor del equipo directivo. El uso de la inteligencia artificial requiere garantías de estanqueidad para evitar la exposición de expedientes escolares. La seguridad escolar depende de un tratamiento adecuado de datos dentro de los dominios corporativos protegidos.
+            </div>
+
+            <details>
+                <summary>Ecosistemas de seguridad para archivos XLS</summary>
+                <div class="details-inner">
+                    <h3>Custodia legal y soberanía digital</h3>
+                    <p>El equipo directivo debe priorizar plataformas con contratos educativos específicos. El uso de herramientas ajenas traslada la responsabilidad legal directamente al profesional que realiza el análisis.</p>
+                    <div class="comparison-grid">
+                        <div class="comparison-item personal">
+                            <h5>Cuentas personales</h5>
+                            <p>Prohibido para gestión institucional. El tratamiento de tablas reales en chats gratuitos transfiere la propiedad intelectual del dato a la empresa para entrenamiento comercial público.</p>
+                        </div>
+                        <div class="comparison-item corporate">
+                            <h5>Ecosistema corporativo institucional</h5>
+                            <p>Nivel de protección regional. El análisis mediante el chat de <em>Copilot</em> institucional garantiza que la información se procesa de forma efímera en una nube privada cifrada bajo el control de la <em>JCCM</em>.</p>
+                        </div>
+                        <div class="comparison-item google-center">
+                            <h5>Workspace de centro</h5>
+                            <p>Seguridad certificada. El acuerdo para educación prohíbe el uso de datos del alumnado para perfiles comerciales, asegurando que la analítica se mantenga dentro del ámbito privado.</p>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <details>
+                <summary>Tutorial: Configuración del entorno seguro de análisis</summary>
+                <div class="details-inner">
+                    <div class="tutorial-block" style="border-left: 5px solid var(--color-microsoft);">
+                        <h4 style="color: var(--color-microsoft);">Opción institucional (@educastillalamancha.es)</h4>
+                        <ol>
+                            <li>Iniciar sesión en <strong>office.com</strong> con el perfil docente de Castilla-La Mancha.</li>
+                            <li>Crear una carpeta en <strong>OneDrive</strong> solo compartida con el equipo directivo.</li>
+                            <li>Acceder al chat de <strong>Copilot</strong> y confirmar que aparece el icono del escudo de protección de datos comerciales.</li>
+                            <li>Cargar el archivo <em>XLS</em> anonimizado mediante el botón de adjuntar para iniciar la extracción de indicadores.</li>
+                        </ol>
+                        <a href="https://educacion.castillalamancha.es/centros-educativos/proteccion-datos-centros" class="step-link" target="_blank">Instrucciones oficiales de la JCCM &rarr;</a>
+                    </div>
+
+                    <div class="tutorial-block" style="border-left: 5px solid var(--color-google);">
+                        <h4 style="color: var(--color-google);">Opción Workspace de centro</h4>
+                        <ol>
+                            <li>Habilitar una "Unidad Compartida" exclusiva para el equipo directivo y orientación.</li>
+                            <li>Configurar en la consola de administración que los archivos no puedan ser compartidos con dominios externos.</li>
+                            <li>Utilizar funciones nativas de <strong>Gemini</strong> integradas para resúmenes de datos directamente en el ecosistema.</li>
+                        </ol>
+                    </div>
+                </div>
+            </details>
+        </section>
+
+        <!-- SECCIÓN: TÉCNICAS DE DATOS -->
+        <section id="tab-tecnica" class="tab-content">
+            <h2>Técnicas de datos y tratamiento XLS</h2>
+            <div class="block-explanation">
+                La precisión de la <em>IA</em> depende de la estructuración técnica del archivo original. Dominar la normalización de tablas maestras permite al equipo directivo automatizar la obtención de indicadores estratégicos, reduciendo el tiempo dedicado a la limpieza manual.
+            </div>
+
+            <details>
+                <summary>Estandarización para modelos de lenguaje</summary>
+                <div class="details-inner">
+                    <h3>¿Por qué y cómo estandarizar un archivo XLS?</h3>
+                    <p>La <em>IA</em> procesa información mediante algoritmos de reconocimiento de patrones. Una tabla con formatos visuales humanos genera ruido estadístico que invalida las conclusiones estratégicas.</p>
+                    <h4>Decálogo de preparación técnica para el equipo directivo:</h4>
+                    <ol>
+                        <li><strong>Formato plano:</strong> Una fila por alumno, una columna por variable.</li>
+                        <li><strong>Encabezados únicos:</strong> Títulos cortos, descriptivos y sin espacios.</li>
+                        <li><strong>Sin celdas combinadas:</strong> Eliminar toda combinación de celdas de <em>Delphos</em>.</li>
+                        <li><strong>Eliminación de metadatos:</strong> Borrar logotipos, imágenes e hipervínculos antes de subir el archivo.</li>
+                        <li><strong>Consistencia de tipos:</strong> Asegurar que las columnas de notas sean exclusivamente numéricas.</li>
+                        <li><strong>Unificación de fechas:</strong> Utilizar siempre el formato estándar DD/MM/AAAA.</li>
+                        <li><strong>Cero notas al pie:</strong> Eliminar aclaraciones finales que la <em>IA</em> lee como registros corruptos.</li>
+                        <li><strong>Seudonimización:</strong> Generar códigos ciegos (AL001) fuera del entorno de análisis antes de procesar.</li>
+                        <li><strong>Limpieza de espacios:</strong> Quitar espacios invisibles al inicio o final de las celdas de texto.</li>
+                        <li><strong>Exportación nativa:</strong> Utilizar siempre <strong>.xlsx</strong> nativo para conservar la integridad del tipo de dato.</li>
+                    </ol>
+                    <div class="block-explanation" style="margin-top: 2rem;">
+                        <span>Instrucción RITA para estandarización técnica:</span>
+                        "Actúa como analista de datos técnico (<strong>Rol y contexto</strong>). Te adjunto una exportación de Delphos con celdas combinadas y encabezados complejos (<strong>Información</strong>). Aplica el decálogo de estandarización para limpiar la tabla y devolverme un archivo XLS plano donde cada columna sea una variable única (<strong>Tarea</strong>). El archivo debe estar listo para descarga directa y análisis masivo (<strong>Adaptabilidad</strong>)."
+                    </div>
+                </div>
+            </details>
+
+            <details>
+                <summary>Tutorial: Análisis seguro en el chat de Copilot</summary>
+                <div class="details-inner">
+                    <div class="tutorial-block" style="border-left: 5px solid var(--color-microsoft);">
+                        <h4 style="color: var(--color-microsoft);">El modelo RITA para diseño de instrucciones</h4>
+                        <div class="block-explanation" style="margin-bottom: 1.5rem;">
+                            <span>Definición del modelo RITA:</span>
+                            <ul>
+                                <li><strong>Rol y contexto:</strong> Define la identidad profesional de la IA.</li>
+                                <li><strong>Información:</strong> Describe el contenido del archivo XLS adjunto.</li>
+                                <li><strong>T - Tarea:</strong> Especifica la acción técnica exacta requerida.</li>
+                                <li><strong>A - Adaptabilidad:</strong> Define el formato de salida y el tono profesional.</li>
+                            </ul>
+                        </div>
+                        <h5>Propuestas estratégicas de uso:</h5>
+                        <ul style="list-style: none; padding-left: 0;">
+                            <li style="margin-bottom: 1rem;"><strong>1. Anonimización masiva:</strong> "Actúa como auditor de privacidad (R). Te adjunto el listado de evaluación (I). Genera una columna 'ID_SEG' con códigos aleatorios y devuélveme el archivo borrando Nombres y NIE (T). Archivo XLS listo para descargar (A)."</li>
+                            <li style="margin-bottom: 1rem;"><strong>2. Resumen ejecutivo de éxito:</strong> "Eres experto en estadística escolar (R). Revisa las notas de toda la etapa (I). Calcula la tasa de éxito global comparando las áreas de Lengua y Matemáticas (T). Presenta una tabla resumida profesional (A)."</li>
+                            <li style="margin-bottom: 1rem;"><strong>3. Detección de absentismo crítico:</strong> "Como gestor de convivencia (R). Analiza la columna de faltas injustificadas (I). Identifica los ID con un nivel de absentismo preocupante para intervención (T). Lista de códigos priorizada (A)."</li>
+                            <li style="margin-bottom: 1rem;"><strong>4. Preparación de indicadores para la memoria:</strong> "Eres secretario del centro (R). Revisa todos los resultados finales (I). Resume los 5 indicadores de progreso más relevantes comparados con el curso pasado (T). Estilo para documento oficial (A)."</li>
+                            <li style="margin-bottom: 1rem;"><strong>5. Auditoría de coherencia evaluativa:</strong> "Como inspector educativo virtual (R). Analiza las notas por criterios y la calificación final (I). Detecta posibles incongruencias estadísticas entre los descriptores y la nota global (T). Lista de casos ID (A)."</li>
+                            <li style="margin-bottom: 1rem;"><strong>6. Análisis de brecha de resultados:</strong> "Eres analista institucional (R). Toma los datos de evaluación por sexo y nivel (I). Calcula si existen diferencias significativas de rendimiento entre grupos (T). Informe breve con conclusiones (A)."</li>
+                            <li style="margin-bottom: 1rem;"><strong>7. Normalización de áreas LOMLOE:</strong> "Como técnico de organización (R). Revisa los nombres de las materias del archivo (I). Sustituye cualquier sigla antigua por el nombre oficial de las áreas LOMLOE (T). Actualiza el archivo XLS (A)."</li>
+                            <li style="margin-bottom: 1rem;"><strong>8. Detección de necesidades de formación:</strong> "Como jefe de estudios (R). Analiza los resultados de las áreas con menor índice de aprobados (I). Sugiere qué competencias del profesorado podrían reforzarse según estos datos (T). Propuesta estratégica (A)."</li>
+                            <li style="margin-bottom: 1rem;"><strong>9. Identificación de duplicados:</strong> "Eres administrativo de centro (R). Comprueba las filas de matrícula (I). Identifica registros duplicados o errores de volcado desde Delphos (T). Indica los ID afectados (A)."</li>
+                            <li style="margin-bottom: 1rem;"><strong>10. Clasificación por niveles de logro:</strong> "Como especialista en evaluación (R). Toma las notas numéricas (I). Tradúcelas automáticamente a niveles: Iniciado, Medio, Avanzado según la normativa regional (T). Nueva columna en el archivo (A)."</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+
+            <details>
+                <summary>Tutorial: Herramientas inteligentes en Google Sheets</summary>
+                <div class="details-inner">
+                    <div class="tutorial-block" style="border-left: 5px solid var(--color-google);">
+                        <h4 style="color: var(--color-google);">Normalización técnica y Gemini</h4>
+                        <ol>
+                            <li>Importar el archivo <em>XLS</em> a la unidad compartida institucional.</li>
+                            <li>Utilizar la herramienta <strong>Datos > Limpieza de datos > Quitar duplicados</strong>.</li>
+                            <li>Activar el panel lateral de <strong>Gemini</strong> para solicitar clasificaciones automáticas: "Clasifica estos registros por niveles competenciales basados en la columna Nota".</li>
+                        </ol>
+                    </div>
+                </div>
+            </details>
+        </section>
+
+        <!-- SECCIÓN: LABOR DE ORIENTACIÓN -->
+        <section id="tab-orientacion" class="tab-content">
+            <h2>Labor de orientación basada en evidencias</h2>
+            <div class="block-explanation">
+                La analítica transforma la orientación de reactiva a preventiva. El cruce sistemático de variables permite detectar vulnerabilidades de forma anticipada. Los sistemas proactivos basados en datos permiten que el equipo de orientación diseñe planes de inclusión más efectivos al contar con evidencias objetivas sobre el rendimiento y la convivencia.
+            </div>
+
+            <details>
+                <summary>Prevención y analítica para la inclusión</summary>
+                <div class="details-inner">
+                    <h3>Identificación temprana y clima escolar</h3>
+                    <p>Cruzar incidencias de patio con caídas de rendimiento permite revelar focos de conflicto social antes de que escalen. El tiempo administrativo recuperado gracias a la <em>IA</em> permite al orientador centrarse en la atención humana.</p>
+                    <h4>Ejemplos de buen uso institucional:</h4>
+                    <ul>
+                        <li><strong>Detección de absentismo técnico:</strong> Análisis de micro-faltas (retrasos o faltas en horas específicas) mediante <em>XLS</em> para identificar patrones previos al absentismo crónico.</li>
+                        <li><strong>Correlación convivencia-rendimiento:</strong> Cruce de amonestaciones registradas en <em>Delphos</em> con la nota de áreas instrumentales para medir el impacto del clima de aula en el aprendizaje.</li>
+                        <li><strong>Seguimiento de planes de refuerzo:</strong> Comparativa automatizada de las celdas de progreso del alumnado con necesidades específicas antes y después de la intervención para validar la efectividad de las medidas.</li>
+                        <li><strong>Perfiles de vulnerabilidad oculta:</strong> Identificación de alumnos que, manteniendo una asistencia normal, presentan una caída drástica y súbita de calificaciones, señalando posibles problemas socioemocionales.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details>
+                <summary>Tutorial: Análisis visual en el chat de Copilot</summary>
+                <div class="details-inner">
+                    <div class="tutorial-block" style="border-left: 5px solid var(--color-microsoft);">
+                        <h4 style="color: var(--color-microsoft);">Instrucciones visuales mediante método RITA</h4>
+                        <div class="block-explanation" style="margin-bottom: 1.5rem;">
+                            <span>Estructura de la instrucción:</span>
+                            <ul>
+                                <li><strong>Rol y contexto:</strong> Define el perfil profesional (Orientador/a).</li>
+                                <li><strong>Información:</strong> Describe el contenido del XLS (evaluación, convivencia).</li>
+                                <li><strong>Tarea:</strong> Define la síntesis o interpretación requerida.</li>
+                                <li><strong>Adaptabilidad:</strong> Especifica el tono y destinatario.</li>
+                            </ul>
+                        </div>
+                        <ul style="list-style: none; padding-left: 0;">
+                            <li style="margin-bottom: 1rem;"><strong>1. Evolución competencial:</strong> "Eres orientadora (R). Analiza las notas de AL005 (I). Describe su progreso en competencias clave este trimestre comparado con el anterior (T). Párrafo motivador para la familia (A)."</li>
+                            <li style="margin-bottom: 1rem;"><strong>2. Mapa de riesgos para CCP:</strong> "Como experto en inclusión (R). Mira el cruce de faltas y notas (I). Identifica los 3 ID con mayor riesgo de exclusión según la tendencia estadística (T). Estilo técnico para junta (A)."</li>
+                            <li style="margin-bottom: 1rem;"><strong>3. Clima de convivencia:</strong> "Eres consultor de clima escolar (R). Revisa la tabla de amonestaciones adjunta (I). Identifica qué días y horas hay más conflictividad en el patio (T). Informe de tendencias (A)."</li>
+                            <li style="margin-bottom: 1rem;"><strong>4. Síntesis psicopedagógica:</strong> "Eres orientador escolar (R). Basado en los datos académicos y de conducta del archivo (I). Redacta el apartado de 'Evolución escolar' para un borrador de informe (T). Estilo formal y clínico (A)."</li>
+                            <li style="margin-bottom: 1rem;"><strong>5. Impacto del absentismo leve:</strong> "Como analista pedagógico (R). Cruza las faltas justificadas con la nota de áreas instrumentales (I). Explica la correlación detectada para justificar una medida de refuerzo (T). Argumentario breve (A)."</li>
+                            <li style="margin-bottom: 1rem;"><strong>6. Resumen de éxito en refuerzos:</strong> "Como apoyo a tutoría (R). Analiza los resultados del grupo de PT/AL (I). Resume el progreso global del grupo frente a sus objetivos iniciales (T). Bullet points resumidos (A)."</li>
+                            <li style="margin-bottom: 1rem;"><strong>7. Detección de talentos creativos:</strong> "Eres especialista en altas capacidades (R). Busca ID con resultados excelentes y alta puntuación en descriptores creativos (I). Lista los casos detectados (T). Tabla ciega de códigos (A)."</li>
+                            <li style="margin-bottom: 1rem;"><strong>8. Comparativa de rendimiento por grupos:</strong> "Como analista de etapa (R). Toma los promedios de 5º de Primaria (I). Compara el rendimiento del grupo A frente al grupo B para detectar necesidades de apoyo (T). Informe de desviaciones (A)."</li>
+                            <li style="margin-bottom: 1rem;"><strong>9. Alerta de bienestar emocional:</strong> "Como orientadora (R). Detecta ID con caídas de rendimiento superiores al 20% sin antecedentes de absentismo (I). Identifica casos prioritarios para entrevista (T). Lista de ID (A)."</li>
+                            <li style="margin-bottom: 1rem;"><strong>10. Logros visuales para tutoría:</strong> "Como mentor educativo (R). Selecciona las fortalezas del ID AL012 basándote en su mejoría (I). Redacta una frase de reconocimiento positivo para su agenda (T). Estilo motivador (A)."</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+
+            <details>
+                <summary>Tutorial: Visualización y Gemini en Google Sheets</summary>
+                <div class="details-inner">
+                    <div class="tutorial-block" style="border-left: 5px solid var(--color-google);">
+                        <h4 style="color: var(--color-google);">Infografías y redacción asistida</h4>
+                        <ol>
+                            <li>Seleccionar los datos de progreso del alumno en la hoja compartida del centro.</li>
+                            <li>Utilizar el menú <strong>Insertar > Gráfico</strong> y elegir visualizaciones de radar o barras recomendadas por el sistema.</li>
+                            <li>Usar la función <strong>"Ayúdame a redactar"</strong> de <em>Gemini</em> en la barra lateral para transformar datos de celdas en párrafos narrativos estructurados para los informes de tutoría.</li>
+                        </ol>
+                    </div>
+                </div>
+            </details>
+        </section>
+
+        <!-- SECCIÓN: REPOSITORIO TÉCNICO -->
+        <section id="tab-recursos" class="tab-content">
+            <h2>Repositorio técnico</h2>
+            <div class="block-explanation">
+                Este espacio centraliza la documentación oficial para blindar legalmente la actuación del equipo directivo y dotar de herramientas avanzadas de consulta.
+            </div>
+
+            <div class="resource-banner">
+                <h3>Gestión de Datos, Inteligencia Artificial y Educación Digital</h3>
+                <p>Consulte mediante <em>IA</em> toda la normativa regional y los manuales técnicos del taller en nuestro entorno especializado.</p>
+                <a href="https://notebooklm.google.com/notebook/c94872df-3e94-4c77-b24e-09576436e05d" class="btn-notebook" target="_blank">Acceder al recurso</a>
+            </div>
+            
+            <div class="index-grid">
+                <div class="index-card">
+                    <h3>Instrucciones JCCM</h3>
+                    <p>Portal oficial con las directrices de protección de datos para centros educativos de la región.</p>
+                    <a href="https://educacion.castillalamancha.es/centros-educativos/proteccion-datos-centros" target="_blank" style="color: var(--color-acento); font-weight: 700; text-decoration: none;">Acceder al Portal &rarr;</a>
+                </div>
+                <div class="index-card">
+                    <h3>Recomendaciones IA AEPD</h3>
+                    <p>Guía de la <em>Agencia Española de Protección de Datos</em> para el uso seguro de la inteligencia artificial.</p>
+                    <a href="https://www.aepd.es/guias/recomendaciones-ia-aepd.pdf" target="_blank" style="color: var(--color-acento); font-weight: 700; text-decoration: none;">Ver Guía AEPD &rarr;</a>
+                </div>
+                <div class="index-card">
+                    <h3>Manual de IA para líderes</h3>
+                    <p>Guía de <em>Microsoft Education</em> para la implementación estratégica de la analítica de centro.</p>
+                    <a href="https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/microsoft/final/en-us/microsoft-product-and-services/microsoft-education/downloadables/Microsoft-Education-AI-Toolkit-ES-XL.pdf" target="_blank" style="color: var(--color-acento); font-weight: 700; text-decoration: none;">Consultar Manual &rarr;</a>
+                </div>
+                <div class="index-card">
+                    <h3>Decálogo de la AEPD</h3>
+                    <p>Infografía con los principios fundamentales para el tratamiento de datos mediante IA en el entorno escolar.</p>
+                    <a href="https://www.aepd.es/sites/default/files/2024-03/infografia-decalogo-ia-centros-educativos.pdf" target="_blank" style="color: var(--color-acento); font-weight: 700; text-decoration: none;">Ver Decálogo &rarr;</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Lucía Serrano Palomo - <a href="mailto:lucia.serrano@jccm.es" class="contacto-email"><em>lucia.serrano@jccm.es</em></a></p>
+        <p class="ia-credit">Realizado con la asistencia de <em>IA</em> (vibe coding)</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('.tab-link');
+            const contents = document.querySelectorAll('.tab-content');
+
+            // Gestión de Pestañas
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.getAttribute('data-target');
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    const targetEl = document.querySelector(target);
+                    if(targetEl) targetEl.classList.add('active');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
