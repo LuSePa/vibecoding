@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repositorio de actividades interactivas - CEIP San Antonio</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Montserrat -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #FFFBEB; /* Cream */
+        }
+        .versalitas {
+            font-variant: small-caps;
+        }
+        .header-shadow {
+            text-shadow: 0 0 10px white, 0 0 5px rgba(255,255,255,0.5);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+        }
+        .accordion-content.open {
+            max-height: 1000px; /* Suficiente para el contenido */
+            padding-bottom: 1rem;
+        }
+        .rotate-180 {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto flex-1 w-full">
+        <!-- Cabecera con imagen restaurada de Postimg -->
+        <header id="main-header" 
+                class="mb-12 rounded-3xl overflow-hidden shadow-xl border-4 relative min-h-[350px] flex flex-col items-center justify-center p-8 text-center border-[#D97706] bg-cover bg-center bg-no-repeat"
+                style="background-image: url('https://i.postimg.cc/9z6BJ8Fz/header.jpg');">
+            
+            <div class="absolute inset-0 bg-white/10 z-0"></div>
+
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 relative z-10 text-[#451A03] versalitas header-shadow">
+                Repositorio de actividades interactivas
+            </h1>
+            <p class="text-2xl md:text-4xl font-semibold italic relative z-10 text-[#78350F] header-shadow">
+                CEIP San Antonio, Tomelloso
+            </p>
+        </header>
+
+        <!-- Disclaimer / Recursos -->
+        <section class="max-w-4xl mx-auto mb-10 overflow-hidden rounded-2xl shadow-lg border bg-white/70 border-amber-500/40">
+            <div class="p-6 md:p-8">
+                <div class="flex items-start gap-4 mb-6">
+                    <span class="shrink-0 p-3 rounded-xl bg-amber-100 text-amber-700">
+                        <i data-lucide="info" class="size-7"></i>
+                    </span>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2 text-[#451A03]">Sobre este proyecto</h3>
+                        <p class="text-base leading-relaxed mb-4 text-[#78350F]">
+                            Este repositorio es el resultado de un taller formativo donde se enseñó a los docentes a elaborar 
+                            <strong> materiales interactivos personalizados</strong> utilizando <strong>lenguaje natural e inteligencia artificial</strong>. 
+                            Esta metodología permite crear recursos educativos de alta calidad técnica sin necesidad de conocimientos previos de programación.
+                        </p>
+                        <p class="text-sm opacity-80 text-[#78350F]">
+                            Cada uno de estos artefactos fue desarrollado en aproximadamente <strong>20 minutos</strong> mediante un ejercicio de 
+                            <em> vibe coding</em>. Las propuestas de mejora incluidas pretenden servir de guía pedagógica para perfeccionar futuras creaciones.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-6 border-amber-500/20">
+                    <a href="https://educacion.bilateria.org/creacion-de-herramientas-educativas-con-inteligencia-artificial-guia-para-docentes-sin-programacion" 
+                       target="_blank" class="flex items-center gap-3 p-4 rounded-xl transition-all hover:scale-[1.02] shadow-sm bg-white border border-amber-500/30">
+                        <i data-lucide="cpu" class="size-6 shrink-0 text-[#D97706]"></i>
+                        <div>
+                            <div class="text-xs font-bold uppercase tracking-wider opacity-60">Metodología</div>
+                            <div class="text-sm font-bold text-[#451A03]">Guía VibeCoding Educativo</div>
+                        </div>
+                    </a>
+
+                    <a href="https://educacion.bilateria.org/visor-web-zip-publica-y-comparte-tus-recursos-educativos-desde-tu-almacenamiento-favorito-en-la-nube" 
+                       target="_blank" class="flex items-center gap-3 p-4 rounded-xl transition-all hover:scale-[1.02] shadow-sm bg-white border border-amber-500/30">
+                        <i data-lucide="share-2" class="size-6 shrink-0 text-[#D97706]"></i>
+                        <div>
+                            <div class="text-xs font-bold uppercase tracking-wider opacity-60">Distribución</div>
+                            <div class="text-sm font-bold text-[#451A03]">Visor Web Zip: Publica y Comparte</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Rejilla de actividades -->
+        <div id="activities-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start mb-12">
+            <!-- Las tarjetas se generan mediante JavaScript -->
+        </div>
+    </div>
+
+    <!-- Pie de página -->
+    <footer class="mt-auto py-12 text-center border-t-2 border-amber-200/40 w-full">
+        <h4 class="text-xl font-bold mb-2 text-[#451A03]">Taller "Vibe Coding educativo"</h4>
+        <h5 class="text-lg italic mb-1 text-[#78350F]">Elaborado por Lucía Serrano Palomo con VibeCoding y Gemini</h5>
+        <h5 class="text-lg text-[#78350F]">Tomelloso, 2 de febrero de 2026</h5>
+    </footer>
+
+    <script>
+        const activities = [
+            {
+                id: 1,
+                titulo: "Reto ecosistemas",
+                autor: "Pilar González",
+                genero: "f",
+                nivel: "Segundo Ciclo de Primaria",
+                area: "Conocimiento del Medio Natural, Social y Cultural",
+                tipo: "Juego de preguntas",
+                enlace: "https://visor-webzip.github.io/site/d8640db96903be61ad1b350cfbbaa67d572c6de5/index.html",
+                mejoras: "Voz desactivada de inicio. Eliminar la letra como pista. Reiniciar el tiempo en cada pregunta.",
+                logros: "Uso de texto a voz para mejorar la accesibilidad. Contador de aciertos. Diseño y fuentes usadas."
+            },
+            {
+                id: 2,
+                titulo: "Aventura silábica",
+                autor: "María Teresa Alises Camacho",
+                genero: "f",
+                nivel: "Segundo Ciclo de Primaria",
+                area: "Lengua Castellana y Literatura",
+                tipo: "Juego interactivo",
+                enlace: "https://visor-webzip.github.io/site/d388b853062d7e281a290c9c946e5fa5a6da33c0/index.html",
+                mejoras: "Revisar el vocabulario para asegurar que es correcto. Añadir elementos de navegación en cada sección. Añadir niveles de dificultad.",
+                logros: "Variedad de actividades para trabajar la sílaba. Sistema de puntos. Uso de vocabulario adecuado para la tarea."
+            },
+            {
+                id: 3,
+                titulo: "El gran carnaval de las letras",
+                autor: "José Manuel Quiralte Aguilar",
+                genero: "m",
+                nivel: "Primer Ciclo de Primaria",
+                area: "Lengua Castellana y Literatura",
+                tipo: "Juego interactivo",
+                enlace: "https://visor-webzip.github.io/site/34b4fd08e331d3f84ee13e3a5a6983eeb18c0f8a/index.html",
+                mejoras: "Revisar los contenidos para asegurarnos de que no hay errores. Eliminar el límite de intentos. Comprobar qué botones no funcionan para corregirlos.",
+                logros: "Diseño lúdico y atractivo. Sistema de puntos y pistas. Variedad de tareas para trabajar la sílaba."
+            },
+            {
+                id: 4,
+                titulo: "Ordena la parábola",
+                autor: "Ángela María Lozano Chinchilla",
+                genero: "f",
+                nivel: "Segundo Ciclo de Primaria",
+                area: "Religión Católica",
+                tipo: "Juego de secuencias",
+                enlace: "https://visor-webzip.github.io/site/d62a7eb8425c57f3f621e012e2cd6f681dbd7169/index.html",
+                mejoras: "Añadir una selección de niveles al inicio que permita elegir entre las cuatro parábolas. Hacer la actividad multinivel. Revisar el funcionamiento del mecanismo de premios.",
+                logros: "Mecánica de trabajo que favorece la autocorrección. Uso de imágenes para favorecer la comprensión. Implementación de un sistema de premios."
+            },
+            {
+                id: 5,
+                titulo: "Las sílabas",
+                autor: "María Victoria Román Ortiz",
+                genero: "f",
+                nivel: "Primer Ciclo de Primaria",
+                area: "Lengua Castellana y Literatura",
+                tipo: "Juego interactivo",
+                enlace: "https://visor-webzip.github.io/site/f2869e11a24e9ae8b0713527bd3aa91238b8caed/index.html",
+                mejoras: "Añadir texto a voz. Cambiar la actividad de división silábica por una en la que el alumno marque el punto de corte, para evitar dar ejemplos erróneos. Cambiar la fuente a una menos decorativa para facilitar la lectura.",
+                logros: "Uso de elementos dinámicos. Inclusión de texto a voz para facilitar la comprensión. Variedad de ejercicios para trabajar la sílaba."
+            },
+            {
+                id: 6,
+                titulo: "Set educativo de sílabas",
+                autor: "Lorena Utiel Martínez",
+                genero: "f",
+                nivel: "Primer Ciclo de Primaria",
+                area: "Lengua Castellana y Literatura",
+                tipo: "Juego interactivo",
+                enlace: "https://visor-webzip.github.io/?url=https%3A%2F%2Fdrive.google.com%2Ffile%2Fd%2F14UL-GX0myzrBFdmxW8mMbyFeJrdj5mp0%2Fview%3Fusp%3Dsharing&view=full",
+                mejoras: "Eliminar las etiquetas en sombreado del material imprimible. Añadir una opción de actividad interactiva. Revisar la configuración de colores del material para hacer una versión no autocorregible (multinivel).",
+                logros: "Material listo para imprimir y maquetar. Adaptado a las necesidades del aula. Actividad multinivel."
+            },
+            {
+                id: 7,
+                titulo: "Mundo de oficios",
+                autor: "Jesús Ángel Moya Torres",
+                genero: "m",
+                nivel: "Educación Infantil",
+                area: "Descubrimiento y Exploración del Entorno",
+                tipo: "Juego interactivo",
+                enlace: "https://visor-webzip.github.io/?url=https%3A%2F%2Fdrive.google.com%2Ffile%2Fd%2F1qiEaTluhwi2lEANDyVT2flD7ULI904oP%2Fview%3Fusp%3Dsharing&view=full",
+                mejoras: "Evitar que los iconos de fondo coincidan con la respuesta correcta para no dar pistas involuntarias. Incluir texto a voz para facilitar la comprensión. Activar la navegación entre preguntas y ajustar el sistema de puntuación de decenas a unidades para adaptarlo a la etapa de Infantil.",
+                logros: "Diseño muy atractivo y visual. Sistema de puntos. Diez niveles de dificultad."
+            },
+            {
+                id: 11,
+                titulo: "Food Match!",
+                autor: "Sandra Muñoz Cano",
+                genero: "f",
+                nivel: "Primer Ciclo de Primaria",
+                area: "Lengua Extranjera (Inglés)",
+                tipo: "Juego interactivo",
+                enlace: "https://visor-webzip.github.io/site/f4d3639de70ff6763ee3035a7403bdfe6beaadde/index.html",
+                mejoras: "Asegurar que el archivo comprimido contenga el código HTML correcto. Ajustar el diseño para eliminar la barra de desplazamiento. Añadir texto a voz para mejorar la experiencia y trabajar la escucha en inglés.",
+                logros: "Mecánica de arrastrar y soltar sencilla para el alumnado. Uso de imágenes adecuadas al público objetivo. Opción de reinicio para volver a jugar."
+            },
+            {
+                id: 9,
+                titulo: "Pasapalabra musical",
+                autor: "Carmen María Aguado López Ortega",
+                genero: "f",
+                nivel: "Tercer Ciclo de Primaria",
+                area: "Educación Artística (Música)",
+                tipo: "Juego de preguntas",
+                enlace: "https://visor-webzip.github.io/site/fcd749e71a00204da9bf0f5c6caeae4586af9538/index.html",
+                mejoras: "Revisar el vocabulario para asegurar que es adecuado (la Y es 'platillos'), dando opciones para admitir varias respuestas (director - directora, castañuela - castañuelas). Permitir la navegación entre las diferentes letras y rebote, así como desactivar el audio. Cambiar la paleta de color para evitar confusiones visuales donde el rojo de equipo se interprete como un fallo.",
+                logros: "Uso de lectura de texto en voz alta para facilitar la accesibilidad. Repaso del vocabulario de la asignatura. Jugabilidad por equipos, con asignación de roles automática."
+            },
+            {
+                id: 10,
+                titulo: "Voley-Quiz 6º",
+                autor: "Eduardo Laborda García",
+                genero: "m",
+                nivel: "Tercer Ciclo de Primaria",
+                area: "Educación Física",
+                tipo: "Juego de preguntas",
+                enlace: "https://visor-webzip.github.io/site/3ef39e2c009b3d5d1be5a18bf57b0709c7d150f3/index.html",
+                mejoras: "Cambiar los sonidos de acierto y error. Revisar la redacción de las preguntas para que sean menos telegráficas. Añadir la opción de texto a voz para que lea las preguntas.",
+                logros: "Implementación de juego por grupos con rebote. Puntuaciones positivas y negativas. Explicación de las puntuaciones al pie."
+            },
+            {
+                id: 12,
+                titulo: "Pasapalabra Junior",
+                autor: "Paz Martínez-Moratalla de la Prida",
+                genero: "f",
+                nivel: "Primer Ciclo de Primaria",
+                area: "Lengua Castellana y Literatura",
+                tipo: "Juego de preguntas",
+                enlace: "https://visor-webzip.github.io/site/e324e47d17a2539f41ca9993e7218200d474998f/index.html",
+                mejoras: "Revisar la correspondencia entre imágenes y texto (ej. evitar que en 'gato' aparezca un perro). Ajustar la paleta de colores de los equipos (rojo y verde) para que no se confundan con la señalización de aciertos y errores. Optimizar el diseño para asegurar que el tablero y el campo de respuesta sean visibles sin necesidad de scroll.",
+                logros: "Interfaz muy colorida y completa (cronómetro, equipos, rosco, casillas). Lectura automática de texto a voz. Combinación de imágenes y texto."
+            },
+            {
+                id: 13,
+                titulo: "Mi memoria de invierno",
+                autor: "Ana María López Ortega",
+                genero: "f",
+                nivel: "Educación Infantil",
+                area: "Comunicación y Representación de la Realidad",
+                tipo: "Juego de memoria",
+                enlace: "https://visor-webzip.github.io/site/83f10aa6a65cb372bbc7e04e04152293207bb3fd/index.html",
+                mejoras: "Incluir más niveles con diferentes dificultades. Añadir sonidos a los aciertos y errores. Añadir texto a voz con las instrucciones del juego.",
+                logros: "Retroalimentación oral para el alumnado. Al reiniciar el juego se cambia el orden de las tarjetas, posibilitando poder volver a jugar. Uso de iconos significativos con el vocabulario del invierno."
+            },
+            {
+                id: 14,
+                titulo: "Pasapalabra de tildes",
+                autor: "Carmen Toledo Ortega",
+                genero: "f",
+                nivel: "Tercer Ciclo de Primaria",
+                area: "Lengua Castellana y Literatura",
+                tipo: "Juego de preguntas",
+                enlace: "https://visor-webzip.github.io/site/c476cd31c813e3a8b76996e58a2d19fda76868c2/index.html",
+                mejoras: "Ajustar el juego a la ventana para evitar el uso de barras de desplazamiento. Ajustar el cronómetro para que tenga una función didáctica más clara. Añadir jugabilidad por equipos y lectura de texto a voz.",
+                logros: "Implementación de un sistema de cuenta atrás. Contador de aciertos. Posibilidad de pasar palabra si hay dudas."
+            },
+            {
+                id: 15,
+                titulo: "Trivial: El sistema locomotor",
+                autor: "Ricardo Álvarez Redondo",
+                genero: "m",
+                nivel: "Tercer Ciclo de Primaria",
+                area: "Conocimiento del Medio Natural, Social y Cultural",
+                tipo: "Juego de preguntas",
+                enlace: "https://visor-webzip.github.io/site/9dd6833efce499c128431b11b5092d5ecc4d0088/index.html",
+                mejoras: "Asegurar que el juego se ajuste a la pantalla para evitar el uso de la barra de desplazamiento. Implementar el texto a voz para facilitar la comprensión. Revisar el funcionamiento de los botones de IA, ya que no son operativos fuera del entorno original.",
+                logros: "Preguntas de repaso para el tema en curso. Medidor de respuestas correctas. Se ofrece retroalimentación a las respuestas, tanto positivas como negativas."
+            },
+            {
+                id: 16,
+                titulo: "La creación",
+                autor: "Gerson Lozano de Lamo",
+                genero: "m",
+                nivel: "Primer Ciclo de Primaria",
+                area: "Religión Católica",
+                tipo: "Juego de secuencias y memoria",
+                enlace: "https://visor-webzip.github.io/site/4585ba73c949876db95e607b7b6146c27b2c4212/index.html",
+                mejoras: "Ajustar el juego a la pantalla para evitar el uso de la barra de desplazamiento. Ajustar la cuadrícula del memory para que se adapte mejor a la pantalla. Convertir la actividad en multinivel.",
+                logros: "Uso de dos juegos diferentes para trabajar el mismo contenido. Navegación entre juegos posibilitada, texto a voz. Se mantienen los aciertos dentro de la actividad de secuenciación."
+            }
+        ];
+
+        const colors = {
+            pumpkin: '#D97706',
+            chocolate: '#451A03',
+            coffee: '#78350F',
+            leaf: '#166534',
+            leafBg: '#F0FDF4'
+        };
+
+        function formatBulletList(text, bulletColor) {
+            if (!text || text === "Pendiente...") return `<p class="text-sm italic opacity-50">Información pendiente</p>`;
+            
+            const items = text.split('. ').filter(t => t.trim().length > 0);
+            let html = '<ul class="space-y-2">';
+            items.forEach(item => {
+                let cleanText = item.trim().replace(/^- /, "");
+                if (!cleanText.endsWith('.')) cleanText += '.';
+                html += `
+                    <li class="text-sm leading-snug flex gap-2 text-[#451A03]">
+                        <span style="color: ${bulletColor}" class="font-bold">•</span>
+                        ${cleanText}
+                    </li>`;
+            });
+            html += '</ul>';
+            return html;
+        }
+
+        function toggleAccordion(id, section) {
+            const content = document.getElementById(`content-${id}-${section}`);
+            const icon = document.getElementById(`icon-${id}-${section}`);
+            
+            if (content.classList.contains('open')) {
+                content.classList.remove('open');
+                icon.classList.remove('rotate-180');
+            } else {
+                content.classList.add('open');
+                icon.classList.add('rotate-180');
+            }
+        }
+
+        function renderActivities() {
+            const grid = document.getElementById('activities-grid');
+            grid.innerHTML = activities.map(activity => `
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden border transition-all hover:shadow-xl flex flex-col border-[#78350F20]">
+                    <div class="p-7 flex flex-col h-full">
+                        <h2 class="text-2xl font-bold mb-6 leading-tight text-center h-14 flex items-center justify-center text-[#451A03]">
+                            ${activity.titulo}
+                        </h2>
+
+                        <div class="space-y-4 mb-8">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="user" class="size-5 shrink-0 text-[#D97706]"></i>
+                                <span class="text-sm text-[#78350F]">
+                                    <span class="font-bold">${activity.genero === 'f' ? 'Autora' : 'Autor'}:</span> ${activity.autor}
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="book-open" class="size-5 shrink-0 text-[#D97706]"></i>
+                                <span class="text-sm text-[#78350F]">
+                                    <span class="font-bold">Nivel:</span> ${activity.nivel}
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="library" class="size-5 shrink-0 text-[#D97706]"></i>
+                                <span class="text-sm text-[#78350F]">
+                                    <span class="font-bold">Área:</span> ${activity.area}
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="layers" class="size-5 shrink-0 text-[#D97706]"></i>
+                                <span class="text-sm text-[#78350F]">
+                                    <span class="font-bold">Tipo:</span> ${activity.tipo}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="mb-8 flex justify-center">
+                            <a href="${activity.enlace}" target="_blank" 
+                               class="inline-flex items-center gap-2 font-bold text-sm px-5 py-2.5 rounded-xl text-white transition-all shadow-md active:scale-95 bg-[#D97706] hover:shadow-lg">
+                                <i data-lucide="external-link" class="size-4"></i>
+                                Ver actividad
+                            </a>
+                        </div>
+
+                        <div class="mt-auto">
+                            <!-- Accordion Logros -->
+                            <div class="rounded-xl border overflow-hidden mb-3 transition-all bg-[#F0FDF4] border-[#16653420]">
+                                <button onclick="toggleAccordion(${activity.id}, 'logros')" class="w-full p-4 flex items-center justify-between hover:bg-black/5 transition-colors">
+                                    <div class="flex items-center gap-2 font-bold text-xs uppercase tracking-widest text-[#166534]">
+                                        <i data-lucide="award" class="size-4"></i>
+                                        Logros destacados
+                                    </div>
+                                    <i data-lucide="chevron-down" id="icon-${activity.id}-logros" class="size-4 opacity-50 transition-transform"></i>
+                                </button>
+                                <div id="content-${activity.id}-logros" class="accordion-content px-4">
+                                    ${formatBulletList(activity.logros, colors.leaf)}
+                                </div>
+                            </div>
+
+                            <!-- Accordion Mejoras -->
+                            <div class="rounded-xl border overflow-hidden mb-3 transition-all bg-[#FFFBEB90] border-[#78350F20]">
+                                <button onclick="toggleAccordion(${activity.id}, 'mejoras')" class="w-full p-4 flex items-center justify-between hover:bg-black/5 transition-colors">
+                                    <div class="flex items-center gap-2 font-bold text-xs uppercase tracking-widest text-[#78350F]">
+                                        <i data-lucide="message-square" class="size-4"></i>
+                                        Propuestas de mejora
+                                    </div>
+                                    <i data-lucide="chevron-down" id="icon-${activity.id}-mejoras" class="size-4 opacity-50 transition-transform"></i>
+                                </button>
+                                <div id="content-${activity.id}-mejoras" class="accordion-content px-4">
+                                    ${formatBulletList(activity.mejoras, colors.pumpkin)}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Reinicializar iconos de Lucide tras inyectar el HTML
+            lucide.createIcons();
+        }
+
+        // Iniciar la aplicación
+        window.onload = () => {
+            renderActivities();
+            lucide.createIcons();
+        };
+    </script>
+</body>
+</html>
