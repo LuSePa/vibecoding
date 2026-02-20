@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Tareas Apiladas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @keyframes rainbow {
+            0% { background-color: #fffafa; }
+            25% { background-color: #f0fff4; }
+            50% { background-color: #f0f9ff; }
+            75% { background-color: #f5f3ff; }
+            100% { background-color: #fffafa; }
+        }
+        .rainbow-bg { 
+            animation: rainbow 30s infinite linear; 
+        }
+        .timer-ring {
+            transition: stroke-dashoffset 1s linear;
+        }
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .report-tab-active {
+            background-color: #f8fafc;
+            color: #3b82f6;
+            border-bottom: 2px solid #3b82f6;
+        }
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        /* Ajuste para tablas largas */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        table {
+            width: 100%;
+            min-width: 650px;
+        }
+    </style>
+</head>
+<body class="rainbow-bg font-sans text-slate-900 h-screen overflow-hidden italic">
+    <!-- Pantalla de Inicio / Contraseña -->
+    <div id="login-screen" class="fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center p-6 text-center transition-opacity duration-500 italic">
+        <div class="mb-6 animate-pulse">
+            <svg width="140" height="80" viewBox="0 0 120 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 60C10 32.3858 32.3858 10 60 10C87.6142 10 110 32.3858 110 60" stroke="#FFADAD" stroke-width="12" stroke-linecap="round"/>
+                <path d="M25 60C25 40.67 40.67 25 60 25C79.33 25 95 40.67 95 60" stroke="#FFD6A5" stroke-width="10" stroke-linecap="round"/>
+                <path d="M40 60C40 48.9543 48.9543 40 60 40C71.0457 40 80 48.9543 80 60" stroke="#FDFFB6" stroke-width="8" stroke-linecap="round"/>
+                <path d="M55 60C55 57.2386 57.2386 55 60 55C62.7614 55 65 57.2386 65 60" stroke="#CAFFBF" stroke-width="6" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <div class="bg-white p-10 rounded-[3rem] shadow-2xl max-w-sm w-full border border-slate-100">
+            <h1 class="text-2xl font-black mb-2 text-slate-800 uppercase tracking-tighter italic">Acceso Protegido</h1>
+            <p class="text-slate-400 text-sm mb-8 font-medium italic italic">Introduce tu clave para entrar</p>
+            <input type="password" id="password-input" class="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-blue-100 outline-none mb-4 text-center text-lg font-mono tracking-widest italic" placeholder="••••••••">
+            <button onclick="checkPassword()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl hover:bg-slate-800 transition-all active:scale-95 uppercase tracking-widest text-sm italic italic">Entrar</button>
+            <p id="login-error" class="text-red-500 text-xs font-bold mt-4 opacity-0 transition-opacity italic italic italic">Contraseña incorrecta</p>
+        </div>
+    </div>
+
+    <!-- Notificaciones -->
+    <div id="toast-container" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[110] pointer-events-none flex flex-col gap-2 w-full max-w-xs items-center italic"></div>
+
+    <!-- Confirmación de Borrado -->
+    <div id="modal-delete" class="fixed inset-0 z-[95] modal-overlay hidden flex items-center justify-center p-6 text-center text-slate-800 italic">
+        <div class="bg-white p-8 rounded-[3rem] shadow-2xl max-w-xs w-full border border-white italic">
+            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-4 italic text-red-500">
+                <i data-lucide="trash-2" class="w-8 h-8 italic"></i>
+            </div>
+            <h3 class="text-xl font-black mb-2 uppercase tracking-tighter italic">¿Eliminar tarea?</h3>
+            <p class="text-slate-500 text-xs mb-6 text-pretty italic italic">Esta acción borrará la tarea de tu historial permanentemente.</p>
+            <div class="flex gap-3 italic">
+                <button onclick="closeDeleteModal()" class="flex-1 p-4 rounded-2xl font-black text-xs bg-slate-100 text-slate-500 uppercase transition-colors hover:bg-slate-200 italic">Cancelar</button>
+                <button onclick="confirmTaskDeletion()" class="flex-1 p-4 rounded-2xl font-black text-xs bg-red-500 text-white uppercase transition-colors hover:bg-red-600 italic italic">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recordatorio de Ejercicio -->
+    <div id="exercise-reminder" class="fixed inset-0 z-[90] modal-overlay hidden flex items-center justify-center p-6 text-center italic">
+        <div class="bg-white p-8 rounded-[3rem] shadow-2xl max-w-sm w-full border border-white italic">
+            <div class="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-3xl flex items-center justify-center mx-auto mb-6 italic">
+                <i data-lucide="activity" class="w-8 h-8 italic"></i>
+            </div>
+            <h2 class="text-2xl font-black mb-2 italic text-emerald-800 uppercase tracking-tighter italic italic">¡Cuerpo en Movimiento!</h2>
+            <p class="text-slate-500 text-sm mb-8 italic italic italic">Llevas 60 minutos de trabajo. Tu salud es lo primero.</p>
+            <a href="https://www.youtube.com/playlist?list=PLEqPOF7W4nWkTNoThoE4SE-vl-VRydopf" target="_blank" class="w-full bg-emerald-500 text-white font-black py-4 rounded-2xl hover:bg-emerald-600 block mb-3 shadow-lg uppercase text-xs tracking-widest italic">Ver ejercicios</a>
+            <button onclick="closeExercise()" class="text-slate-400 font-bold text-xs uppercase tracking-widest italic italic">Omitir</button>
+        </div>
+    </div>
+
+    <!-- Modal de Repetir -->
+    <div id="modal-reschedule" class="fixed inset-0 z-[80] modal-overlay hidden flex items-center justify-center p-6 text-center text-slate-800 italic">
+        <div class="bg-white p-8 rounded-[3rem] shadow-2xl max-w-md w-full border border-white max-h-[90vh] overflow-y-auto hide-scrollbar italic italic italic">
+            <h3 class="text-xl font-black mb-6 flex items-center gap-2 justify-center italic italic italic italic">
+                <i data-lucide="refresh-cw" class="text-blue-500 italic italic italic"></i> Agendar Repetida
+            </h3>
+            <div class="grid grid-cols-2 gap-3 mb-6 text-slate-800 italic italic italic italic">
+                <button onclick="rescheduleTask('tomorrow')" class="p-4 bg-slate-50 rounded-2xl text-[10px] font-black hover:bg-blue-50 hover:text-blue-600 border border-transparent uppercase italic">Mañana</button>
+                <button onclick="rescheduleTask('3days')" class="p-4 bg-slate-50 rounded-2xl text-[10px] font-black hover:bg-blue-50 hover:text-blue-600 border border-transparent uppercase italic">En 3 días</button>
+                <button onclick="rescheduleTask('nextweek')" class="p-4 bg-slate-50 rounded-2xl text-[10px] font-black hover:bg-blue-50 hover:text-blue-600 border border-transparent uppercase italic">Semana próxima</button>
+                <button onclick="rescheduleTask('nextmonth')" class="p-4 bg-slate-50 rounded-2xl text-[10px] font-black hover:bg-blue-50 hover:text-blue-600 border border-transparent uppercase italic">Siguiente mes</button>
+            </div>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1 text-left italic italic italic italic">O selecciona fecha manual:</p>
+            <input type="date" id="custom-date" class="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-blue-100 outline-none mb-6 italic italic italic">
+            <div class="flex gap-3 italic italic italic">
+                <button onclick="closeReschedule()" class="flex-1 p-4 rounded-2xl font-black text-xs bg-slate-100 text-slate-500 uppercase italic">Cancelar</button>
+                <button onclick="rescheduleTask('custom')" class="flex-1 p-4 rounded-2xl font-black text-xs bg-blue-500 text-white uppercase italic">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-content" class="hidden max-w-md mx-auto h-screen flex flex-col italic italic">
+        <!-- Navegación -->
+        <nav class="bg-white/90 backdrop-blur-md border-b border-slate-100 flex-none z-10 italic italic italic">
+            <div class="flex justify-around italic italic italic italic">
+                <button onclick="switchTab('masiva')" id="tab-masiva" class="tab-btn flex flex-col items-center py-3 px-4 text-blue-500 scale-110 transition-all italic italic italic">
+                    <i data-lucide="layers" class="w-5 h-5 italic italic italic italic"></i>
+                    <span class="text-[9px] mt-1 font-bold uppercase tracking-widest italic italic italic italic">Entrada</span>
+                </button>
+                <button onclick="switchTab('trabajo')" id="tab-trabajo" class="tab-btn flex flex-col items-center py-3 px-4 text-slate-400 opacity-60 transition-all italic italic italic italic">
+                    <i data-lucide="timer" class="w-5 h-5 italic italic italic italic italic"></i>
+                    <span class="text-[9px] mt-1 font-bold uppercase tracking-widest text-inherit italic italic italic italic italic">Trabajo</span>
+                </button>
+                <button onclick="switchTab('lista')" id="tab-lista" class="tab-btn flex flex-col items-center py-3 px-4 text-slate-400 opacity-60 transition-all italic italic italic italic italic">
+                    <i data-lucide="list" class="w-5 h-5 italic italic italic italic italic italic"></i>
+                    <span class="text-[9px] mt-1 font-bold uppercase tracking-widest text-inherit italic italic italic italic italic italic">Diario</span>
+                </button>
+                <button onclick="switchTab('informes')" id="tab-informes" class="tab-btn flex flex-col items-center py-3 px-4 text-slate-400 opacity-60 transition-all italic italic italic italic italic italic">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5 italic italic italic italic italic italic italic"></i>
+                    <span class="text-[9px] mt-1 font-bold uppercase tracking-widest text-inherit italic italic italic italic italic italic italic">Informe</span>
+                </button>
+            </div>
+        </nav>
+
+        <main class="flex-1 w-full flex flex-col min-h-0 overflow-hidden relative italic italic italic">
+            <!-- Sección Entrada -->
+            <div id="section-masiva" class="flex-1 flex flex-col min-h-0 overflow-hidden p-6 space-y-4 italic italic italic italic">
+                <div class="flex-none bg-white/50 p-4 rounded-3xl border border-white/50 italic italic italic italic italic">
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3 px-2 italic italic text-center underline decoration-blue-100">Etiqueta activa para nuevas tareas</p>
+                    <div id="tag-selector-container" class="flex flex-wrap gap-2 justify-center italic italic italic italic italic"></div>
+                </div>
+
+                <div class="flex-none bg-white/95 p-5 rounded-[2.5rem] shadow-xl border border-white italic italic italic italic italic">
+                    <h2 class="text-lg font-black mb-3 flex items-center gap-3 text-slate-800 italic italic uppercase tracking-tighter">
+                        <div class="p-2 bg-blue-50 rounded-2xl text-blue-500 italic italic italic"><i data-lucide="plus" class="w-4 h-4 italic italic italic italic"></i></div> Tarea Individual
+                    </h2>
+                    <div class="flex gap-3 italic italic italic italic">
+                        <textarea id="task-input" placeholder="¿Qué vas a añadir?" class="flex-1 p-4 bg-slate-50/50 rounded-2xl border-2 border-transparent focus:border-blue-100 focus:bg-white outline-none h-16 resize-none text-sm shadow-inner italic italic italic italic italic"></textarea>
+                        <button onclick="startNewTask()" class="bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-2xl w-14 flex items-center justify-center shadow-lg active:scale-90 transition-all italic italic italic italic">
+                            <i data-lucide="plus" class="italic italic italic italic italic"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex-1 min-h-0 bg-white/95 p-6 rounded-[2.5rem] shadow-xl border border-white text-slate-800 flex flex-col italic italic italic italic italic">
+                    <h2 class="text-lg font-black mb-1 flex items-center gap-3 italic italic uppercase tracking-tighter flex-none">
+                        <div class="p-2 bg-purple-50 rounded-2xl text-purple-500 italic italic italic italic"><i data-lucide="layers" class="w-4 h-4 italic italic italic italic italic"></i></div> Entrada Masiva
+                    </h2>
+                    <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-12 italic italic flex-none">Escribe cada tarea en una línea distinta</p>
+                    <textarea id="mass-input" placeholder="Llamar al médico...&#10;Enviar correos..." class="flex-1 w-full p-5 bg-slate-50/50 rounded-3xl border-2 border-transparent focus:border-purple-100 focus:bg-white outline-none text-base shadow-inner resize-none italic italic italic italic"></textarea>
+                    <button onclick="processMassTasks()" class="mt-4 flex-none w-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-black py-4 rounded-3xl shadow-lg flex items-center justify-center gap-3 active:scale-95 transition-all text-sm uppercase tracking-widest italic italic italic italic italic">Procesar Bloque</button>
+                </div>
+            </div>
+
+            <!-- Sección Trabajo -->
+            <div id="section-trabajo" class="hidden flex-1 flex flex-col min-h-0 overflow-hidden p-6 space-y-4 italic italic italic italic">
+                <div class="flex-none space-y-4 italic italic italic italic italic">
+                    <div id="work-filters" class="bg-white/50 p-3 rounded-3xl border border-white/50 italic italic italic italic italic italic">
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 px-2 italic italic text-center underline decoration-blue-100">Filtros de Etiquetas</p>
+                        <div id="filter-tag-list" class="flex flex-wrap gap-2 justify-center italic italic italic italic italic italic italic"></div>
+                    </div>
+                </div>
+
+                <div class="flex-1 min-h-0 flex flex-col italic italic italic italic italic">
+                    <div id="stage-waiting" class="bg-white/95 p-5 rounded-[2.5rem] shadow-xl border border-white overflow-hidden flex flex-col h-full italic italic italic italic italic italic">
+                        <div class="flex items-center justify-between mb-4 flex-none italic italic italic italic italic italic italic">
+                            <h2 class="text-lg font-black text-slate-800 italic italic uppercase tracking-tighter">Pila Activa</h2>
+                            <div class="flex items-center gap-2 italic italic italic italic italic italic italic italic">
+                                <span id="queue-count" class="text-[9px] font-black bg-blue-50 text-blue-500 px-3 py-1 rounded-full uppercase italic italic italic italic italic italic italic italic italic">0</span>
+                                <button onclick="startByAlgorithm()" class="bg-slate-900 text-white text-[8px] font-black px-4 py-2 rounded-full uppercase tracking-widest hover:bg-blue-600 active:scale-95 shadow-lg italic italic italic italic italic italic italic italic italic italic">Iniciar Automático</button>
+                            </div>
+                        </div>
+                        <div id="queue-container" class="flex-1 overflow-y-auto hide-scrollbar space-y-2 pb-2 pr-1 italic italic italic italic italic italic italic italic"></div>
+                        <div id="empty-queue-msg" class="hidden py-10 text-center flex-1 flex flex-col justify-center italic italic italic italic italic italic italic italic italic italic">
+                            <i data-lucide="inbox" class="w-10 h-10 text-slate-200 mx-auto mb-4 italic italic italic italic italic italic italic italic italic italic italic"></i>
+                            <p class="text-slate-400 text-xs font-bold uppercase italic italic text-balance italic italic italic italic italic italic italic">Sin tareas disponibles</p>
+                        </div>
+                    </div>
+
+                    <div id="stage-timer" class="hidden flex-1 flex flex-col items-center justify-center text-center space-y-6 italic italic italic italic italic italic italic">
+                        <div class="space-y-2 italic italic italic italic italic italic italic italic">
+                            <div id="timer-badge" class="px-3 py-1 bg-white/50 text-blue-600 text-[10px] font-black rounded-full uppercase border border-white inline-block italic italic italic italic italic italic italic italic italic italic italic italic">SESIÓN 1</div>
+                            <h2 id="active-task-text" class="text-2xl font-black text-slate-800 italic italic break-words max-w-[300px] leading-tight text-pretty italic italic italic italic italic italic italic"></h2>
+                            <div id="active-task-tag" class="text-[9px] font-black text-blue-400 uppercase italic italic tracking-widest underline decoration-blue-100 italic italic italic italic italic italic italic italic italic"></div>
+                        </div>
+                        <div class="relative flex items-center justify-center scale-75 sm:scale-90 flex-none italic italic italic italic italic italic italic italic italic">
+                            <div class="w-64 h-64 rounded-full flex flex-col items-center justify-center bg-white shadow-2xl relative z-10 border-4 border-slate-50 italic italic italic italic italic italic italic italic italic italic">
+                                <span id="timer-display" class="text-5xl font-mono font-black tracking-tighter text-slate-800 italic italic italic italic italic italic italic italic italic italic italic italic">00:02:00</span>
+                            </div>
+                            <svg class="absolute w-72 h-72 -rotate-90 italic italic italic italic italic italic italic italic italic italic italic">
+                                <circle cx="144" cy="144" r="132" stroke="#f1f5f9" strokeWidth="10" fill="transparent" />
+                                <circle id="timer-progress" cx="144" cy="144" r="132" stroke="url(#timer-gradient)" strokeWidth="10" fill="transparent" strokeLinecap="round" stroke-dasharray="830" stroke-dashoffset="0" class="timer-ring italic italic italic italic italic italic italic italic italic italic italic italic" />
+                                <defs><linearGradient id="timer-gradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#3b82f6" /><stop offset="100%" stopColor="#8b5cf6" /></linearGradient></defs>
+                            </svg>
+                        </div>
+                        <div class="flex gap-4 w-full px-4 flex-none italic italic italic italic italic italic italic italic italic italic italic italic">
+                            <button onclick="togglePause()" id="pause-btn" class="flex-1 py-4 rounded-3xl font-black text-xs bg-white border-b-4 border-slate-200 active:border-b-0 uppercase italic italic tracking-widest italic italic italic italic italic italic italic italic">Pausar</button>
+                            <button onclick="stopTimer()" class="flex-1 py-4 rounded-3xl font-black text-xs bg-rose-50 border-b-4 border-rose-200 text-rose-600 active:border-b-0 uppercase italic italic tracking-widest italic italic italic italic italic italic italic italic italic">Terminar</button>
+                        </div>
+                    </div>
+
+                    <div id="stage-decision" class="hidden flex-1 flex flex-col items-center justify-center bg-white p-8 rounded-[3rem] shadow-2xl border border-white text-center space-y-6 italic italic italic italic italic italic italic italic">
+                        <h2 class="text-2xl font-black text-slate-800 italic italic uppercase tracking-tighter italic italic italic italic italic italic italic">¿Qué ha pasado?</h2>
+                        <div id="decision-task-text" class="p-4 bg-slate-50 rounded-3xl font-bold text-lg text-slate-600 italic italic text-pretty italic italic italic italic italic italic italic italic italic"></div>
+                        <div class="grid grid-cols-1 gap-3 w-full italic italic italic italic italic italic italic italic italic italic italic">
+                            <button onclick="handleTaskDone()" class="w-full p-5 bg-emerald-500 text-white rounded-3xl font-black text-base shadow-lg active:scale-95 uppercase italic italic italic italic italic italic italic italic italic italic italic italic italic">Terminada</button>
+                            <button onclick="openReschedule()" class="w-full p-4 bg-blue-50 text-blue-600 rounded-2xl font-black text-xs active:scale-95 transition-all uppercase tracking-widest italic italic underline underline-offset-4 decoration-blue-200 italic italic italic italic italic italic italic italic italic italic italic">Terminada, repetir</button>
+                            <button onclick="handleTaskPending()" class="w-full p-4 bg-slate-100 text-slate-700 rounded-2xl font-black text-xs active:scale-95 transition-all uppercase tracking-widest italic italic underline underline-offset-4 italic italic italic italic italic italic italic italic italic italic italic italic">No terminada</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección Diario General -->
+            <div id="section-lista" class="hidden flex-1 flex flex-col min-h-0 overflow-hidden p-6 space-y-6 text-slate-800 italic italic italic italic italic italic">
+                <h2 class="text-xl font-black flex items-center gap-3 px-2 italic uppercase tracking-tighter italic italic italic italic italic italic italic italic italic">
+                    <div class="p-2 bg-white rounded-2xl shadow-sm text-slate-400 italic italic italic italic italic italic italic italic italic italic"><i data-lucide="history" class="w-5 h-5 italic italic italic italic italic italic italic italic italic italic italic"></i></div> Diario General
+                </h2>
+                <div class="flex-1 overflow-y-auto hide-scrollbar table-container bg-white/80 rounded-[2rem] border border-white shadow-sm italic italic italic italic italic italic italic italic italic italic">
+                    <div id="task-list-table" class="italic italic italic italic italic italic italic italic italic italic italic italic italic"></div>
+                </div>
+            </div>
+
+            <!-- Sección Informe -->
+            <div id="section-informes" class="hidden flex-1 flex flex-col min-h-0 overflow-hidden p-6 space-y-4 pb-12 italic italic italic italic italic italic italic italic">
+                <div class="flex items-center justify-between px-2 italic italic italic italic italic italic italic italic italic italic">
+                    <h2 class="text-xl font-black flex items-center gap-3 text-slate-800 italic italic uppercase tracking-tighter italic italic italic italic italic italic italic italic italic italic italic">
+                        <div class="p-2 bg-indigo-100 rounded-2xl text-indigo-500 italic italic italic italic italic italic italic italic italic italic italic italic"><i data-lucide="bar-chart-3" class="w-5 h-5 italic italic italic italic italic italic italic italic italic italic italic italic italic"></i></div> Informe
+                    </h2>
+                    <button onclick="exportCSV()" class="p-2 bg-white text-blue-600 rounded-xl font-black border-b-2 border-slate-100 shadow-sm transition-all italic italic italic italic italic italic italic italic italic italic italic italic italic"><i data-lucide="download" class="w-4 h-4 text-blue-500 italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic"></i></button>
+                </div>
+
+                <div class="bg-white/60 p-1 rounded-2xl flex overflow-x-auto hide-scrollbar gap-1 border border-white flex-none italic italic italic italic italic italic italic italic italic italic italic italic italic italic">
+                    <button onclick="switchReportTab('dia')" id="rtab-dia" class="flex-1 py-2 px-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all report-tab-active italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic">Día</button>
+                    <button onclick="switchReportTab('semana')" id="rtab-semana" class="flex-1 py-2 px-3 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-400 italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic">Semana</button>
+                    <button onclick="switchReportTab('mes')" id="rtab-mes" class="flex-1 py-2 px-3 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-400 italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic">Mes</button>
+                    <button onclick="switchReportTab('año')" id="rtab-año" class="flex-1 py-2 px-3 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-400 italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic">Año</button>
+                    <button onclick="switchReportTab('general')" id="rtab-general" class="flex-1 py-2 px-3 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-400 italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic">General</button>
+                </div>
+
+                <div id="report-container" class="flex-1 overflow-y-auto hide-scrollbar space-y-3 italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic">
+                    <details class="bg-white/80 border border-white rounded-[2rem] overflow-hidden group shadow-sm italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic" open>
+                        <summary class="p-5 cursor-pointer flex items-center justify-between italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic">
+                            <span class="text-xs font-black uppercase tracking-widest text-slate-700 italic flex items-center gap-2 font-bold italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic">
+                                <i data-lucide="calendar" class="w-4 h-4 text-blue-500 italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic"></i> Diario Detallado
+                            </span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-300 group-open:rotate-180 transition-transform italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic"></i>
+                        </summary>
+                        <div id="report-table-view" class="px-2 pb-5 table-container italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic"></div>
+                    </details>
+
+                    <details class="bg-white/80 border border-white rounded-[2rem] overflow-hidden group shadow-sm italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic">
+                        <summary class="p-5 cursor-pointer flex items-center justify-between italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic">
+                            <span class="text-xs font-black uppercase tracking-widest text-slate-700 italic flex items-center gap-2 font-bold italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic">
+                                <i data-lucide="pie-chart" class="w-4 h-4 text-purple-500 italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic"></i> Estadísticas Visuales
+                            </span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-300 group-open:rotate-180 transition-transform italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic"></i>
+                        </summary>
+                        <div id="report-stats-view" class="p-6 space-y-10 italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic"></div>
+                    </details>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- ESTADO GLOBAl ---
+        let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+        let tags = JSON.parse(localStorage.getItem('tags') || '["#DTDR", "#Salud", "#HGCI", "#EII"]');
+        let activeFilters = JSON.parse(localStorage.getItem('activeFilters') || JSON.stringify(tags));
+        let selectedTag = tags[0];
+        let lastExerciseTime = parseInt(localStorage.getItem('lastExerciseTime') || Date.now());
+        let currentReportTab = 'dia';
+        let currentTask = null;
+        let timeLeft = 0;
+        let timerDuration = 0;
+        let isRunning = false;
+        let timerInterval = null;
+        let sessionStartTime = 0; 
+        let taskToDeleteId = null;
+
+        const INITIAL_TIME = 120; 
+        const INCREMENT_TIME = 60; 
+
+        // --- FUNCIONES INTERNAS (UTILERÍA) ---
+        function formatHHMMSS(seconds) {
+            const s = Math.max(0, Math.floor(seconds));
+            const h = Math.floor(s / 3600);
+            const m = Math.floor((s % 3600) / 60);
+            const sec = s % 60;
+            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+        }
+
+        function formatTimeHM(timestamp) {
+            if(!timestamp) return '--:--';
+            const d = new Date(timestamp);
+            return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `p-3 px-5 rounded-2xl shadow-xl bg-white border flex items-center gap-3 border-slate-100 pointer-events-auto transition-all duration-300 italic`;
+            const colorClass = type === 'success' ? 'text-emerald-500' : 'text-red-500';
+            toast.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle' : 'alert-circle'}" class="${colorClass} w-4 h-4 italic"></i><span class="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">${message}</span>`;
+            container.appendChild(toast); lucide.createIcons();
+            setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-2'); setTimeout(() => toast.remove(), 500); }, 3000);
+        }
+
+        function returnToQueue() {
+            currentTask = null;
+            window.showStage('waiting');
+            renderWorkQueue();
+            const display = document.getElementById('timer-display');
+            if (display) display.classList.remove('text-red-500', 'animate-pulse');
+        }
+
+        function startTimer() {
+            isRunning = true; window.updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeLeft--; window.updateTimerDisplay();
+                if (timeLeft <= 0 && isRunning) {
+                    const display = document.getElementById('timer-display');
+                    if (display) display.classList.add('text-red-500', 'animate-pulse');
+                }
+            }, 1000);
+        }
+
+        // --- RENDERIZADO DE TABLAS ---
+        function generateTaskTable(taskList) {
+            if (taskList.length === 0) return `<p class="p-10 text-center text-slate-300 font-bold uppercase text-[10px] italic italic italic">Sin datos</p>`;
+            
+            let table = `<table class="w-full text-left border-collapse text-[9px] min-w-[600px] italic"><thead><tr class="bg-slate-50 text-slate-400 uppercase italic"><th class="p-3">Tarea</th><th class="p-3 text-center">Fecha</th><th class="p-3 text-center">Inicio</th><th class="p-3 text-center">Fin</th><th class="p-3 text-center">Iter.</th><th class="p-3 text-center">Tiempo</th><th class="p-3 text-center">Tag</th></tr></thead><tbody>`;
+            
+            taskList.sort((a,b) => (b.completedAt || b.createdAt) - (a.completedAt || a.createdAt)).forEach(t => {
+                const dateText = t.completedAt ? new Date(t.completedAt).toLocaleDateString() : new Date(t.createdAt).toLocaleDateString();
+                const statusColor = t.status === 'completed' ? 'text-emerald-500' : 'text-blue-400';
+                table += `<tr class="border-t border-slate-50 italic hover:bg-slate-50/50 transition-colors italic italic">
+                    <td class="p-3 font-bold text-slate-700 truncate max-w-[140px] italic">${t.text}</td>
+                    <td class="p-3 text-slate-400 text-center italic">${dateText}</td>
+                    <td class="p-3 text-slate-400 text-center italic">${formatTimeHM(t.lastStartTime)}</td>
+                    <td class="p-3 text-slate-400 text-center italic">${formatTimeHM(t.lastEndTime)}</td>
+                    <td class="p-3 text-center text-slate-400 italic">${t.iterations}</td>
+                    <td class="p-3 font-black text-slate-500 text-center italic">${formatHHMMSS(t.totalSeconds)}</td>
+                    <td class="p-3 ${statusColor} font-black text-center italic">${t.tag}</td>
+                </tr>`;
+            });
+            return table + `</tbody></table>`;
+        }
+
+        // --- CONEXIÓN DE FUNCIONES GLOBALES ---
+        window.checkPassword = function() {
+            const val = document.getElementById('password-input').value;
+            if (val === 'Al1_Kuetan0') {
+                document.getElementById('login-screen').classList.add('opacity-0');
+                setTimeout(() => {
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('main-content').classList.remove('hidden');
+                    init();
+                }, 500);
+            } else {
+                const err = document.getElementById('login-error');
+                err.style.opacity = '1'; setTimeout(() => err.style.opacity = '0', 2000);
+            }
+        };
+
+        window.requestDelete = function(id) { taskToDeleteId = id; document.getElementById('modal-delete').classList.remove('hidden'); };
+        window.closeDeleteModal = function() { taskToDeleteId = null; document.getElementById('modal-delete').classList.add('hidden'); };
+        window.confirmTaskDeletion = function() {
+            if (taskToDeleteId) {
+                tasks = tasks.filter(t => t.id !== taskToDeleteId);
+                saveTasks(); showToast("Tarea eliminada", "danger");
+                renderWorkQueue(); renderList(); closeDeleteModal();
+            }
+        };
+
+        window.openReschedule = function() { document.getElementById('modal-reschedule').classList.remove('hidden'); };
+        window.closeReschedule = function() { document.getElementById('modal-reschedule').classList.add('hidden'); };
+
+        window.rescheduleTask = function(type) {
+            let delayMs = 0;
+            const now = Date.now();
+            switch(type) {
+                case 'tomorrow': delayMs = 86400000; break;
+                case '3days': delayMs = 86400000 * 3; break;
+                case 'nextweek': delayMs = 86400000 * 7; break;
+                case 'nextmonth': delayMs = 86400000 * 30; break;
+                case 'custom':
+                    const dateVal = document.getElementById('custom-date').value;
+                    if (!dateVal) return;
+                    delayMs = new Date(dateVal).getTime() - now;
+                    break;
+            }
+            if (delayMs > 0) {
+                currentTask.status = 'completed';
+                currentTask.completedAt = now;
+                currentTask.lastEndTime = now; 
+                tasks.push({
+                    id: Date.now() + Math.random(), text: currentTask.text, tag: currentTask.tag,
+                    status: 'pending', iterations: 0, createdAt: now, 
+                    lastSeenAt: now + delayMs, completedAt: null, scheduledDate: now + delayMs,
+                    totalSeconds: 0, sessionCount: 0, isRepeated: true
+                });
+                saveTasks(); closeReschedule(); returnToQueue(); showToast("Repetición agendada");
+            }
+        };
+
+        window.startByAlgorithm = function() {
+            const now = Date.now();
+            const pending = tasks.filter(t => activeFilters.includes(t.tag) && t.status === 'pending' && (!t.scheduledDate || t.scheduledDate <= now)).sort((a,b) => a.lastSeenAt - b.lastSeenAt);
+            if (pending.length > 0) initTimerById(pending[0].id);
+            else showToast("Nada pendiente", "danger");
+        };
+
+        window.initTimerById = function(id) {
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+            currentTask = task;
+            timerDuration = INITIAL_TIME + (task.iterations * INCREMENT_TIME);
+            timeLeft = timerDuration;
+            sessionStartTime = Date.now();
+            if(!currentTask.lastStartTime) currentTask.lastStartTime = sessionStartTime;
+            document.getElementById('active-task-text').innerText = task.text;
+            document.getElementById('active-task-tag').innerText = task.tag;
+            document.getElementById('timer-badge').innerText = task.iterations > 0 ? `REVISIÓN #${task.iterations}` : 'NUEVA TAREA';
+            window.showStage('timer'); startTimer();
+        };
+
+        window.togglePause = function() {
+            if (isRunning) { clearInterval(timerInterval); isRunning = false; }
+            else { startTimer(); }
+            document.getElementById('pause-btn').innerText = isRunning ? 'Pausar' : 'Reanudar';
+        };
+
+        window.stopTimer = function() {
+            if (!currentTask) return;
+            clearInterval(timerInterval);
+            isRunning = false;
+            const now = Date.now();
+            const elapsed = (now - sessionStartTime) / 1000;
+            currentTask.totalSeconds += elapsed;
+            currentTask.sessionCount = (currentTask.sessionCount || 0) + 1;
+            currentTask.lastEndTime = now; 
+            playTone(); window.showStage('decision');
+            document.getElementById('decision-task-text').innerText = currentTask.text;
+        };
+
+        window.handleTaskDone = function() {
+            if (!currentTask) return;
+            currentTask.status = 'completed'; currentTask.completedAt = Date.now();
+            saveTasks(); returnToQueue(); showToast("Tarea terminada");
+        };
+
+        window.handleTaskPending = function() {
+            if (!currentTask) return;
+            currentTask.iterations++; currentTask.lastSeenAt = Date.now(); currentTask.scheduledDate = null;
+            saveTasks(); returnToQueue(); showToast("Vuelta a la pila", "danger");
+        };
+
+        window.startNewTask = function() {
+            const text = document.getElementById('task-input').value.trim();
+            if (!text) return;
+            tasks.push({
+                id: Date.now(), text, tag: selectedTag, status: 'pending', iterations: 0, 
+                createdAt: Date.now(), lastSeenAt: Date.now(), completedAt: null, scheduledDate: null, 
+                totalSeconds: 0, sessionCount: 0
+            });
+            saveTasks(); document.getElementById('task-input').value = '';
+            showToast("Añadida"); renderWorkQueue();
+        };
+
+        window.processMassTasks = function() {
+            const textarea = document.getElementById('mass-input');
+            const lines = textarea.value.split('\n').filter(l => l.trim());
+            lines.forEach((l, i) => {
+                tasks.push({
+                    id: Date.now() + i, text: l.trim(), tag: selectedTag, status: 'pending', iterations: 0,
+                    createdAt: Date.now(), lastSeenAt: Date.now(), completedAt: null, scheduledDate: null,
+                    totalSeconds: 0, sessionCount: 0
+                });
+            });
+            saveTasks(); textarea.value = '';
+            showToast(`${lines.length} añadidas`); renderWorkQueue();
+        };
+
+        window.switchTab = function(tabId) {
+            document.querySelectorAll('main > div').forEach(div => div.classList.add('hidden'));
+            const section = document.getElementById(`section-${tabId}`);
+            if (section) section.classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(btn => { 
+                btn.classList.remove('text-blue-500', 'scale-110'); btn.classList.add('text-slate-400', 'opacity-60'); 
+            });
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            if (activeBtn) activeBtn.classList.add('text-blue-500', 'scale-110');
+            if (tabId === 'trabajo') renderWorkQueue();
+            if (tabId === 'lista') renderList();
+            if (tabId === 'informes') switchReportTab(currentReportTab);
+            const mainScroll = document.getElementById('main-scroll');
+            if (mainScroll) mainScroll.scrollTop = 0;
+        };
+
+        window.switchReportTab = function(id) {
+            currentReportTab = id;
+            document.querySelectorAll('[id^="rtab-"]').forEach(btn => {
+                btn.classList.remove('report-tab-active'); btn.classList.add('text-slate-400');
+            });
+            document.getElementById(`rtab-${id}`).classList.add('report-tab-active');
+            renderReportContent();
+        };
+
+        window.exportCSV = function() {
+            let csv = "Tarea,Tag,Estado,Inicio,Fin,Iteracion,TiempoSeg\n";
+            tasks.forEach(t => csv += `"${t.text}","${t.tag}",${t.status},${formatTimeHM(t.lastStartTime)},${formatTimeHM(t.lastEndTime)},${t.iterations},${t.totalSeconds.toFixed(0)}\n`);
+            const a = document.createElement('a'); a.href = window.URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+            a.download = 'diario_trabajo.csv'; a.click();
+        };
+
+        window.closeExercise = function() {
+            lastExerciseTime = Date.now(); localStorage.setItem('lastExerciseTime', lastExerciseTime);
+            document.getElementById('exercise-reminder').classList.add('hidden');
+        };
+
+        window.startExerciseCheck = function() {
+            setInterval(() => { if (Date.now() - lastExerciseTime >= 3600000) {
+                const el = document.getElementById('exercise-reminder');
+                if(el) el.classList.remove('hidden');
+            }}, 10000);
+        };
+
+        window.showStage = function(stageId) {
+            ['waiting', 'timer', 'decision'].forEach(s => {
+                const el = document.getElementById(`stage-${s}`);
+                if (el) el.classList.add('hidden');
+            });
+            const target = document.getElementById(`stage-${stageId}`);
+            if (target) target.classList.remove('hidden');
+        };
+
+        window.updateTimerDisplay = function() {
+            const display = document.getElementById('timer-display');
+            const progress = document.getElementById('timer-progress');
+            if (display) display.innerText = formatHHMMSS(Math.abs(timeLeft));
+            if (progress) progress.style.strokeDashoffset = 830 * (1 - Math.max(0, timeLeft) / timerDuration);
+        };
+
+        window.renderTagSelectors = function() {
+            const container = document.getElementById('tag-selector-container');
+            if(!container) return; container.innerHTML = '';
+            tags.forEach(tag => {
+                const btn = document.createElement('button');
+                btn.className = `px-3 py-2 rounded-xl text-[10px] font-black transition-all ${selectedTag === tag ? 'bg-slate-900 text-white shadow-lg' : 'bg-white text-slate-400 border border-slate-100'}`;
+                btn.innerText = tag; btn.onclick = () => { selectedTag = tag; window.renderTagSelectors(); };
+                container.appendChild(btn);
+            });
+            const add = document.createElement('button');
+            add.className = "px-3 py-2 rounded-xl text-[10px] font-black bg-blue-50 text-blue-500 border border-blue-100 italic";
+            add.innerHTML = '<i data-lucide="plus" class="w-3 h-3 italic"></i>';
+            add.onclick = () => {
+                const n = prompt("Tag (con #):");
+                if (n && n.startsWith('#') && !tags.includes(n)) {
+                    tags.push(n); activeFilters.push(n); localStorage.setItem('tags', JSON.stringify(tags));
+                    window.renderTagSelectors(); renderWorkFilters();
+                }
+            };
+            container.appendChild(add); lucide.createIcons();
+        };
+
+        function renderList() {
+            const container = document.getElementById('task-list-table');
+            if(!container) return;
+            container.innerHTML = generateTaskTable(tasks);
+        }
+
+        function renderReportContent() {
+            const tableView = document.getElementById('report-table-view');
+            const statsView = document.getElementById('report-stats-view');
+            if(!tableView || !statsView) return;
+            
+            const completed = tasks.filter(t => t.status === 'completed' && t.completedAt);
+            const now = new Date();
+            let filtered = [];
+            
+            if (currentReportTab === 'dia') filtered = completed.filter(t => new Date(t.completedAt).toLocaleDateString() === now.toLocaleDateString());
+            else if (currentReportTab === 'semana') filtered = completed.filter(t => t.completedAt >= now.getTime() - 604800000);
+            else if (currentReportTab === 'mes') filtered = completed.filter(t => t.completedAt >= now.getTime() - 2592000000);
+            else if (currentReportTab === 'año') filtered = completed.filter(t => t.completedAt >= now.getTime() - 31536000000);
+            else filtered = completed;
+
+            tableView.innerHTML = generateTaskTable(filtered);
+
+            // Estadísticas comunes (Tarta)
+            const totalTime = filtered.reduce((acc, t) => acc + t.totalSeconds, 0);
+            const tagStats = {}; 
+            filtered.forEach(t => tagStats[t.tag] = (tagStats[t.tag] || 0) + t.totalSeconds);
+            const tagEntries = Object.entries(tagStats).sort((a,b) => b[1] - a[1]);
+            const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#f97316', '#10b981', '#facc15'];
+
+            let pieHtml = '';
+            if (tagEntries.length > 0 && totalTime > 0) {
+                let cumulative = 0;
+                const grad = tagEntries.map((e, i) => {
+                    const p = (e[1]/totalTime)*100;
+                    const res = `${colors[i % colors.length]} ${cumulative}% ${cumulative + p}%`;
+                    cumulative += p; return res;
+                }).join(', ');
+                pieHtml = `<div class="flex flex-col items-center gap-4 italic"><div class="w-32 h-32 rounded-full border-2 border-white shadow-sm italic" style="background: conic-gradient(${grad})"></div><div class="grid grid-cols-2 gap-x-3 gap-y-1 italic">${tagEntries.slice(0,4).map((e, i) => `<div class="flex items-center gap-1.5 italic"><div class="w-1.5 h-1.5 rounded-full italic" style="background:${colors[i%colors.length]}"></div><span class="text-[7px] font-bold text-slate-500 truncate italic">${e[0]}</span></div>`).join('')}</div></div>`;
+            }
+
+            if (currentReportTab === 'general') {
+                const totalFinished = completed.length;
+                const totalCreated = tasks.length;
+                const totalRepeated = tasks.filter(t => t.isRepeated).length;
+                const totalResumed = tasks.filter(t => t.iterations > 0).length;
+                
+                const hoursMap = new Array(24).fill(0);
+                completed.forEach(t => hoursMap[new Date(t.completedAt).getHours()]++);
+                const peakHour = hoursMap.indexOf(Math.max(...hoursMap));
+                const uniqueDays = [...new Set(completed.map(t => new Date(t.completedAt).toLocaleDateString()))].length;
+
+                // Gráfico Comparativo Etiquetas vs Tiempos
+                let barHtml = '<div class="space-y-3 mt-4 italic">';
+                const maxTimeForBars = Math.max(...Object.values(tagStats), 1);
+                tagEntries.forEach((e, i) => {
+                    const p = (e[1]/maxTimeForBars)*100;
+                    barHtml += `<div class="space-y-1 italic">
+                        <div class="flex justify-between text-[8px] font-black text-slate-400 uppercase italic italic"><span>${e[0]}</span><span>${formatHHMMSS(e[1])}</span></div>
+                        <div class="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden italic"><div class="h-full rounded-full transition-all italic" style="width:${p}%; background:${colors[i%colors.length]}"></div></div>
+                    </div>`;
+                });
+                barHtml += '</div>';
+
+                statsView.innerHTML = `
+                    <div class="bg-white p-5 rounded-[2.5rem] border border-slate-50 shadow-sm text-center italic">
+                        <h4 class="text-[10px] font-black uppercase text-slate-700 italic mb-4 italic">Total de Tareas Históricas</h4>
+                        <div class="grid grid-cols-2 gap-4 italic">
+                            <div class="italic"><p class="text-[8px] font-bold text-blue-400 uppercase italic italic">Realizadas</p><p class="text-xl font-black text-slate-800 italic italic">${totalCreated}</p></div>
+                            <div class="italic"><p class="text-[8px] font-bold text-emerald-500 uppercase italic italic">Finalizadas</p><p class="text-xl font-black text-slate-800 italic italic">${totalFinished}</p></div>
+                            <div class="italic"><p class="text-[8px] font-bold text-purple-400 uppercase italic italic">Repetidas</p><p class="text-xl font-black text-slate-800 italic italic">${totalRepeated}</p></div>
+                            <div class="italic"><p class="text-[8px] font-bold text-orange-400 uppercase italic italic">Reanudadas</p><p class="text-xl font-black text-slate-800 italic italic">${totalResumed}</p></div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 italic">
+                        <div class="bg-white p-4 rounded-3xl border border-slate-50 shadow-sm text-center italic"><p class="text-[8px] font-black text-slate-400 uppercase italic italic">Pico Actividad</p><p class="text-lg font-black text-indigo-600 italic italic italic">${peakHour}:00h</p></div>
+                        <div class="bg-white p-4 rounded-3xl border border-slate-50 shadow-sm text-center italic"><p class="text-[8px] font-black text-slate-400 uppercase italic italic">Racha Días</p><p class="text-lg font-black text-purple-600 italic italic italic">${uniqueDays}</p></div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-[2.5rem] border border-slate-50 shadow-sm text-center italic">
+                        <p class="text-[9px] font-black text-slate-400 uppercase mb-4 italic italic">Inversión por Etiquetas</p>
+                        ${pieHtml || '<p class="text-[8px] text-slate-300 italic">Sin datos</p>'}
+                        <div class="mt-6 border-t border-slate-50 pt-4 italic">
+                            <p class="text-[8px] font-black text-slate-400 uppercase mb-3 italic italic">Tiempos vs Etiquetas</p>
+                            ${barHtml || '<p class="text-[8px] text-slate-300 italic">Sin datos</p>'}
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-3xl border border-slate-50 shadow-sm flex items-center justify-between">
+                        <div class="italic"><p class="text-[8px] font-black text-slate-400 uppercase italic italic">Esfuerzo Acumulado</p><p class="text-xs text-slate-600 font-black italic italic italic">${formatHHMMSS(totalTime)}</p></div>
+                        <i data-lucide="zap" class="text-yellow-400 w-6 h-6 italic italic"></i>
+                    </div>
+                `;
+            } else {
+                statsView.innerHTML = `
+                    <div class="grid grid-cols-2 gap-3 italic">
+                        <div class="bg-white p-5 rounded-[2rem] border border-slate-50 text-center italic"><p class="text-[9px] font-black text-slate-400 uppercase italic mb-1 italic">Total Periodo</p><p class="text-xl font-black text-indigo-600 italic italic italic">${formatHHMMSS(totalTime)}</p></div>
+                        <div class="bg-white p-5 rounded-[2rem] border border-slate-50 text-center italic"><p class="text-[9px] font-black text-slate-400 uppercase italic mb-1 italic">Media Tarea</p><p class="text-xl font-black text-emerald-600 italic italic italic">${formatHHMMSS(totalTime/(filtered.length || 1))}</p></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-[2.5rem] border border-slate-50 shadow-sm text-center italic">
+                        <p class="text-[9px] font-black text-slate-400 uppercase mb-4 italic italic">Inversión por Etiquetas (Periodo)</p>
+                        ${pieHtml || '<p class="text-[8px] text-slate-300 italic">Sin datos</p>'}
+                    </div>
+                `;
+            }
+            lucide.createIcons();
+        }
+
+        function saveTasks() { localStorage.setItem('tasks', JSON.stringify(tasks)); }
+
+        function playTone() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator(); const gain = ctx.createGain();
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+                gain.gain.setValueAtTime(0.1, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+                osc.start(); osc.stop(ctx.currentTime + 0.5);
+            } catch(e) {}
+        }
+
+        function renderWorkFilters() {
+            const container = document.getElementById('filter-tag-list');
+            if(!container) return; container.innerHTML = '';
+            tags.forEach(tag => {
+                const active = activeFilters.includes(tag);
+                const btn = document.createElement('button');
+                btn.className = `px-3 py-1.5 rounded-xl text-[9px] font-black transition-all ${active ? 'bg-blue-50 text-blue-600 border border-blue-200 shadow-sm' : 'bg-white text-slate-300 opacity-50 border border-slate-100'}`;
+                btn.innerText = tag;
+                btn.onclick = () => {
+                    if (active) activeFilters = activeFilters.filter(t => t !== tag);
+                    else activeFilters.push(tag);
+                    localStorage.setItem('activeFilters', JSON.stringify(activeFilters));
+                    renderWorkFilters(); renderWorkQueue();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function renderWorkQueue() {
+            const container = document.getElementById('queue-container');
+            const countEl = document.getElementById('queue-count');
+            const emptyEl = document.getElementById('empty-queue-msg');
+            if(!container || !countEl) return; container.innerHTML = '';
+            const now = Date.now();
+            const pending = tasks.filter(t => activeFilters.includes(t.tag) && t.status === 'pending' && (!t.scheduledDate || t.scheduledDate <= now)).sort((a,b) => a.lastSeenAt - b.lastSeenAt);
+            countEl.innerText = pending.length;
+            if (pending.length === 0) emptyEl.classList.remove('hidden');
+            else {
+                emptyEl.classList.add('hidden');
+                pending.forEach(t => {
+                    const div = document.createElement('div');
+                    div.className = "p-4 bg-white border border-slate-100 rounded-3xl flex items-center justify-between shadow-sm italic italic";
+                    div.innerHTML = `<div class="flex-1 min-w-0 pr-3 text-left italic italic"><div class="text-[8px] font-black text-blue-400 uppercase italic mb-0.5 italic italic italic">${t.tag}</div><p class="text-sm font-bold text-slate-800 truncate italic italic italic">${t.text}</p><div class="text-[8px] font-black text-slate-400 uppercase mt-0.5 italic italic italic italic">Iteración: ${t.iterations}</div></div><div class="flex gap-2 italic italic italic"><button onclick="requestDelete(${t.id})" class="p-2 text-slate-200 hover:text-red-500 italic italic italic"><i data-lucide="trash-2" class="w-4 h-4 italic italic italic italic"></i></button><button onclick="initTimerById(${t.id})" class="bg-blue-500 text-white p-2.5 rounded-xl hover:bg-blue-600 active:scale-90 italic italic italic"><i data-lucide="play" class="w-4 h-4 fill-current italic italic italic italic"></i></button></div>`;
+                    container.appendChild(div);
+                });
+            }
+            lucide.createIcons();
+        }
+
+        function init() {
+            window.renderTagSelectors(); renderWorkFilters(); window.startExerciseCheck(); renderWorkQueue(); lucide.createIcons();
+        }
+    </script>
+</body>
+</html>
