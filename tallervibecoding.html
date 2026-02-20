@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Taller - Vibe coding para docentes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ------------------- */
+        /* MANUAL DE ESTILO    */
+        /* ------------------- */
+        :root {
+            --color-fondo: #FDF5E6;     /* Crema */
+            --color-titulos: #D2691E;     /* Chocolate */
+            --color-texto: #3C2A1E;       /* Café oscuro */
+            --color-acento: #E49B0F;      /* Calabaza */
+            --fuente-titulos: 'Montserrat', sans-serif;
+            --fuente-cuerpo: 'Open Sans', sans-serif;
+        }
+
+        /* ------------------- */
+        /* ESTILOS GENERALES   */
+        /* ------------------- */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: var(--fuente-cuerpo);
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+            line-height: 1.7;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: var(--fuente-titulos);
+            color: var(--color-titulos);
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+        
+        h1 { font-size: 2.8rem; }
+        h2 { font-size: 2.2rem; margin-top: 2rem; border-bottom: 2px solid rgba(210, 105, 30, 0.1); padding-bottom: 0.5rem; }
+        h3 { font-size: 1.8rem; margin-top: 2.5rem; margin-bottom: 1.5rem; color: var(--color-texto); border-left: 5px solid var(--color-acento); padding-left: 1rem; }
+
+        p { margin-bottom: 1.25rem; }
+        a { color: var(--color-acento); font-weight: 600; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        
+        em { font-style: italic; }
+
+        /* ------------------- */
+        /* CABECERA Y PIE      */
+        /* ------------------- */
+        header {
+            display: grid;
+            background-color: var(--color-texto);
+            position: relative;
+        }
+
+        header img.logo-cabecera {
+            grid-column: 1 / -1; 
+            grid-row: 1 / -1;    
+            width: 100%;
+            height: auto;
+            max-height: 350px;
+            object-fit: cover;
+            filter: brightness(0.7);
+        }
+        
+        .info-taller {
+            grid-column: 1 / -1;
+            grid-row: 1 / -1;
+            z-index: 1; 
+            display: grid;
+            align-content: center;
+            justify-items: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 3.2rem;
+            color: var(--color-acento); 
+            text-shadow: 0 0 15px rgba(60, 42, 30, 0.9);
+        }
+
+        header p {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--color-fondo); 
+            text-shadow: 0 0 10px rgba(60, 42, 30, 0.9);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            margin-top: 3rem;
+            border-top: 2px solid rgba(60, 42, 30, 0.1);
+            font-size: 0.9rem;
+            color: #6c5d53;
+        }
+        
+        .contacto-email {
+            color: var(--color-titulos);
+            font-style: italic;
+            font-weight: 600;
+        }
+
+        /* ------------------- */
+        /* SISTEMA DE PESTAÑAS */
+        /* ------------------- */
+        .tab-nav-wrapper {
+            background-color: var(--color-texto);
+            padding: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .tab-nav {
+            display: flex;
+            margin: 0 auto;
+            max-width: 1100px;
+            overflow-x: auto;
+        }
+
+        .tab-link {
+            font-family: var(--fuente-titulos);
+            background-color: transparent;
+            border: none;
+            padding: 1.2rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--color-fondo);
+            opacity: 0.7;
+            flex: 1;
+            min-width: 110px;
+            text-align: center;
+            transition: 0.2s ease;
+        }
+        
+        .tab-link:hover { opacity: 1; }
+        .tab-link.active {
+            opacity: 1;
+            color: #fff;
+            box-shadow: inset 0 -4px 0 var(--color-acento);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* --------------------------- */
+        /* PESTAÑA: ÍNDICE TARJETAS    */
+        /* --------------------------- */
+        .index-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.2rem;
+            padding-top: 1rem;
+        }
+        
+        .index-card {
+            background-color: #f7efe1;
+            border: 1px solid rgba(60, 42, 30, 0.1);
+            border-radius: 8px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: 0.2s ease;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 160px;
+        }
+        
+        .index-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(60, 42, 30, 0.1);
+        }
+        
+        .index-card span {
+            font-family: var(--fuente-titulos);
+            color: var(--color-titulos);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-variant: small-caps;
+            font-size: 1.2rem;
+            display: block;
+        }
+        
+        .index-card p {
+            font-size: 0.85rem;
+            margin-bottom: 0;
+        }
+
+        /* ------------------- */
+        /* ACORDEONES LINEALES */
+        /* ------------------- */
+        details {
+            border: 1px solid rgba(60, 42, 30, 0.15);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            background: rgba(255, 255, 255, 0.4);
+            overflow: hidden;
+            transition: background 0.3s ease;
+        }
+
+        details[open] {
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(60, 42, 30, 0.05);
+        }
+        
+        summary {
+            font-family: var(--fuente-titulos);
+            font-size: 1.3rem;
+            color: var(--color-titulos);
+            padding: 1.2rem 1.5rem;
+            cursor: pointer;
+            position: relative;
+            list-style: none;
+            outline: none;
+        }
+
+        summary:hover { background-color: rgba(228, 155, 15, 0.05); }
+        summary::-webkit-details-marker { display: none; }
+        
+        summary::after {
+            content: '+';
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-acento);
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        details[open] > summary::after { content: '−'; }
+
+        .details-content {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(60, 42, 30, 0.1);
+        }
+
+        .details-content details {
+            margin-top: 1rem;
+            margin-bottom: 0;
+            background-color: rgba(60, 42, 30, 0.02);
+            border-color: rgba(60, 42, 30, 0.1);
+        }
+
+        .details-content details summary {
+            font-size: 1.1rem;
+            padding: 0.8rem 1.2rem;
+            color: var(--color-texto);
+        }
+
+        .nested-inner-content {
+            padding: 1.2rem;
+            background-color: #fff;
+        }
+
+        /* --------------------------- */
+        /* TABLAS Y OTROS ELEMENTOS    */
+        /* --------------------------- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+            background-color: #fff;
+        }
+
+        th, td { border: 1px solid rgba(60, 42, 30, 0.1); padding: 1rem; text-align: left; }
+        th { background-color: var(--color-texto); color: var(--color-fondo); font-family: var(--fuente-titulos); font-variant: small-caps; }
+        tr:nth-child(even) { background-color: rgba(228, 155, 15, 0.03); }
+
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding-top: 1rem;
+        }
+
+        .resource-card {
+            background-color: #fff;
+            border: 1px solid rgba(60, 42, 30, 0.1);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .resource-card h4 { color: var(--color-titulos); font-size: 1.1rem; margin-bottom: 0.5rem; }
+        .resource-card p { font-size: 0.85rem; margin-bottom: 1rem; line-height: 1.5; }
+        .resource-card .date-tag { font-size: 0.75rem; color: #6c5d53; font-weight: 600; margin-bottom: 0.5rem; display: block; }
+        .resource-card .status-tag { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-acento); font-weight: 700; }
+
+        .resource-banner {
+            background-color: var(--color-titulos);
+            color: var(--color-fondo);
+            padding: 2.5rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .resource-banner h3 { color: var(--color-fondo); border: none; margin: 0 0 1rem 0; padding: 0; }
+        .resource-banner p { opacity: 0.9; margin-bottom: 1.5rem; }
+        .btn-notebook {
+            background-color: var(--color-acento);
+            color: var(--color-texto);
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            display: inline-block;
+            transition: 0.3s ease;
+        }
+        .btn-notebook:hover { transform: scale(1.05); background-color: #fff; text-decoration: none; }
+
+        @media (max-width: 768px) {
+            header h1 { font-size: 2.2rem; }
+            header p { font-size: 1.1rem; }
+            summary { font-size: 1.1rem; }
+            table { font-size: 0.75rem; }
+            th, td { padding: 0.5rem; }
+            .tab-link { min-width: 100px; padding: 1rem 0.5rem; font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img class="logo-cabecera" src="https://i.postimg.cc/gjycnBqp/Imagen1.png" alt="Cabecera">
+        <div class="info-taller">
+            <h1>Vibe coding para docentes</h1>
+            <p>Crea tus propias aplicaciones multimedia sin saber programar</p>
+        </div>
+    </header>
+
+    <div class="tab-nav-wrapper">
+        <nav class="tab-nav" role="tablist">
+            <button class="tab-link active" data-target="#seccion-contenidos">Contenidos</button>
+            <button class="tab-link" data-target="#seccion-fundamentos">Fundamentos</button>
+            <button class="tab-link" data-target="#seccion-prompting"><em>Prompting</em></button>
+            <button class="tab-link" data-target="#seccion-miae">Marco <em>MIAE</em></button>
+            <button class="tab-link" data-target="#seccion-vibe"><em>Vibecoding</em></button>
+            <button class="tab-link" data-target="#seccion-taller-practico">Taller práctico</button>
+            <button class="tab-link" data-target="#seccion-recursos">Recursos</button>
+        </nav>
+    </div>
+
+    <main>
+        <!-- PESTAÑA 1: ÍNDICE -->
+        <section id="seccion-contenidos" class="tab-content active">
+            <h2 style="text-align: center; margin-bottom: 2rem; border-bottom: none;">Índice del Taller</h2>
+            <div class="index-grid">
+                <div class="index-card" data-target-tab="seccion-fundamentos">
+                    <span>Fundamentos</span>
+                    <p>La mística de la <em>IA</em>, alucinaciones, sesgos y seguridad en el aula.</p>
+                </div>
+                <div class="index-card" data-target-tab="seccion-prompting">
+                    <span>Prompting</span>
+                    <p>El arte de preguntar: técnica <em>RITA</em> e iteración efectiva.</p>
+                </div>
+                <div class="index-card" data-target-tab="seccion-miae">
+                    <span>Marco MIAE</span>
+                    <p>Niveles de integración de la <em>IA</em> en tareas educativas.</p>
+                </div>
+                <div class="index-card" data-target-tab="seccion-vibe">
+                    <span>Vibecoding</span>
+                    <p>Planificación estratégica y ejemplos prácticos de aplicaciones.</p>
+                </div>
+                <div class="index-card" data-target-tab="seccion-taller-practico">
+                    <span>Taller práctico</span>
+                    <p>Guía paso a paso para crear y publicar tu propio recurso educativo.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 1: FUNDAMENTOS -->
+        <section id="seccion-fundamentos" class="tab-content">
+            <h2>Fundamentos y seguridad</h2>
+            <p>Para trabajar eficazmente con estas herramientas, debemos despojar a la <em>IA</em> de su aura mágica y entender su mecánica real como un proceso de asistencia algorítmica.</p>
+            
+            <details>
+                <summary>La mística y la realidad de la IA</summary>
+                <div class="details-content">
+                    <details>
+                        <summary>Proceso estadístico vs. Magia</summary>
+                        <div class="nested-inner-content">
+                            <p>La <em>IA</em> no "sabe" cosas en el sentido humano; es un sistema que predice la siguiente palabra o píxel más probable basándose en patrones masivos de datos. Comprender que es un <strong>proceso estadístico avanzado</strong> es el primer paso para dominar el <em>vibe coding</em>.</p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>Alucinaciones: El riesgo de la invención</summary>
+                        <div class="nested-inner-content">
+                            <p>Debido a su naturaleza probabilística, la <em>IA</em> puede generar información coherente pero <strong>falsa</strong>. Como docentes, nuestra misión es siempre verificar el resultado; la <em>IA</em> asiste, pero el criterio experto sigue siendo humano.</p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>Sesgos y ética</summary>
+                        <div class="nested-inner-content">
+                            <p>Los modelos reflejan los sesgos de sus datos de entrenamiento. Detectar y corregir estereotipos es fundamental para crear materiales inclusivos y equitativos en el aula.</p>
+                        </div>
+                    </details>
+                </div>
+            </details>
+
+            <details>
+                <summary>Seguridad y privacidad</summary>
+                <div class="details-content">
+                    <p>El uso de la tecnología debe proteger los derechos de menores y profesorado.</p>
+                    <details>
+                        <summary>Protección de datos personales</summary>
+                        <div class="nested-inner-content">
+                            <p>Nunca introduzcas datos reales de alumnos (nombres, fotos, expedientes). Trabaja siempre con datos anonimizados o ficticios.</p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>Entornos seguros</summary>
+                        <div class="nested-inner-content">
+                            <p>Revisa siempre los términos de servicio sobre el uso de tus datos para el reentrenamiento de modelos de terceros.</p>
+                        </div>
+                    </details>
+                </div>
+            </details>
+        </section>
+
+        <!-- SECCIÓN 2: PROMPTING -->
+        <section id="seccion-prompting" class="tab-content">
+            <h2>El arte del <em>prompting</em></h2>
+            <p>El <em>prompting</em> educativo es el diálogo estructurado que permite traducir la intención pedagógica en código funcional.</p>
+            
+            <details>
+                <summary>¿Qué es un prompt?</summary>
+                <div class="details-content">
+                    <p>Un <em>prompt</em> es la instrucción en lenguaje natural que enviamos a la <em>IA</em>. En el <em>vibe coding</em>, el <em>prompt</em> es nuestro código fuente.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>La técnica RITA para educadores</summary>
+                <div class="details-content">
+                    <p>Estructura tus instrucciones siguiendo estos cuatro pilares:</p>
+                    <details><summary><strong>R</strong>ol</summary><div class="nested-inner-content"><p>Define la personalidad de la <em>IA</em>. Ej: "Actúa como un experto en gamificación para Primaria".</p></div></details>
+                    <details><summary><strong>I</strong>nformación</summary><div class="nested-inner-content"><p>Aporta el contexto. Ej: "Alumnos de 8 años con dificultades en comprensión lectora".</p></div></details>
+                    <details><summary><strong>T</strong>area</summary><div class="nested-inner-content"><p>Describe la acción. Ej: "Crea un juego de ordenar frases para formar un cuento".</p></div></details>
+                    <details><summary><strong>A</strong>cción</summary><div class="nested-inner-content"><p>Formato de entrega. Ej: "Genera un único archivo <em>HTML</em> interactivo y responsivo".</p></div></details>
+                </div>
+            </details>
+
+            <details>
+                <summary>El ciclo de iteración</summary>
+                <div class="details-content">
+                    <p>El <em>vibe coding</em> es iterativo. No busques la perfección al primer intento; dialoga con la <em>IA</em> para refinar colores, tamaños y funciones paso a paso.</p>
+                </div>
+            </details>
+        </section>
+
+        <!-- SECCIÓN 3: MARCO MIAE -->
+        <section id="seccion-miae" class="tab-content">
+            <h2>Marco <em>MIAE</em></h2>
+            <p>El <strong>Marco para la Integración de la <em>IA</em> Generativa en las tareas educativas</strong> (de <strong>Juan José de Haro</strong>) ayuda a reflexionar sobre la implicación de la máquina.</p>
+            
+            <details>
+                <summary>Niveles de integración de la IA</summary>
+                <div class="details-content">
+                    <details>
+                        <summary>Nivel 0: Trabajo completamente humano</summary>
+                        <div class="nested-inner-content"><p>Tarea realizada íntegramente por el docente sin intervención de <em>IA</em>.</p></div>
+                    </details>
+                    <details>
+                        <summary>Nivel 1: Asistencia técnica por IA</summary>
+                        <div class="nested-inner-content"><p>La <em>IA</em> ayuda en tareas de formato o traducción, pero no en el contenido lógico.</p></div>
+                    </details>
+                    <details>
+                        <summary>Nivel 2: Planificación asistida por IA</summary>
+                        <div class="nested-inner-content"><p>La <em>IA</em> sugiere esquemas o estructuras iniciales que el docente desarrolla.</p></div>
+                    </details>
+                    <details>
+                        <summary>Nivel 3: Asistencia parcial con control humano</summary>
+                        <div class="nested-inner-content"><p>Se delegan partes de la creación, manteniendo el humano el control del flujo.</p></div>
+                    </details>
+                    <details>
+                        <summary>Nivel 4: Colaboración avanzada humano-IA</summary>
+                        <div class="nested-inner-content"><p>Diálogo continuo para cocrear el producto. Es el nivel típico del <em>vibe coding</em>.</p></div>
+                    </details>
+                    <details>
+                        <summary>Nivel 5: Supervisión humana de IA autónoma</summary>
+                        <div class="nested-inner-content"><p>La <em>IA</em> genera la mayor parte del trabajo y el humano actúa como editor final.</p></div>
+                    </details>
+                </div>
+            </details>
+        </section>
+
+        <!-- SECCIÓN 4: VIBECODING -->
+        <section id="seccion-vibe" class="tab-content">
+            <h2><em>Vibecoding</em> práctico</h2>
+            <p>Programar con lenguaje natural requiere pasar del "cómo se hace" al "qué quiero obtener".</p>
+            
+            <details>
+                <summary>Ejemplos de planificación de proyectos</summary>
+                <div class="details-content">
+                    <table>
+                        <thead>
+                            <tr><th>Qué voy a hacer</th><th>Cómo lo voy a hacer</th><th>Para quién</th><th>Cómo va a funcionar</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Un <em>trivial</em> de geografía.</td><td>Diseño <em>responsivo</em> e iconos grandes.</td><td>3º de Primaria.</td><td>Que cuente errores y elija equipos.</td></tr>
+                            <tr><td>Un rosco de <em>pasapalabra</em>.</td><td>Tonos otoñales y fuentes claras.</td><td>Niños de 3 años (visual).</td><td>Que haga rebotes de tiempo y audio.</td></tr>
+                            <tr><td>Un <em>memory</em> animal.</td><td>Que se ajuste a pantalla.</td><td>Aula de idiomas.</td><td>Que cambie el orden cada partida.</td></tr>
+                            <tr><td>Clon de <em>bamboozle</em>.</td><td>Estilo minimalista, botones color.</td><td>5º de Primaria.</td><td>Que asigne puntos aleatorios.</td></tr>
+                            <tr><td>Baraja de <em>flashcards</em>.</td><td>Fondo crema, interfaz limpia.</td><td>Niños de 4 años.</td><td>Que lea el texto al pulsar.</td></tr>
+                            <tr><td>Clasificador reciclaje.</td><td>Arrastrar y soltar (<em>drag & drop</em>).</td><td>Educación Especial.</td><td>Que emita sonidos de éxito/error.</td></tr>
+                            <tr><td>Generador de historias.</td><td>Tarjetas apiladas.</td><td>6º de Primaria.</td><td>Que mezcle elementos al azar.</td></tr>
+                            <tr><td>Simulador operaciones.</td><td>Estilo calculadora retro.</td><td>2º de Primaria.</td><td>Que genere un diploma al terminar.</td></tr>
+                            <tr><td>Mapa cuerpo humano.</td><td>Etiquetas flotantes y zoom.</td><td>Ciencias Naturales.</td><td>Modo examen: ocultar nombres.</td></tr>
+                            <tr><td>*Escape room* lógico.</td><td>Ambiente café oscuro e inmersivo.</td><td>Enriquecimiento curricular.</td><td>Bloqueo con código de tres dígitos.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+        </section>
+
+        <!-- SECCIÓN 5: TALLER PRÁCTICO -->
+        <section id="seccion-taller-practico" class="tab-content">
+            <h2>Taller práctico</h2>
+            <p>Guía completa para el desarrollo y publicación de tu aplicación educativa.</p>
+
+            <details>
+                <summary>Fase 1: Creación con IA</summary>
+                <div class="details-content">
+                    <details><summary>Paso 1: Entorno</summary><div class="nested-inner-content"><p>Accede a <em>Gemini</em> con tu <strong>cuenta personal</strong> y asegúrate de activar el <strong><em>Canvas</em></strong> (o Lienzo).</p></div></details>
+                    <details><summary>Paso 2: Prompt</summary><div class="nested-inner-content"><p>Indica claramente: "Quiero crear una actividad interactiva en <em>HTML</em>". Especificar <em>HTML</em> es vital para la compatibilidad.</p></div></details>
+                    <details><summary>Paso 3: Iteración</summary><div class="nested-inner-content"><p>Prueba el código en el visor integrado y pide ajustes específicos: "Pon el fondo verde", "Haz el botón más grande", "Corrige el contador".</p></div></details>
+                </div>
+            </details>
+
+            <details>
+                <summary>Fase 2: Publicación (Visor Web-ZIP)</summary>
+                <div class="details-content">
+                    <details><summary>Paso 4: Obtener código</summary><div class="nested-inner-content"><p>En <em>Gemini</em>, selecciona <strong>Compartir</strong> > <strong>Copiar contenido</strong> para obtener todo el bloque de código.</p></div></details>
+                    <details><summary>Paso 5: Crear ZIP</summary><div class="nested-inner-content"><p>Entra en <a href="https://visor-webzip.github.io/" target="_blank">Visor Web-ZIP</a>, elige <strong>Crea un <em>ZIP</em></strong>, pega el código y descárgalo comprimido.</p></div></details>
+                    <details><summary>Paso 6: Nube</summary><div class="nested-inner-content"><p>Sube el archivo <em>ZIP</em> a <em>Google Drive</em>, <em>Dropbox</em> o <em>Github</em> y obtén el enlace de descarga directa configurado como público.</p></div></details>
+                    <details><summary>Paso 7: URL definitiva</summary><div class="nested-inner-content"><p>En la pestaña "Ya tengo un <em>ZIP</em>" del visor, pega el enlace de descarga y genera la dirección de visualización final.</p></div></details>
+                </div>
+            </details>
+
+            <details>
+                <summary>Fase 3: Entrega</summary>
+                <div class="details-content">
+                    <details><summary>Paso 8: Incógnito</summary><div class="nested-inner-content"><p>Verifica que el enlace funciona correctamente abriéndolo en una ventana de incógnito del navegador.</p></div></details>
+                    <details><summary>Paso 9: Teams</summary><div class="nested-inner-content"><p>Envía el enlace final a <strong>Lucía Serrano Palomo</strong> a través del chat de <em>Teams</em> para integrarlo en el repositorio común.</p></div></details>
+                </div>
+            </details>
+
+            <details>
+                <summary>Fase 4: Uso con el alumnado</summary>
+                <div class="details-content">
+                    <details><summary>Panel interactivo</summary><div class="nested-inner-content"><p>Abre el enlace generado en el navegador del panel de clase para trabajar en gran grupo de forma táctil.</p></div></details>
+                    <details><summary>Envío directo</summary><div class="nested-inner-content"><p>Comparte el enlace por cualquier canal; el alumno accederá directamente sin necesidad de registro ni cuentas personales.</p></div></details>
+                    <details>
+                        <summary>Incrustación en Moodle CLM</summary>
+                        <div class="nested-inner-content">
+                            <p>Pasos para integrar la actividad directamente en el curso:</p>
+                            <ol style="padding-left: 1.5rem;">
+                                <li>En <em>Visor Web-ZIP</em>, pulsa en <strong>Insertar en una web</strong> para copiar el código <strong><em>iFrame</em></strong>.</li>
+                                <li>En tu curso de <em>Moodle</em>, añade un recurso tipo <strong>Etiqueta</strong> (o Página).</li>
+                                <li>En el editor de texto, pulsa el icono de <strong>Código HTML</strong> (<code>&lt;/&gt;</code>) y pega el bloque copiado.</li>
+                                <li>Pulsa en <strong>Guardar cambios</strong>. La actividad aparecerá integrada en el cuerpo del curso.</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </details>
+        </section>
+
+        <!-- PESTAÑA 6: RECURSOS -->
+        <section id="seccion-recursos" class="tab-content">
+            <h2>Recursos</h2>
+
+            <div class="resource-banner">
+                <h3>Cuaderno del Taller en Notebook LM</h3>
+                <p>Accede a todos los materiales ampliados, notas y recursos de este taller en un único cuaderno interactivo con asistencia de <em>IA</em>.</p>
+                <a href="https://notebooklm.google.com/notebook/73137102-c88c-44d4-aa15-78d6c1aed030" class="btn-notebook" target="_blank" rel="noopener noreferrer">Acceder al Cuaderno</a>
+            </div>
+            
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <h4>Vibe Coding Educativo</h4>
+                    <p>Categoría del blog sobre creación de recursos multimedia educativos mediante programación por lenguaje natural.</p>
+                    <a href="https://educacion.bilateria.org/category/vibe-coding" target="_blank" rel="noopener noreferrer">Explorar artículos &rarr;</a>
+                </div>
+                <div class="resource-card">
+                    <h4>Visor Web-ZIP (Herramienta)</h4>
+                    <p>Aplicación para publicar y compartir tus recursos <em>web</em> directamente desde tu almacenamiento en la nube.</p>
+                    <a href="https://visor-webzip.github.io/" target="_blank" rel="noopener noreferrer">Ir al visor &rarr;</a>
+                </div>
+                <div class="resource-card">
+                    <h4>Marco MIAE</h4>
+                    <p>Documento de referencia para la integración ética y técnica de la <em>IA</em> generativa en las tareas educativas.</p>
+                    <a href="https://educacion.bilateria.org/marco-para-la-integracion-de-la-ia-generativa-en-las-tareas-educativas-v-2-revisada" target="_blank" rel="noopener noreferrer">Ver publicación &rarr;</a>
+                </div>
+            </div>
+
+            <h3>Repositorio de actividades</h3>
+            <div class="resource-grid">
+                <!-- ORDEN CRONOLÓGICO: FEBRERO A ABRIL -->
+                <div class="resource-card">
+                    <span class="date-tag">02-02-2026</span>
+                    <h4>CEIP San Antonio</h4>
+                    <p>Repositorio de actividades <em>interactivas</em> generadas durante el taller.</p>
+                    <a href="https://lusepa.github.io/vibecoding/sanantonio.html" target="_blank" rel="noopener noreferrer">Acceder &rarr;</a>
+                </div>
+                <div class="resource-card">
+                    <span class="date-tag">23-02-2026</span>
+                    <h4>CEIP San José de Calasanz</h4>
+                    <p>Repositorio de herramientas multimedia del claustro.</p>
+                    <span class="status-tag">Pendiente</span>
+                </div>
+                <div class="resource-card">
+                    <span class="date-tag">23-02-2026</span>
+                    <h4>CEIP Almirante Topete</h4>
+                    <p>Banco compartido de recursos gamificados.</p>
+                    <span class="status-tag">Pendiente</span>
+                </div>
+                <div class="resource-card">
+                    <span class="date-tag">02-03-2026</span>
+                    <h4>CEIP Doña Crisanta</h4>
+                    <p>Aplicaciones educativas y dinámicas interactivas.</p>
+                    <span class="status-tag">Pendiente</span>
+                </div>
+                <div class="resource-card">
+                    <span class="date-tag">13-04-2026</span>
+                    <h4>CRA Alciares</h4>
+                    <p>Recursos multimedia y actividades para el aula virtual.</p>
+                    <span class="status-tag">Pendiente</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Lucía Serrano Palomo - <a href="mailto:lucia.serrano@jccm.es" class="contacto-email"><em>lucia.serrano@jccm.es</em></a></p>
+        <p class="ia-credit">Realizado con la asistencia de IA (vibe coding)</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabLinks = document.querySelectorAll('.tab-link');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const indexCards = document.querySelectorAll('.index-card');
+
+            function switchTab(targetId) {
+                tabLinks.forEach(link => link.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                const targetContent = document.getElementById(targetId);
+                const targetLink = document.querySelector(`[data-target="#${targetId}"]`);
+                
+                if (targetContent) targetContent.classList.add('active');
+                if (targetLink) targetLink.classList.add('active');
+                window.scrollTo(0, 0);
+            }
+
+            tabLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    const targetId = link.getAttribute('data-target').substring(1);
+                    switchTab(targetId);
+                });
+            });
+
+            indexCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const targetId = card.getAttribute('data-target-tab');
+                    switchTab(targetId);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
