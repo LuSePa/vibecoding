@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Version Perfected</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        // Tailwind trae por defecto stone, orange, amber, rose, emerald
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Animaciones base que simulaban tailwindcss-animate en React */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideInRight { from { transform: translateX(1rem); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideInBottom { from { transform: translateY(0.5rem); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideInTop { from { transform: translateY(-0.5rem); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        .animate-zoom-in { animation: zoomIn 0.2s ease-out forwards; }
+        .animate-slide-right { animation: slideInRight 0.3s ease-out forwards; }
+        .animate-slide-bottom { animation: slideInBottom 0.3s ease-out forwards; }
+        .animate-slide-top { animation: slideInTop 0.2s ease-out forwards; }
+
+        /* Estilo para ocultar scrollbars si se requiere */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-amber-50 via-stone-50 to-orange-100 dark:from-stone-950 dark:via-orange-950/10 dark:to-stone-900 text-stone-800 dark:text-stone-100 font-sans flex flex-col items-center py-10 px-4 transition-colors duration-500">
+    
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="w-full max-w-2xl bg-white/80 backdrop-blur-md dark:bg-stone-900/90 border border-orange-200/50 dark:border-stone-800 shadow-xl shadow-orange-900/5 p-8 rounded-lg transition-colors duration-200" id="main-card">
+        
+        <!-- HEADER -->
+        <header class="mb-6 flex justify-between items-end pb-4" id="app-header">
+            <!-- Renderizado por JS -->
+        </header>
+
+        <!-- PLATOS -->
+        <div class="mb-6 pb-6 border-b border-stone-200 dark:border-stone-800" id="plates-section">
+            <!-- Renderizado por JS -->
+        </div>
+
+        <!-- FASE DINÁMICA (Captura, Selección, Acción) -->
+        <div id="phase-container">
+            <!-- Renderizado por JS -->
+        </div>
+    </div>
+
+    <!-- LISTA LARGA -->
+    <div class="w-full max-w-2xl mt-8" id="long-list-section">
+        <!-- Renderizado por JS -->
+    </div>
+
+    <!-- ESTADÍSTICAS -->
+    <div class="w-full max-w-2xl mt-8 mb-12" id="stats-section">
+        <!-- Renderizado por JS -->
+    </div>
+
+    <!-- LÓGICA DE LA APLICACIÓN -->
+    <script>
+        // --- UTILIDADES ---
+        const getToday = () => new Date().toISOString().split('T')[0];
+        const getYesterday = () => {
+            const d = new Date();
+            d.setDate(d.getDate() - 1);
+            return d.toISOString().split('T')[0];
+        };
+        const getFutureDate = (days) => {
+            const d = new Date();
+            d.setDate(d.getDate() + days);
+            return d.toISOString().split('T')[0];
+        };
+        const escapeHTML = (str) => {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag])
+            );
+        };
+
+        const getTrafficLight = (lastActionDate) => {
+            if (lastActionDate === getToday()) return { color: 'bg-emerald-500', text: 'Al día' };
+            if (lastActionDate === getYesterday()) return { color: 'bg-amber-500', text: 'Ayer' };
+            return { color: 'bg-rose-500', text: 'Inactivo' };
+        };
+
+        // Sintetizador de sonido
+        const playTone = (frequency, type = 'sine', duration = 0.1, volume = 0.1) => {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
+                const osc = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+                
+                osc.type = type;
+                osc.frequency.setValueAtTime(frequency, ctx.currentTime);
+                
+                gainNode.gain.setValueAtTime(volume, ctx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+                
+                osc.connect(gainNode);
+                gainNode.connect(ctx.destination);
+                
+                osc.start();
+                osc.stop(ctx.currentTime + duration);
+            } catch (e) {
+                console.error("Audio no soportado:", e);
+            }
+        };
+
+        const playAlarmTone = () => {
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => playTone(800, 'sine', 0.2, 0.1), i * 400);
+                setTimeout(() => playTone(1000, 'sine', 0.2, 0.1), i * 400 + 200);
+            }
+        };
+
+        // --- ESTRUCTURA DE DATOS ---
+        const createNewTask = (text, plateId, scheduledDate = null) => ({
+            id: crypto.randomUUID(),
+            text,
+            status: 'todo',
+            skipCount: 0,
+            createdAt: Date.now(),
+            plateId,
+            scheduledDate,
+            completedAt: null
+        });
+
+        const initialState = {
+            tasks: [],
+            chain: [],
+            plates: [],
+            currentPlateId: null,
+            mode: 'capture',
+            candidateIndex: 0,
+            fastFVP: false,
+            isDarkMode: false,
+            stats: {
+                maxChain: 0, selectYes: 0, selectNo: 0,
+                pomodoroDate: getToday(), pomodorosToday: 0, pomodoroMinutesToday: 0,
+                pomodoroMinutesByPlate: {}, reenteredDate: getToday(), reenteredToday: 0
+            }
+        };
+
+        // Estado Global
+        let state = { ...initialState };
+        
+        // Variables Locales de UI
+        let editingTaskId = null;
+        let showScheduleMenu = false;
+        let showCustomDate = false;
+        let showAdvancedStats = false;
+        let customDateValue = getToday();
+        
+        // Pomodoro Vars
+        let pomodoroDuration = 25 * 60;
+        let pomodoroLeft = 25 * 60;
+        let isPomodoroRunning = false;
+        let isPomodoroAlarm = false;
+        let showCustomPomodoro = false;
+        let pomodoroInterval = null;
+
+        // Cargar desde LocalStorage
+        function loadState() {
+            try {
+                const localData = localStorage.getItem('fvp_app_state_vanilla');
+                if (localData) {
+                    const parsed = JSON.parse(localData);
+                    if (!parsed.plates) { parsed.plates = []; parsed.currentPlateId = null; }
+                    if (!parsed.stats) { parsed.stats = initialState.stats; }
+                    state = parsed;
+                }
+            } catch (e) { console.error("Error cargando estado", e); }
+        }
+
+        function saveState() {
+            localStorage.setItem('fvp_app_state_vanilla', JSON.stringify(state));
+        }
+
+        function rotatePlateHelper() {
+            if (!state.plates || state.plates.length === 0) return state.currentPlateId;
+            const currentIndex = state.plates.findIndex(p => p.id === state.currentPlateId);
+            const nextIndex = (currentIndex + 1) % state.plates.length;
+            return state.plates[nextIndex].id;
+        }
+
+        function findNextTodoIndex(startIndex, plateId) {
+            const todayStr = getToday();
+            for (let i = startIndex; i < state.tasks.length; i++) {
+                const t = state.tasks[i];
+                const isScheduledForFuture = t.scheduledDate && t.scheduledDate > todayStr;
+                if (t.status === 'todo' && t.plateId === plateId && !isScheduledForFuture) return i;
+            }
+            return -1;
+        }
+
+        // --- MOTOR DE REDUCER / ACCIONES ---
+        window.dispatch = function(action) {
+            switch (action.type) {
+                case 'TOGGLE_DARK_MODE':
+                    state.isDarkMode = !state.isDarkMode;
+                    document.documentElement.classList.toggle('dark', state.isDarkMode);
+                    break;
+                case 'TOGGLE_FAST_FVP':
+                    state.fastFVP = !state.fastFVP;
+                    break;
+                case 'ADD_PLATE':
+                    const newPlate = { id: crypto.randomUUID(), name: action.payload, dailyGoal: '', lastActionDate: null };
+                    state.plates.push(newPlate);
+                    if (state.plates.length === 1) state.currentPlateId = newPlate.id;
+                    break;
+                case 'ROTATE_PLATE':
+                    state.currentPlateId = rotatePlateHelper();
+                    break;
+                case 'SET_CURRENT_PLATE':
+                    state.currentPlateId = action.payload;
+                    break;
+                case 'UPDATE_PLATE_GOAL':
+                    const p = state.plates.find(p => p.id === action.payload.id);
+                    if (p) p.dailyGoal = action.payload.goal;
+                    break;
+                case 'ADD_TASK':
+                    state.tasks.push(createNewTask(action.payload.text, action.payload.plateId));
+                    break;
+                case 'ADD_URGENT_TASK':
+                    const uTask = createNewTask(action.payload.text, action.payload.plateId);
+                    state.tasks.push(uTask);
+                    state.chain.push(uTask.id);
+                    state.mode = 'action';
+                    break;
+                case 'START_SELECTION':
+                    const firstTodo = findNextTodoIndex(0, state.currentPlateId);
+                    if (firstTodo === -1) break;
+                    const anchor = state.tasks[firstTodo];
+                    const nextCandidate = findNextTodoIndex(firstTodo + 1, state.currentPlateId);
+                    if (nextCandidate === -1) {
+                        state.chain = [anchor.id];
+                        state.mode = 'action';
+                    } else {
+                        state.chain = [anchor.id];
+                        state.candidateIndex = nextCandidate;
+                        state.mode = 'select';
+                    }
+                    break;
+                case 'SELECT_YES':
+                    const cTask = state.tasks[state.candidateIndex];
+                    state.chain.push(cTask.id);
+                    state.stats.selectYes++;
+                    state.stats.maxChain = Math.max(state.stats.maxChain, state.chain.length);
+                    
+                    if (state.fastFVP) {
+                        state.mode = 'action';
+                    } else {
+                        const nextIdY = findNextTodoIndex(state.candidateIndex + 1, state.currentPlateId);
+                        if (nextIdY === -1) state.mode = 'action';
+                        else state.candidateIndex = nextIdY;
+                    }
+                    break;
+                case 'SELECT_NO':
+                    state.tasks[state.candidateIndex].skipCount++;
+                    state.stats.selectNo++;
+                    const nextIdN = findNextTodoIndex(state.candidateIndex + 1, state.currentPlateId);
+                    if (nextIdN === -1) state.mode = 'action';
+                    else state.candidateIndex = nextIdN;
+                    break;
+                case 'FINISH_CURRENT_TASK':
+                    finishCurrentTask();
+                    break;
+                case 'REENTER_CURRENT_TASK':
+                    reenterCurrentTask(action.payload?.scheduledDate);
+                    break;
+                case 'POMODORO_COMPLETED':
+                    handlePomodoroCompleted(action.payload.minutes, action.payload.plateId);
+                    break;
+                case 'DELETE_TASK':
+                    state.tasks = state.tasks.filter(t => t.id !== action.payload);
+                    break;
+                case 'DISMISS_TASK':
+                    const dt = state.tasks.find(t => t.id === action.payload);
+                    if (dt) dt.status = 'dismissed';
+                    break;
+                case 'EDIT_TASK':
+                    const et = state.tasks.find(t => t.id === action.payload.id);
+                    if (et) et.text = action.payload.text;
+                    break;
+                case 'CLEAR_HISTORY':
+                    state.tasks = state.tasks.filter(t => t.status === 'todo');
+                    break;
+                case 'FACTORY_RESET':
+                    state = { ...initialState, plates: [], tasks: [], stats: { ...initialState.stats } };
+                    break;
+                case 'IMPORT_TXT':
+                    importFromTxt(action.payload);
+                    break;
+            }
+            saveState();
+            renderApp();
+        };
+
+        function finishCurrentTask() {
+            const cid = state.chain[state.chain.length - 1];
+            const tIdx = state.tasks.findIndex(t => t.id === cid);
+            const plateId = state.tasks[tIdx].plateId;
+            
+            state.tasks[tIdx].status = 'done';
+            state.tasks[tIdx].completedAt = getToday();
+            
+            const pIdx = state.plates.findIndex(p => p.id === plateId);
+            if(pIdx !== -1) state.plates[pIdx].lastActionDate = getToday();
+
+            state.chain.pop();
+            const nextIdx = findNextTodoIndex(tIdx + 1, state.currentPlateId);
+
+            if (nextIdx !== -1 && state.chain.length > 0) {
+                state.candidateIndex = nextIdx;
+                state.mode = 'select';
+            } else if (state.chain.length > 0) {
+                state.mode = 'action';
+            } else {
+                state.mode = 'capture';
+                state.currentPlateId = rotatePlateHelper();
+            }
+        }
+
+        function reenterCurrentTask(scheduledDate) {
+            const cid = state.chain[state.chain.length - 1];
+            const tIdx = state.tasks.findIndex(t => t.id === cid);
+            const task = state.tasks[tIdx];
+            
+            const isToday = state.stats.reenteredDate === getToday();
+            state.stats.reenteredToday = isToday ? state.stats.reenteredToday + 1 : 1;
+            state.stats.reenteredDate = getToday();
+
+            state.tasks[tIdx].status = 'done';
+            state.tasks[tIdx].completedAt = getToday();
+            state.tasks.push(createNewTask(task.text, task.plateId, scheduledDate || null));
+
+            const pIdx = state.plates.findIndex(p => p.id === task.plateId);
+            if(pIdx !== -1) state.plates[pIdx].lastActionDate = getToday();
+
+            state.chain.pop();
+            const nextIdx = findNextTodoIndex(tIdx + 1, state.currentPlateId);
+
+            if (nextIdx !== -1 && state.chain.length > 0) {
+                state.candidateIndex = nextIdx;
+                state.mode = 'select';
+            } else if (state.chain.length > 0) {
+                state.mode = 'action';
+            } else {
+                state.mode = 'capture';
+                state.currentPlateId = rotatePlateHelper();
+            }
+        }
+
+        function handlePomodoroCompleted(minutes, plateId) {
+            const isToday = state.stats.pomodoroDate === getToday();
+            state.stats.pomodorosToday = isToday ? state.stats.pomodorosToday + 1 : 1;
+            state.stats.pomodoroMinutesToday = isToday ? state.stats.pomodoroMinutesToday + minutes : minutes;
+            state.stats.pomodoroDate = getToday();
+            
+            const pId = plateId || 'unassigned';
+            if (!state.stats.pomodoroMinutesByPlate) state.stats.pomodoroMinutesByPlate = {};
+            state.stats.pomodoroMinutesByPlate[pId] = (state.stats.pomodoroMinutesByPlate[pId] || 0) + minutes;
+        }
+
+        // --- FUNCIONES INTERFAZ DE USUARIO (Acciones Directas) ---
+        window.handleAddTaskSubmit = function(e) {
+            e.preventDefault();
+            const input = document.getElementById('new-task-input');
+            const select = document.getElementById('plate-select');
+            if (input.value.trim() && state.plates.length > 0) {
+                window.dispatch({ type: 'ADD_TASK', payload: { text: input.value.trim(), plateId: select.value } });
+                // En vez de renderApp total, actualizamos partes para no perder foco
+                renderPhase();
+                renderList();
+                renderStats();
+                lucide.createIcons();
+                setTimeout(() => document.getElementById('new-task-input').focus(), 10);
+            }
+        };
+
+        window.handleAddUrgentClick = function() {
+            const input = document.getElementById('new-task-input');
+            const select = document.getElementById('plate-select');
+            if (input.value.trim() && state.plates.length > 0) {
+                window.dispatch({ type: 'ADD_URGENT_TASK', payload: { text: input.value.trim(), plateId: select.value } });
+            }
+        };
+
+        window.handleAddPlateSubmit = function(e) {
+            e.preventDefault();
+            const input = document.getElementById('new-plate-input');
+            if (input.value.trim()) {
+                window.dispatch({ type: 'ADD_PLATE', payload: input.value.trim() });
+            }
+        };
+
+        window.handleSelectYes = function() {
+            playTone(600, 'sine', 0.15, 0.1);
+            window.dispatch({ type: 'SELECT_YES' });
+        };
+        window.handleSelectNo = function() {
+            playTone(300, 'triangle', 0.15, 0.05);
+            window.dispatch({ type: 'SELECT_NO' });
+        };
+
+        window.startEditingTask = function(id, text) {
+            editingTaskId = id;
+            renderList();
+            setTimeout(() => {
+                const el = document.getElementById('edit-input-' + id);
+                if(el) { el.focus(); el.value = ''; el.value = text; }
+            }, 10);
+        };
+        window.cancelEditingTask = function() {
+            editingTaskId = null;
+            renderList();
+        };
+        window.saveEditingTask = function(id) {
+            const input = document.getElementById('edit-input-' + id);
+            if (input && input.value.trim()) {
+                window.dispatch({ type: 'EDIT_TASK', payload: { id, text: input.value.trim() } });
+            }
+            editingTaskId = null;
+            renderList();
+        };
+        window.handleEditKeyDown = function(e, id) {
+            if (e.key === 'Enter') window.saveEditingTask(id);
+            if (e.key === 'Escape') window.cancelEditingTask();
+        };
+
+        // --- POMODORO LOGIC ---
+        function runPomodoro() {
+            if (isPomodoroRunning && pomodoroLeft > 0) {
+                pomodoroLeft--;
+                updatePomodoroUI();
+            } else if (isPomodoroRunning && pomodoroLeft === 0) {
+                isPomodoroRunning = false;
+                isPomodoroAlarm = true;
+                playAlarmTone();
+                window.dispatch({ type: 'POMODORO_COMPLETED', payload: { minutes: pomodoroDuration / 60, plateId: state.currentPlateId } });
+                updatePomodoroUI();
+            }
+        }
+
+        window.togglePomodoro = function() {
+            if (isPomodoroAlarm) isPomodoroAlarm = false;
+            if (pomodoroLeft === 0) pomodoroLeft = pomodoroDuration;
+            isPomodoroRunning = !isPomodoroRunning;
+            if (isPomodoroRunning) {
+                if(pomodoroInterval) clearInterval(pomodoroInterval);
+                pomodoroInterval = setInterval(runPomodoro, 1000);
+            } else {
+                clearInterval(pomodoroInterval);
+            }
+            renderPhase(); // Actualiza botones UI
+        };
+
+        window.handlePomodoroChange = function(minutes) {
+            if (!minutes || isNaN(minutes) || minutes <= 0) return;
+            pomodoroDuration = minutes * 60;
+            pomodoroLeft = minutes * 60;
+            isPomodoroRunning = false;
+            isPomodoroAlarm = false;
+            showCustomPomodoro = false;
+            clearInterval(pomodoroInterval);
+            renderPhase();
+        };
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        window.submitCustomPomodoro = function(e) {
+            e.preventDefault();
+            const val = document.getElementById('custom-pom-input').value;
+            window.handlePomodoroChange(Number(val));
+        };
+
+        window.stopPomodoroOnTaskEnd = function() {
+            isPomodoroRunning = false;
+            clearInterval(pomodoroInterval);
+        };
+
+        // --- IMPORT/EXPORT ---
+        window.handleExportTxt = function() {
+            const lines = state.tasks.map(t => {
+                let mark = t.status === 'done' ? '[x]' : (t.status === 'dismissed' ? '[-]' : '[ ]');
+                const plate = state.plates.find(p => p.id === t.plateId);
+                const plateName = plate ? `[${plate.name}]` : '';
+                return `${mark} ${plateName} ${t.text}`.trim();
+            });
+            const textContent = `Final Version Perfected - Exportación (${new Date().toLocaleDateString()})\n\n${lines.join('\n')}`;
+            const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'fvp-tareas.txt';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        };
+
+        function importFromTxt(content) {
+            const lines = content.split('\n');
+            lines.forEach(line => {
+                if(!line.trim()) return;
+                let status = 'todo'; let text = line; let plateId = state.currentPlateId;
+                if (text.startsWith('[x]')) { status = 'done'; text = text.replace('[x]', '').trim(); }
+                else if (text.startsWith('[-]')) { status = 'dismissed'; text = text.replace('[-]', '').trim(); }
+                else if (text.startsWith('[ ]')) { status = 'todo'; text = text.replace('[ ]', '').trim(); }
+                const pMatch = text.match(/^\[(.*?)\]/);
+                if (pMatch) {
+                    const pName = pMatch[1];
+                    text = text.replace(`[${pName}]`, '').trim();
+                    let ePlate = state.plates.find(p => p.name.toLowerCase() === pName.toLowerCase());
+                    if (!ePlate) {
+                        ePlate = { id: crypto.randomUUID(), name: pName, lastActionDate: null, dailyGoal: '' };
+                        state.plates.push(ePlate);
+                    }
+                    plateId = ePlate.id;
+                }
+                if (text && plateId) {
+                    const nt = createNewTask(text, plateId);
+                    nt.status = status;
+                    state.tasks.push(nt);
+                }
+            });
+            if(!state.currentPlateId && state.plates.length > 0) state.currentPlateId = state.plates[0].id;
+        }
+
+        window.triggerImport = function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => { window.dispatch({ type: 'IMPORT_TXT', payload: ev.target.result }); };
+            reader.readAsText(file);
+            e.target.value = null;
+        };
+
+        // --- RENDERIZADO DOM ---
+        function renderHeader() {
+            const header = document.getElementById('app-header');
+            header.innerHTML = `
+                <div>
+                    <h1 class="text-2xl font-semibold tracking-tight text-stone-900 dark:text-white">Final Version Perfected</h1>
+                    <p class="text-sm text-stone-500 dark:text-stone-400 mt-1">Preparación psicológica antes que prioridad racional.</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <label class="flex items-center gap-2 text-sm cursor-pointer select-none text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white transition-colors">
+                        <input type="checkbox" ${state.fastFVP ? 'checked' : ''} onchange="window.dispatch({type:'TOGGLE_FAST_FVP'})" class="accent-orange-600 dark:accent-orange-500"/>
+                        Modo Fast FVP
+                    </label>
+                    <button onclick="window.dispatch({type:'TOGGLE_DARK_MODE'})" class="p-2 text-stone-500 dark:text-stone-400 hover:text-orange-600 dark:hover:text-orange-400 transition-colors rounded-sm hover:bg-stone-100 dark:hover:bg-stone-800" title="Alternar modo oscuro">
+                        <i data-lucide="${state.isDarkMode ? 'sun' : 'moon'}" class="w-[18px] h-[18px]"></i>
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderPlates() {
+            const container = document.getElementById('plates-section');
+            let platesHtml = state.plates.map(p => {
+                const tl = getTrafficLight(p.lastActionDate);
+                const isActive = state.currentPlateId === p.id;
+                return `
+                <div class="flex flex-col items-center gap-1 cursor-pointer" onclick="window.dispatch({type:'SET_CURRENT_PLATE', payload:'${p.id}'})">
+                    <div class="px-3 py-1.5 rounded-full text-sm font-medium transition-all ${isActive ? 'bg-orange-700 text-white dark:bg-orange-600 shadow-sm' : 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400 border border-transparent hover:bg-orange-50 dark:hover:bg-stone-700'}">
+                        ${escapeHTML(p.name)}
+                    </div>
+                    <div class="flex items-center gap-1 text-[9px] text-stone-500 uppercase tracking-wider font-semibold">
+                        <span class="w-2 h-2 rounded-full ${tl.color}"></span> ${tl.text}
+                    </div>
+                </div>`;
+            }).join('');
+
+            const cPlate = state.plates.find(p => p.id === state.currentPlateId);
+            
+            container.innerHTML = `
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-xs uppercase tracking-widest text-stone-400 dark:text-stone-500">Platos (proyectos)</h2>
+                    <button onclick="window.dispatch({type:'ROTATE_PLATE'})" class="text-xs flex items-center gap-1 text-stone-500 hover:text-orange-700 dark:hover:text-orange-400 transition-colors">
+                        <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Girar plato
+                    </button>
+                </div>
+                <div class="flex flex-wrap gap-4 items-start">
+                    ${platesHtml}
+                    <form onsubmit="window.handleAddPlateSubmit(event)" class="flex items-center ml-2">
+                        <input type="text" id="new-plate-input" placeholder="+ Nuevo plato" class="text-sm bg-transparent border border-dashed border-stone-300 dark:border-stone-700 rounded-full px-3 py-1.5 w-32 outline-none focus:border-orange-400 dark:focus:border-orange-500 dark:text-white transition-colors" />
+                    </form>
+                </div>
+                ${state.currentPlateId ? `
+                <div class="mt-5 bg-stone-100 dark:bg-stone-800/50 p-3 rounded-sm flex flex-col sm:flex-row sm:items-center gap-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400 shrink-0">Objetivo del día (${escapeHTML(cPlate?.name)}):</span>
+                    <input type="text" value="${escapeHTML(cPlate?.dailyGoal)}" onchange="window.dispatch({type:'UPDATE_PLATE_GOAL', payload:{id:'${state.currentPlateId}', goal:this.value}})" placeholder="Escribe aquí el objetivo principal..." class="flex-1 bg-transparent border-b border-stone-300 dark:border-stone-700 outline-none focus:border-orange-500 dark:focus:border-orange-400 dark:text-white text-sm px-1 py-0.5 transition-colors"/>
+                </div>` : ''}
+            `;
+        }
+
+        function renderPhase() {
+            const container = document.getElementById('phase-container');
+            const cPlateName = state.plates.find(p => p.id === state.currentPlateId)?.name || '';
+            const todayStr = getToday();
+            
+            if (state.mode === 'capture') {
+                const activeCount = state.tasks.filter(t => t.status === 'todo' && t.plateId === state.currentPlateId && (!t.scheduledDate || t.scheduledDate <= todayStr)).length;
+                let optionsHtml = state.plates.map(p => `<option value="${p.id}" ${state.currentPlateId === p.id ? 'selected' : ''}>${escapeHTML(p.name)}</option>`).join('');
+                
+                container.innerHTML = `
+                <div class="animate-slide-bottom">
+                    <form onsubmit="window.handleAddTaskSubmit(event)" class="flex gap-2 mb-8">
+                        <select id="plate-select" ${state.plates.length === 0 ? 'disabled' : ''} class="p-3 bg-stone-100 dark:bg-stone-800 border-none outline-none focus:ring-2 focus:ring-orange-200 dark:focus:ring-orange-900 rounded-sm dark:text-white text-sm shrink-0 cursor-pointer disabled:opacity-50">
+                            ${state.plates.length === 0 ? '<option value="">Sin platos</option>' : optionsHtml}
+                        </select>
+                        <input id="new-task-input" type="text" placeholder="${state.plates.length === 0 ? 'Añade un plato primero...' : 'Añade cualquier tarea sin clasificar...'}" ${state.plates.length === 0 ? 'disabled' : ''} class="flex-1 p-3 bg-stone-100 dark:bg-stone-800 border-none outline-none focus:ring-2 focus:ring-orange-200 dark:focus:ring-orange-900 rounded-sm dark:text-white dark:placeholder-stone-400 disabled:opacity-50 transition-shadow" />
+                        <button type="submit" ${state.plates.length === 0 ? 'disabled' : ''} class="p-3 bg-orange-700 dark:bg-orange-600 text-white rounded-sm hover:bg-orange-800 dark:hover:bg-orange-700 transition-colors flex items-center justify-center disabled:opacity-50" title="Añadir a la lista">
+                            <i data-lucide="plus" class="w-5 h-5"></i>
+                        </button>
+                        <button type="button" onclick="window.handleAddUrgentClick()" ${state.plates.length === 0 ? 'disabled' : ''} class="p-3 border border-rose-300 dark:border-rose-900 text-rose-600 dark:text-rose-400 rounded-sm hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors flex items-center justify-center font-medium text-sm disabled:opacity-50" title="Marcar como urgente (saltar a la acción)">
+                            Urgente
+                        </button>
+                    </form>
+                    ${state.plates.length > 0 && activeCount > 0 ? `
+                    <div class="text-center mt-8">
+                        <button onclick="window.dispatch({type:'START_SELECTION'})" class="bg-orange-700 dark:bg-orange-600 text-white px-8 py-3 rounded-sm font-medium tracking-wide hover:bg-orange-800 dark:hover:bg-orange-700 transition-transform active:scale-95 flex items-center gap-2 mx-auto shadow-sm hover:shadow-md">
+                            <i data-lucide="play" class="w-[18px] h-[18px]"></i> Iniciar preselección (${escapeHTML(cPlateName)})
+                        </button>
+                    </div>` : (state.plates.length > 0 ? `
+                    <div class="text-center mt-8 text-sm text-stone-500 dark:text-stone-400">
+                        No hay tareas pendientes en este plato para hoy.
+                        <button onclick="window.dispatch({type:'ROTATE_PLATE'})" class="ml-2 underline text-orange-700 dark:text-orange-400 hover:text-orange-800">Girar plato</button>
+                    </div>` : '')}
+                </div>`;
+            } 
+            else if (state.mode === 'select') {
+                const cTask = state.tasks[state.candidateIndex];
+                const anchorTask = state.tasks.find(t => t.id === state.chain[state.chain.length - 1]);
+                container.innerHTML = `
+                <div class="py-10 flex flex-col items-center text-center animate-zoom-in">
+                    <h2 class="text-stone-500 dark:text-stone-400 uppercase tracking-widest text-xs mb-6">Comparación</h2>
+                    <p class="text-lg text-stone-600 dark:text-stone-300 mb-8">¿Quieres o puedes hacer esto <strong class="text-stone-900 dark:text-white border-b border-stone-900 dark:border-white">ANTES</strong> que la tarea marcada?</p>
+                    
+                    <div class="bg-stone-100 dark:bg-stone-800 w-full p-6 rounded-sm border border-stone-200 dark:border-stone-700 mb-8 relative">
+                        <span class="absolute top-2 left-3 text-[10px] uppercase tracking-wider text-stone-400 dark:text-stone-500">${escapeHTML(cPlateName)}</span>
+                        <span class="text-xs text-stone-400 dark:text-stone-500 block mb-2 mt-2">Tarea a evaluar:</span>
+                        <p class="text-2xl font-medium text-stone-900 dark:text-stone-100">${escapeHTML(cTask?.text)}</p>
+                    </div>
+
+                    <div class="opacity-50 flex items-center gap-3 mb-12">
+                        <span class="text-xs uppercase tracking-widest text-stone-600 dark:text-stone-400">Marcada actual:</span>
+                        <span class="line-through text-stone-600 dark:text-stone-400">${escapeHTML(anchorTask?.text)}</span>
+                    </div>
+
+                    <div class="flex gap-4 w-full justify-center">
+                        <button onclick="window.handleSelectNo()" class="flex-1 max-w-[200px] p-4 border border-stone-300 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 rounded-sm flex flex-col items-center gap-2 transition-colors">
+                            <span class="font-semibold text-lg">No</span>
+                            <span class="text-xs opacity-50">Flecha abajo ↓</span>
+                        </button>
+                        <button onclick="window.handleSelectYes()" class="flex-1 max-w-[200px] p-4 bg-orange-700 dark:bg-orange-600 text-white hover:bg-orange-800 dark:hover:bg-orange-700 rounded-sm flex flex-col items-center gap-2 transition-colors shadow-md">
+                            <span class="font-semibold text-lg">Sí, la marco</span>
+                            <span class="text-xs opacity-70">Flecha derecha →</span>
+                        </button>
+                    </div>
+                </div>`;
+            }
+            else if (state.mode === 'action') {
+                const aTask = state.tasks.find(t => t.id === state.chain[state.chain.length - 1]);
+                const chainHtml = state.chain.map((id, index) => {
+                    const t = state.tasks.find(tx => tx.id === id);
+                    const isTop = index === state.chain.length - 1;
+                    return `<div class="text-sm truncate pl-3 border-l-2 transition-all ${isTop ? 'border-orange-700 dark:border-orange-500 font-medium text-orange-800 dark:text-orange-300 scale-105 origin-left' : 'border-stone-200 dark:border-stone-800 text-stone-400 dark:text-stone-500'}">${escapeHTML(t?.text)}</div>`;
+                }).join('');
+
+                const pBtnsHtml = [5, 15, 25, 50].map(min => `
+                    <button onclick="window.handlePomodoroChange(${min})" class="text-xs px-2.5 py-1 rounded-sm transition-colors ${pomodoroDuration === min*60 ? 'bg-orange-700 text-white dark:bg-orange-600' : 'bg-stone-100 text-stone-600 hover:bg-orange-100 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700'}">${min}m</button>
+                `).join('');
+
+                const customPomHtml = showCustomPomodoro 
+                    ? `<form onsubmit="window.submitCustomPomodoro(event)" class="flex items-center gap-1 ml-1"><input type="number" min="1" id="custom-pom-input" class="w-12 text-xs px-1.5 py-1 rounded-sm bg-stone-100 dark:bg-stone-800 border border-stone-300 dark:border-stone-600 outline-none dark:text-white" placeholder="Min"/><button type="submit" class="text-xs bg-orange-700 dark:bg-orange-600 text-white px-2 py-1 rounded-sm">Ok</button></form>`
+                    : `<button onclick="showCustomPomodoro=true; renderPhase(); lucide.createIcons(); setTimeout(()=>document.getElementById('custom-pom-input').focus(),10)" class="text-xs px-2.5 py-1 rounded-sm transition-colors ml-1 ${![5,15,25,50].includes(pomodoroDuration/60) ? 'bg-orange-700 text-white dark:bg-orange-600' : 'bg-stone-100 text-stone-600 hover:bg-orange-100 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700'}">Otro</button>`;
+
+                const scheduleMenuHtml = showScheduleMenu ? `
+                    <div class="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 shadow-lg rounded-sm z-10 p-1 flex flex-col gap-1 text-sm animate-zoom-in">
+                        ${!showCustomDate ? `
+                            <button onclick="window.stopPomodoroOnTaskEnd(); window.dispatch({type:'REENTER_CURRENT_TASK', payload:{scheduledDate:'${getFutureDate(1)}'}})" class="p-2 text-left hover:bg-orange-50 dark:hover:bg-stone-800 rounded-sm text-stone-700 dark:text-stone-300">Mañana</button>
+                            <button onclick="window.stopPomodoroOnTaskEnd(); window.dispatch({type:'REENTER_CURRENT_TASK', payload:{scheduledDate:'${getFutureDate(2)}'}})" class="p-2 text-left hover:bg-orange-50 dark:hover:bg-stone-800 rounded-sm text-stone-700 dark:text-stone-300">En 2 días</button>
+                            <button onclick="window.stopPomodoroOnTaskEnd(); window.dispatch({type:'REENTER_CURRENT_TASK', payload:{scheduledDate:'${getFutureDate(3)}'}})" class="p-2 text-left hover:bg-orange-50 dark:hover:bg-stone-800 rounded-sm text-stone-700 dark:text-stone-300">En 3 días</button>
+                            <button onclick="window.stopPomodoroOnTaskEnd(); window.dispatch({type:'REENTER_CURRENT_TASK', payload:{scheduledDate:'${getFutureDate(7)}'}})" class="p-2 text-left hover:bg-orange-50 dark:hover:bg-stone-800 rounded-sm text-stone-700 dark:text-stone-300">En 1 semana</button>
+                            <div class="h-px bg-stone-200 dark:bg-stone-700 my-1"></div>
+                            <button onclick="showCustomDate=true; renderPhase(); lucide.createIcons();" class="p-2 text-left hover:bg-orange-50 dark:hover:bg-stone-800 rounded-sm text-stone-700 dark:text-stone-300 font-medium">Elegir fecha...</button>
+                        ` : `
+                            <div class="p-2 flex flex-col gap-2">
+                                <input type="date" value="${customDateValue}" onchange="customDateValue=this.value" class="w-full bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-white p-2 rounded-sm outline-none border border-transparent focus:border-orange-300 dark:focus:border-orange-600"/>
+                                <div class="flex gap-1">
+                                    <button onclick="window.stopPomodoroOnTaskEnd(); window.dispatch({type:'REENTER_CURRENT_TASK', payload:{scheduledDate:customDateValue}})" class="flex-1 bg-orange-700 dark:bg-orange-600 text-white p-1.5 rounded-sm">Guardar</button>
+                                    <button onclick="showCustomDate=false; renderPhase(); lucide.createIcons();" class="flex-1 border border-stone-300 dark:border-stone-700 text-stone-600 dark:text-stone-400 p-1.5 rounded-sm">Atrás</button>
+                                </div>
+                            </div>
+                        `}
+                    </div>` : '';
+
+                container.innerHTML = `
+                <div class="py-6 animate-slide-right">
+                    <div class="flex items-start gap-6">
+                        <div class="w-1/3 border-r border-stone-200 dark:border-stone-800 pr-6 flex flex-col">
+                            <h3 class="text-xs uppercase tracking-widest text-stone-400 dark:text-stone-500 mb-4">Cadena de acción</h3>
+                            <div class="flex flex-col gap-3">${chainHtml}</div>
+                        </div>
+                        <div class="w-2/3 pl-2">
+                            <h2 class="text-orange-700 dark:text-orange-400 uppercase tracking-widest text-xs mb-4 flex items-center gap-2">
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i> Haz esto ahora
+                            </h2>
+                            <p class="text-3xl font-medium leading-tight mb-10 text-stone-900 dark:text-white">${escapeHTML(aTask?.text)}</p>
+                            
+                            <div class="flex flex-col gap-3">
+                                <button onclick="window.stopPomodoroOnTaskEnd(); window.dispatch({type:'FINISH_CURRENT_TASK'})" class="w-full p-4 bg-orange-700 dark:bg-orange-600 text-white hover:bg-orange-800 dark:hover:bg-orange-700 rounded-sm flex items-center justify-center gap-2 font-medium shadow-sm">
+                                    <i data-lucide="check-circle-2" class="w-[18px] h-[18px]"></i> Terminada
+                                </button>
+                                <div class="flex flex-col sm:flex-row gap-2 w-full">
+                                    <button onclick="window.stopPomodoroOnTaskEnd(); window.dispatch({type:'REENTER_CURRENT_TASK'})" class="flex-1 p-3 border border-stone-300 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 rounded-sm flex items-center justify-center gap-2 font-medium" title="Reingresar al final">
+                                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reingresar (hoy)
+                                    </button>
+                                    <div class="relative flex-1">
+                                        <button onclick="showScheduleMenu=!showScheduleMenu; renderPhase(); lucide.createIcons();" class="w-full p-3 border border-stone-300 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 rounded-sm flex items-center justify-center gap-2 font-medium transition-colors">
+                                            <i data-lucide="calendar" class="w-4 h-4"></i> Programar...
+                                        </button>
+                                        ${scheduleMenuHtml}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 p-5 rounded-sm border transition-all duration-500 shadow-sm ${isPomodoroAlarm ? 'bg-rose-50 border-rose-400 dark:bg-rose-900/30 dark:border-rose-500 animate-pulse scale-[1.02]' : 'bg-white/90 dark:bg-stone-900/80 border-stone-200 dark:border-stone-800'}">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-xs uppercase tracking-widest text-stone-500 dark:text-stone-400 font-semibold flex items-center gap-2">
+                                        <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-500"></i> Pomodoro
+                                    </h3>
+                                    <div class="flex gap-1 items-center">
+                                        ${pBtnsHtml} ${customPomHtml}
+                                    </div>
+                                </div>
+                                <div class="w-full h-1.5 bg-stone-100 dark:bg-stone-800 rounded-full overflow-hidden mb-4">
+                                    <div id="pomodoro-progress" class="h-full bg-orange-500 dark:bg-orange-400 transition-all duration-1000 ease-linear" style="width: ${pomodoroDuration>0 ? ((pomodoroDuration-pomodoroLeft)/pomodoroDuration)*100 : 0}%"></div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div id="pomodoro-display" class="text-4xl font-mono font-bold tracking-tight ${isPomodoroAlarm ? 'text-rose-600 dark:text-rose-400' : 'text-stone-900 dark:text-white'}">
+                                        ${formatTime(pomodoroLeft)}
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button onclick="window.togglePomodoro()" class="p-3 rounded-full flex items-center justify-center transition-colors ${isPomodoroRunning ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400'}">
+                                            ${isPomodoroRunning ? '<i data-lucide="pause" class="w-5 h-5"></i>' : '<i data-lucide="play" class="w-5 h-5 ml-1"></i>'}
+                                        </button>
+                                        <button onclick="window.handlePomodoroChange(pomodoroDuration/60)" class="p-3 text-stone-500 hover:bg-stone-200 hover:text-stone-900 dark:hover:bg-stone-800 dark:hover:text-white rounded-full transition-colors">
+                                            <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                ${isPomodoroAlarm ? '<p class="mt-3 text-sm text-rose-600 dark:text-rose-400 font-medium text-center bg-rose-100 dark:bg-rose-950/50 py-1.5 rounded-sm">¡Tiempo terminado! Tómate un descanso.</p>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }
+        }
+
+        // Pomodoro UI updates inside the interval
+        function updatePomodoroUI() {
+            const display = document.getElementById('pomodoro-display');
+            const progress = document.getElementById('pomodoro-progress');
+            if(display) display.innerText = formatTime(pomodoroLeft);
+            if(progress) progress.style.width = `${pomodoroDuration>0 ? ((pomodoroDuration-pomodoroLeft)/pomodoroDuration)*100 : 0}%`;
+            if(isPomodoroAlarm) renderPhase(); // Force full re-render for alarm state
+        }
+
+        function renderList() {
+            const container = document.getElementById('long-list-section');
+            const hasHistory = state.tasks.some(t => t.status === 'done' || t.status === 'dismissed');
+            
+            let listHtml = state.tasks.length === 0 ? '<p class="text-stone-400 dark:text-stone-500 italic text-center py-4">La lista está vacía.</p>' : '';
+            
+            state.tasks.forEach((task, idx) => {
+                const tPlate = state.plates.find(p => p.id === task.plateId);
+                const isChain = state.chain.includes(task.id);
+                const todayStr = getToday();
+                const isFuture = task.scheduledDate && task.scheduledDate > todayStr && task.status === 'todo';
+                const isEditing = editingTaskId === task.id;
+
+                const statusClass = task.status === 'done' ? 'opacity-40 line-through' : (task.status === 'dismissed' ? 'opacity-40 bg-rose-50 dark:bg-rose-950/20 line-through text-rose-900 dark:text-rose-200' : 'hover:bg-stone-50 dark:hover:bg-stone-800/50');
+                
+                listHtml += `
+                <div class="flex items-center justify-between p-2 rounded-sm group transition-colors ${statusClass}">
+                    <div class="flex items-center gap-3 overflow-hidden flex-1">
+                        <span class="text-stone-400 dark:text-stone-500 w-5 text-right text-xs shrink-0">${idx + 1}.</span>
+                        ${isChain ? '<i data-lucide="circle" class="fill-orange-700 text-orange-700 dark:fill-orange-500 dark:text-orange-500 shrink-0 w-2.5 h-2.5"></i>' : '<div class="w-2.5 shrink-0"></div>'}
+                        <span class="text-[10px] uppercase tracking-wider bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-500 dark:text-stone-400 px-1.5 py-0.5 rounded-sm shrink-0">${escapeHTML(tPlate?.name || 'Varios')}</span>
+                        ${isFuture ? `<span class="text-[10px] flex items-center gap-1 uppercase tracking-wider bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 px-1.5 py-0.5 rounded-sm shrink-0"><i data-lucide="calendar" class="w-2.5 h-2.5"></i>${task.scheduledDate}</span>` : ''}
+                        
+                        ${isEditing ? `
+                            <div class="flex items-center gap-2 flex-1 mr-2">
+                                <input id="edit-input-${task.id}" type="text" value="${escapeHTML(task.text)}" onkeydown="window.handleEditKeyDown(event, '${task.id}')" class="flex-1 bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-600 rounded-sm px-2 py-1 outline-none focus:ring-1 focus:ring-orange-400 dark:text-white text-sm" />
+                                <button onclick="window.saveEditingTask('${task.id}')" class="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 p-1"><i data-lucide="check" class="w-4 h-4"></i></button>
+                                <button onclick="window.cancelEditingTask()" class="text-stone-400 hover:text-rose-500 p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
+                            </div>
+                        ` : `<span class="truncate text-stone-800 dark:text-stone-200">${escapeHTML(task.text)}</span>`}
+                    </div>
+                    
+                    ${!isEditing ? `
+                    <div class="flex items-center gap-2 shrink-0">
+                        ${task.status === 'todo' ? `<button onclick="window.startEditingTask('${task.id}', \`${escapeHTML(task.text).replace(/`/g, '\\`')}\`)" class="text-stone-400 hover:text-orange-600 dark:hover:text-orange-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>` : ''}
+                        <button onclick="window.dispatch({type:'DELETE_TASK', payload:'${task.id}'})" class="text-stone-400 hover:text-rose-500 dark:hover:text-rose-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                        ${task.status === 'todo' && task.skipCount >= 3 ? `
+                            <span class="text-xs text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30 px-2 py-1 rounded-sm flex items-center gap-1 border border-rose-100 dark:border-rose-900/50"><i data-lucide="alert-triangle" class="w-3 h-3"></i> Saltada ${task.skipCount} veces</span>
+                            <button onclick="window.dispatch({type:'DISMISS_TASK', payload:'${task.id}'})" class="text-xs text-stone-500 hover:text-rose-600 dark:hover:text-rose-400 underline opacity-0 group-hover:opacity-100 transition-opacity">Descartar</button>
+                        ` : ''}
+                    </div>` : ''}
+                </div>`;
+            });
+
+            container.innerHTML = `
+                <div class="flex justify-between items-center mb-4 pl-2">
+                    <h3 class="text-xs uppercase tracking-widest text-stone-400 dark:text-stone-500">La lista larga (registro general)</h3>
+                    <div class="flex gap-2 flex-wrap justify-end">
+                        <label class="text-xs text-stone-500 dark:text-stone-400 hover:text-orange-700 dark:hover:text-orange-400 flex items-center gap-1 transition-colors px-2 py-1 rounded-sm hover:bg-stone-200/50 dark:hover:bg-stone-800 cursor-pointer">
+                            <i data-lucide="upload" class="w-3.5 h-3.5"></i> Importar
+                            <input type="file" accept=".txt" class="hidden" onchange="window.triggerImport(event)" />
+                        </label>
+                        <button onclick="window.handleExportTxt()" class="text-xs text-stone-500 dark:text-stone-400 hover:text-orange-700 dark:hover:text-orange-400 flex items-center gap-1 transition-colors px-2 py-1 rounded-sm hover:bg-stone-200/50 dark:hover:bg-stone-800"><i data-lucide="download" class="w-3.5 h-3.5"></i> Exportar</button>
+                        ${hasHistory ? `<button onclick="window.dispatch({type:'CLEAR_HISTORY'})" class="text-xs text-stone-500 dark:text-stone-400 hover:text-rose-600 dark:hover:text-rose-400 flex items-center gap-1 transition-colors px-2 py-1 rounded-sm hover:bg-rose-50 dark:hover:bg-rose-950/30"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Limpiar historial</button>` : ''}
+                        <button onclick="if(window.confirm('¿Estás seguro de que quieres borrar todos los datos?')) window.dispatch({type:'FACTORY_RESET'})" class="text-xs text-stone-500 dark:text-stone-400 hover:text-rose-600 dark:hover:text-rose-400 flex items-center gap-1 transition-colors px-2 py-1 rounded-sm hover:bg-rose-50 dark:hover:bg-rose-950/30 font-medium">Reiniciar todo</button>
+                    </div>
+                </div>
+                <div class="bg-white/80 backdrop-blur-md dark:bg-stone-900/90 border border-stone-200/50 dark:border-stone-800 rounded-lg p-4 text-sm flex flex-col gap-2 shadow-sm transition-colors duration-200">
+                    ${listHtml}
+                </div>
+            `;
+        }
+
+        function calculateAdvancedStats() {
+            const todayStr = getToday();
+            const pending = state.tasks.filter(t => t.status === 'todo');
+            const done = state.tasks.filter(t => t.status === 'done');
+            const doneT = done.length;
+            const dismissedT = state.tasks.filter(t => t.status === 'dismissed').length;
+            const doneToday = done.filter(t => t.completedAt === todayStr).length;
+
+            const discardRate = doneT + dismissedT > 0 ? Math.round((dismissedT / (doneT + dismissedT)) * 100) : 0;
+            const friction = state.stats.selectYes > 0 ? (state.stats.selectNo / state.stats.selectYes).toFixed(1) : 0;
+            const avgSkips = pending.length > 0 ? (pending.reduce((a, t) => a + t.skipCount, 0) / pending.length).toFixed(1) : 0;
+            const atRisk = pending.filter(t => t.skipCount >= 2).length;
+            const maxChain = state.stats.maxChain || 0;
+            
+            const doneByPlate = done.reduce((acc, t) => { acc[t.plateId] = (acc[t.plateId] || 0) + 1; return acc; }, {});
+            const mostActivePlateId = Object.keys(doneByPlate).sort((a,b) => doneByPlate[b] - doneByPlate[a])[0];
+            const mostActivePlateName = state.plates.find(p => p.id === mostActivePlateId)?.name || 'Ninguno';
+            
+            const neglectedPlate = [...state.plates].sort((a,b) => (a.lastActionDate || '') < (b.lastActionDate || '') ? -1 : 1)[0];
+            const neglectedPlateName = neglectedPlate?.name || 'Ninguno';
+            
+            const greenPlatesCount = state.plates.filter(p => p.lastActionDate === todayStr).length;
+            const balanceRate = state.plates.length > 0 ? Math.round((greenPlatesCount / state.plates.length) * 100) : 0;
+            
+            const doneTodayByPlate = done.filter(t => t.completedAt === todayStr).reduce((acc, t) => { acc[t.plateId] = (acc[t.plateId] || 0) + 1; return acc; }, {});
+            const maxDTPlateId = Object.keys(doneTodayByPlate).sort((a,b) => doneTodayByPlate[b] - doneTodayByPlate[a])[0];
+            const concentration = doneToday > 0 && maxDTPlateId ? Math.round((doneTodayByPlate[maxDTPlateId] / doneToday) * 100) : 0;
+            
+            const pomsToday = state.stats.pomodoroDate === todayStr ? state.stats.pomodorosToday : 0;
+            const focusMinutes = state.stats.pomodoroDate === todayStr ? state.stats.pomodoroMinutesToday : 0;
+            const timePerTask = doneToday > 0 ? Math.round(focusMinutes / doneToday) : 0;
+            
+            const pomsByPlate = state.stats.pomodoroMinutesByPlate || {};
+            const mostFocusedPlateId = Object.keys(pomsByPlate).sort((a,b) => pomsByPlate[b] - pomsByPlate[a])[0];
+            const mostFocusedPlateName = state.plates.find(p => p.id === mostFocusedPlateId)?.name || 'Ninguno';
+            
+            const addedToday = state.tasks.filter(t => new Date(t.createdAt).toISOString().split('T')[0] === todayStr).length;
+            const captureExecution = doneToday > 0 ? (addedToday / doneToday).toFixed(1) : addedToday;
+            
+            const avgAgeDays = pending.length > 0 ? Math.round(pending.reduce((a, t) => a + (Date.now() - t.createdAt), 0) / pending.length / (1000 * 60 * 60 * 24)) : 0;
+            
+            const uniqueDoneDates = [...new Set(done.map(t => t.completedAt).filter(Boolean))].sort((a,b) => b.localeCompare(a));
+            let streak = 0;
+            if (uniqueDoneDates.includes(todayStr) || uniqueDoneDates.includes(getYesterday())) {
+                let checkDate = uniqueDoneDates.includes(todayStr) ? new Date(todayStr) : new Date(getYesterday());
+                while(true) {
+                    if (uniqueDoneDates.includes(checkDate.toISOString().split('T')[0])) {
+                        streak++; checkDate.setDate(checkDate.getDate() - 1);
+                    } else break;
+                }
+            }
+            
+            const reenteredTodayCount = state.stats.reenteredDate === todayStr ? state.stats.reenteredToday : 0;
+            
+            const daysOfWeek = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+            const dayCounts = new Array(7).fill(0);
+            done.forEach(t => { if (t.completedAt) dayCounts[new Date(t.completedAt).getDay()]++; });
+            const bestDayName = Math.max(...dayCounts) > 0 ? daysOfWeek[dayCounts.indexOf(Math.max(...dayCounts))] : 'N/A';
+            
+            const sevenDaysAgo = getFutureDate(-7);
+            const doneLast7Days = done.filter(t => t.completedAt && t.completedAt >= sevenDaysAgo).length;
+
+            return [
+                { l: "Tasa de descarte", v: `${discardRate}%` }, { l: "Fricc. selección", v: `${friction} N/S` },
+                { l: "Saltos promedio", v: avgSkips }, { l: "Tareas en riesgo", v: atRisk },
+                { l: "Cadena máxima", v: maxChain }, { l: "Plato + activo", v: mostActivePlateName },
+                { l: "Plato descuidado", v: neglectedPlateName }, { l: "Equilibrio actual", v: `${balanceRate}%` },
+                { l: "Concentración hoy", v: `${concentration}%` }, { l: "Platos activos", v: greenPlatesCount },
+                { l: "Pomodoros hoy", v: pomsToday }, { l: "Tiempo enfoque", v: `${focusMinutes}m` },
+                { l: "Tiempo / tarea", v: `${timePerTask}m` }, { l: "Plato + enfocado", v: mostFocusedPlateName },
+                { l: "Captura/Ejecución", v: `${captureExecution}x` }, { l: "Edad de lista", v: `${avgAgeDays}d` },
+                { l: "Racha productiva", v: `${streak}d` }, { l: "Reingresos hoy", v: reenteredTodayCount },
+                { l: "Día más fuerte", v: bestDayName }, { l: "Últimos 7 días", v: doneLast7Days }
+            ];
+        }
+
+        function renderStats() {
+            const container = document.getElementById('stats-section');
+            const todayStr = getToday();
+            const doneT = state.tasks.filter(t => t.status === 'done').length;
+            const doneToday = state.tasks.filter(t => t.status === 'done' && t.completedAt === todayStr).length;
+            const pendingT = state.tasks.filter(t => t.status === 'todo').length;
+            const disT = state.tasks.filter(t => t.status === 'dismissed').length;
+
+            let advHtml = '';
+            if (showAdvancedStats) {
+                const adv = calculateAdvancedStats();
+                advHtml = `<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 mt-4 animate-slide-top">
+                    ${adv.map(s => `
+                        <div class="bg-white/80 backdrop-blur-md dark:bg-stone-900/90 border border-stone-200/50 dark:border-stone-800 p-3 rounded-lg shadow-sm flex flex-col items-center text-center justify-center h-20 hover:border-orange-200 dark:hover:border-orange-800 transition-colors">
+                            <span class="text-lg font-semibold text-stone-900 dark:text-white leading-none mb-1.5">${s.v}</span>
+                            <span class="text-[9px] uppercase tracking-wider text-stone-500 leading-tight">${s.l}</span>
+                        </div>
+                    `).join('')}
+                </div>`;
+            }
+
+            container.innerHTML = `
+                <h3 class="text-xs uppercase tracking-widest text-stone-400 dark:text-stone-500 mb-4 pl-2 flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i> Estadísticas</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                    <div class="bg-white/80 backdrop-blur-md dark:bg-stone-900/90 border border-stone-200/50 dark:border-stone-800 p-4 rounded-lg shadow-sm flex flex-col items-center justify-center">
+                        <span class="text-3xl font-semibold text-orange-600 dark:text-orange-400">${doneToday}</span>
+                        <span class="text-[10px] uppercase tracking-wider text-stone-500 mt-1">Completadas hoy</span>
+                    </div>
+                    <div class="bg-white/80 backdrop-blur-md dark:bg-stone-900/90 border border-stone-200/50 dark:border-stone-800 p-4 rounded-lg shadow-sm flex flex-col items-center justify-center">
+                        <span class="text-3xl font-semibold text-amber-600 dark:text-amber-500">${doneT}</span>
+                        <span class="text-[10px] uppercase tracking-wider text-stone-500 mt-1">Completadas total</span>
+                    </div>
+                    <div class="bg-white/80 backdrop-blur-md dark:bg-stone-900/90 border border-stone-200/50 dark:border-stone-800 p-4 rounded-lg shadow-sm flex flex-col items-center justify-center">
+                        <span class="text-3xl font-semibold text-stone-700 dark:text-stone-300">${pendingT}</span>
+                        <span class="text-[10px] uppercase tracking-wider text-stone-500 mt-1">Pendientes</span>
+                    </div>
+                    <div class="bg-white/80 backdrop-blur-md dark:bg-stone-900/90 border border-stone-200/50 dark:border-stone-800 p-4 rounded-lg shadow-sm flex flex-col items-center justify-center">
+                        <span class="text-3xl font-semibold text-rose-600 dark:text-rose-400">${disT}</span>
+                        <span class="text-[10px] uppercase tracking-wider text-stone-500 mt-1">Descartadas</span>
+                    </div>
+                </div>
+                <button onclick="showAdvancedStats=!showAdvancedStats; renderStats(); lucide.createIcons();" class="w-full flex items-center justify-center gap-2 p-3 text-sm text-stone-500 hover:text-orange-700 dark:text-stone-400 dark:hover:text-orange-400 transition-colors border border-transparent hover:border-stone-200 dark:hover:border-stone-800 rounded-lg bg-white/80 backdrop-blur-md dark:bg-stone-900/90 shadow-sm">
+                    <i data-lucide="${showAdvancedStats ? 'chevron-up' : 'chevron-down'}" class="w-4 h-4"></i>
+                    ${showAdvancedStats ? 'Ocultar métricas avanzadas' : 'Ver 20 métricas avanzadas'}
+                </button>
+                ${advHtml}
+            `;
+        }
+
+        // --- INICIALIZADOR ---
+        function renderApp() {
+            renderHeader();
+            renderPlates();
+            renderPhase();
+            renderList();
+            renderStats();
+            lucide.createIcons();
+            document.documentElement.classList.toggle('dark', state.isDarkMode);
+        }
+
+        // Bind keyboard shortcuts
+        window.addEventListener('keydown', (e) => {
+            if (state.mode === 'select' && editingTaskId === null) {
+                if (e.key === 'ArrowRight') window.handleSelectYes();
+                else if (e.key === 'ArrowDown') window.handleSelectNo();
+            }
+        });
+
+        // Inicio automático
+        window.onload = () => {
+            loadState();
+            renderApp();
+        };
+    </script>
+</body>
+</html>
