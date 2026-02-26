@@ -25,6 +25,7 @@
         @keyframes slideInBottom { from { transform: translateY(0.5rem); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes slideInTop { from { transform: translateY(-0.5rem); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes pulseLeaf { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+        @keyframes spinSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         
         .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
         .animate-zoom-in { animation: zoomIn 0.2s ease-out forwards; }
@@ -32,13 +33,30 @@
         .animate-slide-bottom { animation: slideInBottom 0.3s ease-out forwards; }
         .animate-slide-top { animation: slideInTop 0.2s ease-out forwards; }
         .animate-pulse-leaf { animation: pulseLeaf 2s infinite ease-in-out; display: inline-block; }
+        .animate-spin-slow { animation: spinSlow 2s linear infinite; }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body id="app-body" class="min-h-screen font-sans flex flex-col items-center py-6 sm:py-10 px-3 sm:px-4 transition-colors duration-500">
+<body id="app-body" class="min-h-screen font-sans flex flex-col items-center py-6 sm:py-10 px-3 sm:px-4 transition-colors duration-500 relative">
     
+    <!-- PANTALLA DE ACCESO -->
+    <div id="login-overlay" class="fixed inset-0 bg-stone-950 z-[100] flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="bg-white dark:bg-stone-900 p-8 rounded-lg shadow-2xl w-full max-w-sm text-center mx-4 border border-stone-200 dark:border-stone-800">
+            <div class="flex justify-center mb-4">
+                <i data-lucide="lock" class="w-8 h-8 text-orange-600 dark:text-orange-500"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-stone-900 dark:text-white mb-2">Acceso Seguro</h1>
+            <p class="text-sm text-stone-500 dark:text-stone-400 mb-6">Por favor, introduce tu contraseña.</p>
+            <form onsubmit="window.handleLogin(event)" class="flex flex-col gap-4">
+                <input type="password" id="app-password-input" placeholder="Contraseña..." class="w-full bg-stone-50 dark:bg-stone-950 border border-stone-300 dark:border-stone-700 rounded-sm p-3 text-center outline-none focus:border-orange-500 dark:focus:border-orange-500 dark:text-white transition-colors" autofocus />
+                <button type="submit" class="w-full bg-orange-700 hover:bg-orange-800 text-white font-medium p-3 rounded-sm transition-colors">Entrar</button>
+            </form>
+            <p id="login-error" class="text-rose-500 text-xs mt-4 hidden">Contraseña incorrecta. Inténtalo de nuevo.</p>
+        </div>
+    </div>
+
     <!-- CONTENEDOR PRINCIPAL -->
     <div class="w-full max-w-2xl bg-white/80 backdrop-blur-md dark:bg-stone-900/90 shadow-xl p-4 sm:p-8 rounded-lg transition-all duration-300 border" id="main-card">
         
@@ -68,8 +86,40 @@
         <!-- Renderizado por JS -->
     </div>
 
+    <!-- MODAL DE SINCRONIZACIÓN EN LA NUBE -->
+    <div id="sync-modal-container" class="fixed inset-0 bg-stone-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300 px-4">
+        <!-- Renderizado por JS -->
+    </div>
+
     <!-- LÓGICA DE LA APLICACIÓN -->
     <script>
+        // --- SEGURIDAD LOCAL ---
+        const APP_PASSWORD = "LuSePa@finalversion.ja";
+        
+        window.handleLogin = function(e) {
+            e.preventDefault();
+            const input = document.getElementById('app-password-input').value;
+            const errorMsg = document.getElementById('login-error');
+            
+            if (input === APP_PASSWORD) {
+                sessionStorage.setItem('fvp_auth_v1', 'true');
+                const overlay = document.getElementById('login-overlay');
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 500);
+                
+                // Solicitar permisos de notificación tras interacción del usuario
+                if ("Notification" in window && Notification.permission === "default") {
+                    Notification.requestPermission();
+                }
+            } else {
+                errorMsg.classList.remove('hidden');
+                setTimeout(() => errorMsg.classList.add('hidden'), 3000);
+                document.getElementById('app-password-input').value = '';
+            }
+        };
+
         // --- CONFIGURACIÓN DE TEMAS ---
         const themeConfig = {
             autumn: {
@@ -193,7 +243,7 @@
             estimatedTime: 0,
             timeSpent: 0,
             completedAt: null,
-            blockedBy: '' // Feature 7: Dependencias
+            blockedBy: '' 
         });
 
         const initialState = {
@@ -207,9 +257,10 @@
             isDarkMode: false,
             zenMode: false,
             listTab: 'all',
-            theme: 'autumn', // Feature 9: Selector de temas
+            theme: 'autumn',
             excludedPlatesForRound: [],
-            journal: {}, // Feature 10: Diario
+            journal: {},
+            syncSettings: { url: '', pin: '' }, // Ajuste 1: Nube y PIN local
             stats: {
                 maxChain: 0, selectYes: 0, selectNo: 0,
                 pomodoroDate: getToday(), pomodorosToday: 0, pomodoroMinutesToday: 0,
@@ -227,6 +278,10 @@
         let expandedNotes = {}; 
         let showJournalInput = false;
         
+        // Variables UI Nube
+        let isSyncModalOpen = false;
+        let isSyncing = false;
+        
         let pomodoroDuration = 25 * 60;
         let pomodoroLeft = 25 * 60;
         let isPomodoroRunning = false;
@@ -238,7 +293,7 @@
         // Cargar desde LocalStorage
         function loadState() {
             try {
-                const localData = localStorage.getItem('fvp_app_state_vanilla_v3');
+                const localData = localStorage.getItem('fvp_app_state_vanilla_v4');
                 if (localData) {
                     const parsed = JSON.parse(localData);
                     if (!parsed.plates) { parsed.plates = []; parsed.currentPlateId = null; }
@@ -246,6 +301,7 @@
                     if (!parsed.excludedPlatesForRound) parsed.excludedPlatesForRound = [];
                     if (!parsed.journal) parsed.journal = {};
                     if (!parsed.theme) parsed.theme = 'autumn';
+                    if (!parsed.syncSettings) parsed.syncSettings = { url: '', pin: '' };
                     parsed.tasks.forEach(t => {
                         if (t.blockedBy === undefined) t.blockedBy = '';
                     });
@@ -255,7 +311,7 @@
         }
 
         function saveState() {
-            localStorage.setItem('fvp_app_state_vanilla_v3', JSON.stringify(state));
+            localStorage.setItem('fvp_app_state_vanilla_v4', JSON.stringify(state));
         }
 
         function findNextTodoIndex(startIndex) {
@@ -290,6 +346,20 @@
                     break;
                 case 'SET_LIST_TAB':
                     state.listTab = action.payload;
+                    break;
+                case 'SAVE_SYNC_SETTINGS':
+                    state.syncSettings = action.payload;
+                    break;
+                case 'OVERWRITE_STATE_FROM_CLOUD':
+                    // Reemplazamos los datos esenciales, mantenemos configuración UI local
+                    state.tasks = action.payload.tasks || [];
+                    state.plates = action.payload.plates || [];
+                    state.stats = action.payload.stats || initialState.stats;
+                    state.journal = action.payload.journal || {};
+                    // Resetear máquina de estados FVP para evitar desajustes
+                    state.mode = 'capture';
+                    state.chain = [];
+                    state.currentPlateId = state.plates.length > 0 ? state.plates[0].id : null;
                     break;
                 case 'ADD_PLATE':
                     const newPlate = { id: crypto.randomUUID(), name: action.payload, dailyGoal: '', lastActionDate: null };
@@ -399,7 +469,7 @@
                     state.tasks = state.tasks.filter(t => t.status === 'todo');
                     break;
                 case 'FACTORY_RESET':
-                    state = { ...initialState, plates: [], tasks: [], stats: { ...initialState.stats }, journal: {} };
+                    state = { ...initialState, plates: [], tasks: [], stats: { ...initialState.stats }, journal: {}, syncSettings: state.syncSettings };
                     break;
                 case 'IMPORT_TXT':
                     importFromTxt(action.payload);
@@ -429,7 +499,7 @@
                 const recTask = createNewTask(task.text, task.plateId, nextDate.toISOString().split('T')[0], task.recurrence);
                 recTask.notes = task.notes; 
                 recTask.estimatedTime = task.estimatedTime;
-                recTask.blockedBy = ''; // Desvincular bloqueo en la copia
+                recTask.blockedBy = ''; 
                 state.tasks.push(recTask);
             }
 
@@ -495,6 +565,66 @@
             if (!state.stats.pomodoroMinutesByPlate) state.stats.pomodoroMinutesByPlate = {};
             state.stats.pomodoroMinutesByPlate[pId] = (state.stats.pomodoroMinutesByPlate[pId] || 0) + minutes;
         }
+
+        // --- LÓGICA DE SINCRONIZACIÓN EN LA NUBE ---
+        window.toggleSyncModal = function() {
+            isSyncModalOpen = !isSyncModalOpen;
+            renderSyncModal();
+        };
+
+        window.saveSyncForm = function() {
+            const url = document.getElementById('sync-url').value.trim();
+            const pin = document.getElementById('sync-pin').value.trim();
+            window.dispatch({ type: 'SAVE_SYNC_SETTINGS', payload: { url, pin } });
+            alert("Configuración de nube guardada en este dispositivo.");
+        };
+
+        window.uploadToCloud = async function() {
+            const url = state.syncSettings.url;
+            const pin = state.syncSettings.pin;
+            if (!url || !pin) return alert("Por favor, configura primero la URL y el PIN de Google Apps Script.");
+
+            isSyncing = true; renderSyncModal();
+            try {
+                const dataToSave = { tasks: state.tasks, plates: state.plates, stats: state.stats, journal: state.journal };
+                const res = await fetch(`${url}?pin=${encodeURIComponent(pin)}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' }, // texto plano para evitar preflight OPTIONS
+                    body: JSON.stringify(dataToSave)
+                });
+                const result = await res.json();
+                if(result.error) throw new Error(result.error);
+                alert("¡Datos guardados en la nube correctamente!");
+            } catch(e) {
+                alert("Error de conexión al subir. Verifica la URL y el PIN.\nDetalle: " + e.message);
+            }
+            isSyncing = false; renderSyncModal();
+        };
+
+        window.downloadFromCloud = async function() {
+            const url = state.syncSettings.url;
+            const pin = state.syncSettings.pin;
+            if (!url || !pin) return alert("Por favor, configura primero la URL y el PIN de Google Apps Script.");
+
+            if (!confirm("Esto sobrescribirá los datos actuales de este dispositivo con los de la nube. ¿Continuar?")) return;
+
+            isSyncing = true; renderSyncModal();
+            try {
+                const res = await fetch(`${url}?pin=${encodeURIComponent(pin)}`);
+                const result = await res.json();
+                
+                if (result.error) throw new Error(result.error);
+                if (Object.keys(result).length === 0) throw new Error("La nube está vacía.");
+                
+                window.dispatch({ type: 'OVERWRITE_STATE_FROM_CLOUD', payload: result });
+                alert("¡Datos descargados y actualizados correctamente!");
+                isSyncModalOpen = false; // Cierra el modal tras el éxito
+            } catch(e) {
+                alert("Error de conexión al descargar. Verifica la URL y el PIN.\nDetalle: " + e.message);
+            }
+            isSyncing = false; 
+            if (isSyncModalOpen) renderSyncModal(); // Solo si falló y sigue abierto
+        };
 
         // --- FUNCIONES INTERFAZ DE USUARIO ---
         window.handleAddTaskSubmit = function(e) {
@@ -730,7 +860,6 @@
         function renderHeader() {
             const th = themeConfig[state.theme || 'autumn'];
             
-            // Actualizar body theme
             document.getElementById('app-body').className = `min-h-screen font-sans flex flex-col items-center py-6 sm:py-10 px-3 sm:px-4 transition-colors duration-500 text-stone-800 dark:text-stone-100 ${th.grad}`;
             document.getElementById('main-card').className = `w-full max-w-2xl bg-white/80 backdrop-blur-md dark:bg-stone-900/90 shadow-xl p-4 sm:p-8 rounded-lg transition-all duration-300 border ${th.borderMain} dark:${th.borderDark} shadow-${th.color}-900/5`;
 
@@ -759,6 +888,10 @@
                         Fast FVP
                     </label>
                     <div class="flex gap-1">
+                        <!-- Feature: Botón de Nube -->
+                        <button onclick="window.toggleSyncModal()" class="p-2 text-stone-500 dark:text-stone-400 hover:${th.textMain} dark:hover:text-white transition-colors rounded-sm hover:bg-stone-100 dark:hover:bg-stone-800" title="Sincronización en la Nube">
+                            <i data-lucide="cloud" class="w-[18px] h-[18px]"></i>
+                        </button>
                         <button onclick="window.dispatch({type:'CYCLE_THEME'})" class="p-2 text-stone-500 dark:text-stone-400 hover:${th.textMain} dark:hover:text-white transition-colors rounded-sm hover:bg-stone-100 dark:hover:bg-stone-800" title="Cambiar tema visual">
                             <i data-lucide="palette" class="w-[18px] h-[18px]"></i>
                         </button>
@@ -768,6 +901,79 @@
                     </div>
                 </div>
             `;
+        }
+
+        // Feature: Renderizar modal de sincronización
+        function renderSyncModal() {
+            const th = themeConfig[state.theme || 'autumn'];
+            const container = document.getElementById('sync-modal-container');
+            
+            if (!isSyncModalOpen) {
+                container.classList.add('opacity-0', 'hidden');
+                setTimeout(() => container.style.display = 'none', 300);
+                return;
+            }
+
+            container.style.display = 'flex';
+            setTimeout(() => container.classList.remove('opacity-0', 'hidden'), 10);
+
+            const isConfigured = state.syncSettings && state.syncSettings.url && state.syncSettings.pin;
+
+            container.innerHTML = `
+                <div class="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 shadow-2xl rounded-lg p-6 w-full max-w-md relative animate-zoom-in">
+                    <button onclick="window.toggleSyncModal()" class="absolute top-4 right-4 text-stone-400 hover:text-stone-700 dark:hover:text-white transition-colors">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                    
+                    <h2 class="text-xl font-semibold text-stone-900 dark:text-white flex items-center gap-2 mb-6">
+                        <i data-lucide="cloud-sync" class="${th.textMain} w-5 h-5"></i>
+                        Sincronización en la Nube
+                    </h2>
+
+                    ${isSyncing ? `
+                        <div class="flex flex-col items-center justify-center py-8">
+                            <i data-lucide="loader-2" class="w-8 h-8 ${th.textMain} animate-spin-slow mb-4"></i>
+                            <p class="text-stone-600 dark:text-stone-300 text-sm">Conectando con Google Sheets...</p>
+                        </div>
+                    ` : `
+                        <div class="mb-8">
+                            <p class="text-xs uppercase tracking-widest text-stone-500 dark:text-stone-400 mb-3 font-semibold">1. Configuración Local</p>
+                            <p class="text-xs text-stone-500 dark:text-stone-400 mb-4">Estos datos no se comparten en internet, se guardan solo en este navegador.</p>
+                            
+                            <div class="flex flex-col gap-3">
+                                <div>
+                                    <label class="text-xs text-stone-600 dark:text-stone-300 mb-1 block">URL de Google Apps Script:</label>
+                                    <input type="text" id="sync-url" value="${state.syncSettings?.url || ''}" placeholder="https://script.google.com/..." class="w-full bg-stone-100 dark:bg-stone-800 border border-stone-300 dark:border-stone-600 rounded-sm p-2 text-sm outline-none focus:border-stone-500 dark:text-white">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-stone-600 dark:text-stone-300 mb-1 block">PIN Secreto:</label>
+                                    <input type="password" id="sync-pin" value="${state.syncSettings?.pin || ''}" placeholder="Tu contraseña..." class="w-full bg-stone-100 dark:bg-stone-800 border border-stone-300 dark:border-stone-600 rounded-sm p-2 text-sm outline-none focus:border-stone-500 dark:text-white">
+                                </div>
+                                <button onclick="window.saveSyncForm()" class="mt-1 w-full bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-300 dark:hover:bg-stone-700 p-2 rounded-sm text-sm font-medium transition-colors">
+                                    Guardar configuración en este dispositivo
+                                </button>
+                            </div>
+                        </div>
+
+                        ${isConfigured ? `
+                        <div class="pt-6 border-t border-stone-200 dark:border-stone-700">
+                            <p class="text-xs uppercase tracking-widest text-stone-500 dark:text-stone-400 mb-4 font-semibold">2. Acciones de Nube</p>
+                            <div class="flex gap-3">
+                                <button onclick="window.uploadToCloud()" class="flex-1 ${th.bgMain} ${th.bgHover} text-white p-3 rounded-sm text-sm font-medium transition-colors flex flex-col items-center gap-2">
+                                    <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+                                    Subir mis datos
+                                </button>
+                                <button onclick="window.downloadFromCloud()" class="flex-1 border border-stone-300 dark:border-stone-600 hover:bg-stone-50 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-300 p-3 rounded-sm text-sm font-medium transition-colors flex flex-col items-center gap-2">
+                                    <i data-lucide="download-cloud" class="w-5 h-5"></i>
+                                    Descargar de la nube
+                                </button>
+                            </div>
+                        </div>
+                        ` : ''}
+                    `}
+                </div>
+            `;
+            lucide.createIcons();
         }
 
         function renderPlates() {
@@ -1275,7 +1481,6 @@
                 </div>`;
             }
 
-            // Feature 10: Diario / Reflexión
             const journalText = state.journal[todayStr] || '';
             const journalHtml = `
                 <div class="mt-8 bg-white/80 backdrop-blur-md dark:bg-stone-900/90 border border-stone-200/50 dark:border-stone-800 rounded-lg p-5 shadow-sm">
@@ -1308,7 +1513,7 @@
                         <span class="text-[10px] uppercase tracking-wider text-stone-500 mt-1">Completadas hoy</span>
                     </div>
                     <div class="bg-white/80 backdrop-blur-md dark:bg-stone-900/90 border border-stone-200/50 dark:border-stone-800 p-4 rounded-lg shadow-sm flex flex-col items-center justify-center">
-                        <span class="text-3xl font-semibold text-amber-600 dark:text-amber-500">${doneT}</span>
+                        <span class="text-3xl font-semibold text-stone-700 dark:text-stone-300">${doneT}</span>
                         <span class="text-[10px] uppercase tracking-wider text-stone-500 mt-1">Completadas total</span>
                     </div>
                     <div class="bg-white/80 backdrop-blur-md dark:bg-stone-900/90 border border-stone-200/50 dark:border-stone-800 p-4 rounded-lg shadow-sm flex flex-col items-center justify-center">
@@ -1342,25 +1547,27 @@
             renderPhase();
             renderList();
             renderStats();
+            renderSyncModal();
             lucide.createIcons();
             document.documentElement.classList.toggle('dark', state.isDarkMode);
         }
 
-        // Bind keyboard shortcuts
         window.addEventListener('keydown', (e) => {
-            if (state.mode === 'select' && editingTaskId === null) {
+            if (state.mode === 'select' && editingTaskId === null && !isSyncModalOpen && sessionStorage.getItem('fvp_auth_v1') === 'true') {
                 if (e.key === 'ArrowRight') window.handleSelectYes();
                 else if (e.key === 'ArrowDown') window.handleSelectNo();
             }
         });
 
-        // Inicio automático
         window.onload = () => {
+            if (sessionStorage.getItem('fvp_auth_v1') === 'true') {
+                document.getElementById('login-overlay').style.display = 'none';
+                if ("Notification" in window && Notification.permission === "default") {
+                    Notification.requestPermission();
+                }
+            }
             loadState();
             renderApp();
-            if ("Notification" in window && Notification.permission === "default") {
-                Notification.requestPermission();
-            }
         };
     </script>
 </body>
