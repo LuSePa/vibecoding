@@ -14,7 +14,6 @@
             --color-cream: #fefae0;
             --color-tan: #dda15e;
             --color-rust: #bc6c25;
-            --special-ai: rgb(170, 0, 77);
         }
 
         body { 
@@ -452,6 +451,9 @@
                 }
             }
 
+            // Cambiamos a la pestaña solicitada y refrescamos la vista
+            currentMainTab = (tabName === 'obras' || tabName === 'elementos') ? tabName : currentMainTab;
+
             if(tabName === 'historial') renderHistory();
             if(tabName === 'obras') updatePreviewObras();
             if(tabName === 'elementos') updatePreviewElementos();
@@ -506,19 +508,61 @@
             updateInline(authors, year, title);
         }
 
+        // LIMPIEZA TOTAL DE FORMULARIO
+        function clearFields() {
+            if (currentMainTab === 'obras') {
+                document.getElementById('authorsList').innerHTML = "";
+                authorCount = 0;
+                addAuthorField();
+                document.getElementById('f_year').value = "";
+                document.getElementById('f_date_extra').value = "";
+                document.getElementById('f_title').value = "";
+                document.getElementById('f_source').value = "";
+                document.getElementById('f_url').value = "";
+                updatePreviewObras();
+            } else {
+                document.getElementById('el_type_num').value = "";
+                document.getElementById('el_title').value = "";
+                document.getElementById('el_action').value = "";
+                document.getElementById('el_tool').value = "";
+                document.getElementById('el_tool_url').value = "";
+                document.getElementById('el_company').value = "";
+                document.getElementById('el_company_url').value = "";
+                document.getElementById('el_year').value = "";
+                document.getElementById('el_license').value = "";
+                // Reset author type to human
+                document.querySelector('input[name="el_author_type"][value="human"]').checked = true;
+                toggleElementType();
+                updatePreviewElementos();
+            }
+        }
+
         function loadExampleObras() {
+            // Aseguramos limpiar primero todos los campos para evitar arrastres
             document.getElementById('authorsList').innerHTML = "";
             authorCount = 0;
+            document.getElementById('f_year').value = "";
+            document.getElementById('f_date_extra').value = "";
+            document.getElementById('f_title').value = "";
+            document.getElementById('f_source').value = "";
+            document.getElementById('f_url').value = "";
+
             if (currentTypeObras === 'libro') {
                 addAuthorField('D.', 'Norman');
                 document.getElementById('f_year').value = "2013";
                 document.getElementById('f_title').value = "El diseño de las cosas cotidianas";
                 document.getElementById('f_source').value = "Basic Books";
-            } else {
+            } else if (currentTypeObras === 'web') {
                 addAuthorField('', 'OMS');
                 document.getElementById('f_year').value = "2024";
                 document.getElementById('f_title').value = "Consejos de salud pública";
                 document.getElementById('f_source').value = "Organización Mundial de la Salud";
+            } else if (currentTypeObras === 'articulo') {
+                addAuthorField('A.', 'Einstein');
+                document.getElementById('f_year').value = "1905";
+                document.getElementById('f_title').value = "Sobre la electrodinámica de los cuerpos en movimiento";
+                document.getElementById('f_source').value = "Annalen der Physik, 322(10)";
+                document.getElementById('f_url').value = "https://doi.org/10.1002/andp.19053221004";
             }
             updatePreviewObras();
         }
@@ -538,15 +582,9 @@
         function setTypeElementos(type) {
             currentTypeElementos = type;
             ['imagen', 'audio', 'video'].forEach(id => {
-                const b = document.getElementById('btn-' + id);
-                if(id === 'audio' || id === 'imagen') {
-                    b.className = "btn-special inactive px-4 py-2 rounded-md text-sm text-white transition font-medium";
-                    b.style.backgroundColor = "rgb(170, 0, 77)";
-                } else { b.className = "px-4 py-2 rounded-md bg-white text-stone-700 border border-tan text-sm transition hover:bg-stone-50"; }
+                document.getElementById('btn-' + id).className = "px-4 py-2 rounded-md bg-white text-stone-700 border border-tan text-sm transition hover:bg-stone-50";
             });
-            const act = document.getElementById('btn-' + type);
-            if(type === 'video') act.className = "px-4 py-2 rounded-md text-sm transition font-medium bg-rust text-white shadow-sm";
-            else act.classList.replace('inactive', 'active');
+            document.getElementById('btn-' + type).className = "px-4 py-2 rounded-md text-sm transition font-medium bg-rust text-white shadow-sm";
             updatePreviewElementos();
         }
 
@@ -580,6 +618,17 @@
 
         function loadExampleElementos() {
             const isAI = document.querySelector('input[name="el_author_type"]:checked').value === 'ai';
+            
+            // Limpiamos los campos primero
+            document.getElementById('el_type_num').value = "";
+            document.getElementById('el_title').value = "";
+            document.getElementById('el_action').value = "";
+            document.getElementById('el_tool').value = "";
+            document.getElementById('el_tool_url').value = "";
+            document.getElementById('el_company').value = "";
+            document.getElementById('el_company_url').value = "";
+            document.getElementById('el_year').value = "";
+
             if (currentTypeElementos === 'imagen') {
                 document.getElementById('el_type_num').value = isAI ? "Figura 2" : "Figura 1";
                 document.getElementById('el_title').value = isAI ? "Bosque geométrico" : "Paseo por el bosque";
@@ -639,47 +688,28 @@
         }
 
         function processAndSave() {
+            // Forzar actualización final de los textos en pantalla a memoria
             if(currentMainTab === 'obras') updatePreviewObras(); else updatePreviewElementos();
+            
+            // Bloquea el guardado si todo está absolutamente en blanco
             if (!hasContent()) { 
                 document.getElementById('modal-warning').classList.remove('hidden'); 
                 return; 
             }
+            
+            // Guardamos al array del historial
             historyData.push({ id: generateUID(), ...window.curr });
+            
+            // Feedback en el botón
             const b = event.currentTarget;
             const old = b.innerHTML;
             b.innerHTML = '<i class="fas fa-check"></i> ¡Guardado!';
             b.classList.add('bg-olive');
             
+            // Borra todos los campos visuales para la siguiente cita y previene arrastrar datos
             clearFields();
 
             setTimeout(() => { b.innerHTML = old; b.classList.remove('bg-olive'); }, 1500);
-        }
-
-        function clearFields() {
-            if (currentMainTab === 'obras') {
-                document.getElementById('authorsList').innerHTML = "";
-                authorCount = 0;
-                addAuthorField();
-                document.getElementById('f_year').value = "";
-                document.getElementById('f_date_extra').value = "";
-                document.getElementById('f_title').value = "";
-                document.getElementById('f_source').value = "";
-                document.getElementById('f_url').value = "";
-                updatePreviewObras();
-            } else {
-                document.getElementById('el_type_num').value = "";
-                document.getElementById('el_title').value = "";
-                document.getElementById('el_action').value = "";
-                document.getElementById('el_tool').value = "";
-                document.getElementById('el_tool_url').value = "";
-                document.getElementById('el_company').value = "";
-                document.getElementById('el_company_url').value = "";
-                document.getElementById('el_year').value = "";
-                document.getElementById('el_license').value = "";
-                document.querySelector('input[name="el_author_type"][value="human"]').checked = true;
-                toggleElementType();
-                updatePreviewElementos();
-            }
         }
 
         function renderHistory() {
@@ -826,7 +856,7 @@
         }
         function copyInputText(id, btn) { document.getElementById(id).select(); document.execCommand('copy'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-        function formatDOI(u) { if(u.startsWith("10.")) return "https://doi.org/" + u; return u; }
+        function formatDOI(u) { if(u && u.startsWith("10.")) return "https://doi.org/" + u; return u; }
     </script>
 </body>
 </html>
