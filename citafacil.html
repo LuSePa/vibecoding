@@ -57,22 +57,6 @@
         .btn-special.inactive { opacity: 0.5; }
 
         .preview-link { color: #0284c7; text-decoration: underline; word-break: break-all; }
-        
-        /* Grid responsivo blindado sin scroll horizontal */
-        .layout-wrapper {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-            width: 100%;
-        }
-        @media (min-width: 1024px) {
-            .layout-wrapper.parallel-mode {
-                grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
-            }
-            .layout-wrapper.full-mode {
-                grid-template-columns: 1fr;
-            }
-        }
 
         .break-all { word-break: break-all; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -107,10 +91,11 @@
     </nav>
 
     <main class="max-w-7xl mx-auto mt-6 p-4">
-        <div id="layout-container" class="layout-wrapper parallel-mode">
+        <!-- Contenedor grid: garantiza dos columnas paralelas en pantallas de tablet o mayores -->
+        <div id="layout-container" class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start w-full">
             
-            <!-- SECCIÓN IZQUIERDA: FORMULARIOS -->
-            <div id="form-column" class="bg-white rounded-xl shadow-md border border-tan p-5 md:p-8 transition-all overflow-hidden">
+            <!-- SECCIÓN IZQUIERDA: FORMULARIOS (8 columnas) -->
+            <div id="form-column" class="md:col-span-8 bg-white rounded-xl shadow-md border border-tan p-5 md:p-8 transition-all overflow-hidden min-w-0">
                 
                 <!-- Pestañas Principales -->
                 <div class="flex border-b border-tan mb-6 overflow-x-auto no-scrollbar">
@@ -263,12 +248,11 @@
                 <div id="view-historial" class="hidden">
                     <h2 class="text-xl font-bold mb-6 pb-2 border-b border-tan" style="color: var(--color-dark-green)">Bibliografía organizada</h2>
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-8">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
                         <button onclick="copyFullBibliography('visual')" class="bg-rust text-white py-3 rounded-lg text-xs font-bold shadow hover:bg-orange-800 transition">Copiar Visual</button>
                         <button onclick="copyFullBibliography('html')" class="bg-rust text-white py-3 rounded-lg text-xs font-bold shadow hover:bg-orange-800 transition">Copiar HTML</button>
                         <button onclick="exportHistory()" class="bg-olive text-white py-3 rounded-lg text-xs font-bold shadow hover:bg-dark-green transition">Exportar</button>
                         <button onclick="document.getElementById('importFile').click()" class="bg-olive text-white py-3 rounded-lg text-xs font-bold shadow hover:bg-dark-green transition">Importar</button>
-                        <!-- NUEVO BOTÓN DE BORRADO -->
                         <button onclick="showClearHistoryModal()" class="bg-stone-600 text-white py-3 rounded-lg text-xs font-bold shadow hover:bg-stone-800 transition">Borrar Historial</button>
                         <input type="file" id="importFile" accept=".json" multiple class="hidden" onchange="importHistory(event)">
                     </div>
@@ -337,8 +321,9 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN DERECHA: RESULTADOS -->
-            <div id="results-column" class="space-y-4 transition-all">
+            <!-- SECCIÓN DERECHA: RESULTADOS (Fija en paralelo) -->
+            <!-- 4 columnas reservadas para el lateral -->
+            <div id="results-column" class="md:col-span-4 space-y-4 transition-all overflow-hidden min-w-0">
                 <div class="bg-white rounded-xl shadow-md border border-tan overflow-hidden sticky top-24">
                     <div class="bg-dark-green text-white p-4 flex justify-between items-center">
                         <h3 class="font-bold text-xs uppercase tracking-widest"><i class="fas fa-eye mr-2"></i> Resultados</h3>
@@ -399,8 +384,8 @@
     <div id="modal-warning" class="fixed inset-0 bg-stone-900 bg-opacity-70 hidden flex items-center justify-center z-50 px-4">
         <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center border-t-8 border-tan">
             <div class="text-rust text-5xl mb-4"><i class="fas fa-exclamation-circle"></i></div>
-            <h2 class="text-xl font-bold mb-2">Sin contenido</h2>
-            <p class="mb-6 text-stone-600 text-sm text-pretty">Debes introducir al menos un título o autor antes de poder guardar la cita en el historial.</p>
+            <h2 class="text-xl font-bold mb-2" style="color: var(--color-dark-green)">Sin contenido</h2>
+            <p class="mb-6 text-stone-600 text-sm text-pretty">Debes introducir datos en el formulario para poder generar y guardar una cita válida.</p>
             <button onclick="closeModal('modal-warning')" class="w-full py-3 bg-rust text-white rounded-xl shadow hover:bg-orange-800 transition font-bold">Entendido</button>
         </div>
     </div>
@@ -446,16 +431,25 @@
             document.getElementById('tab-' + tabName).classList.add('tab-active');
             
             const results = document.getElementById('results-column');
-            const layout = document.getElementById('layout-container');
+            const formCol = document.getElementById('form-column');
             const inlinePanel = document.getElementById('inline-citations-panel');
 
+            // Ajuste dinámico de columnas usando clases Tailwind para evitar scroll horizontal
             if (tabName === 'historial' || tabName === 'ayuda') {
                 results.classList.add('hidden');
-                layout.className = "layout-grid full-view";
+                formCol.classList.remove('md:col-span-8');
+                formCol.classList.add('md:col-span-12');
             } else {
                 results.classList.remove('hidden');
-                layout.className = "layout-grid parallel-view";
-                inlinePanel.classList.toggle('hidden', tabName === 'elementos');
+                formCol.classList.remove('md:col-span-12');
+                formCol.classList.add('md:col-span-8');
+                
+                // Ocultar sección "Citas en párrafos" exclusivamente si estamos en "Elementos"
+                if (tabName === 'elementos') {
+                    inlinePanel.classList.add('hidden');
+                } else {
+                    inlinePanel.classList.remove('hidden');
+                }
             }
 
             if(tabName === 'historial') renderHistory();
@@ -625,7 +619,9 @@
             document.getElementById('preview-html').value = h;
             document.getElementById('html-render-preview').innerHTML = h;
             document.getElementById('pedagogyText').innerHTML = p;
-            window.curr = { h, v, s, c };
+            
+            // Usar la sintaxis completa para mantener compatibilidad con exportaciones
+            window.curr = { html: h, visual: v, sortKey: s, category: c };
         }
 
         function hasContent() {
@@ -651,7 +647,7 @@
             historyData.push({ id: generateUID(), ...window.curr });
             const b = event.currentTarget;
             const old = b.innerHTML;
-            b.innerHTML = '<i class="fas fa-check"></i> ¡Cita Guardada!';
+            b.innerHTML = '<i class="fas fa-check"></i> ¡Guardado!';
             b.classList.add('bg-olive');
             setTimeout(() => { b.innerHTML = old; b.classList.remove('bg-olive'); }, 1500);
         }
@@ -662,15 +658,18 @@
                 l.innerHTML = '<div class="text-center py-12 text-stone-400 italic text-sm">El historial está vacío. Genera o importa citas para verlas aquí.</div>'; 
                 return; 
             }
-            let obs = historyData.filter(i => i.c === 'obra');
-            let els = historyData.filter(i => i.c === 'elemento');
+            
+            // Compatible con versiones previas minimizadas ('c' o 'category')
+            let obs = historyData.filter(i => (i.category || i.c) === 'obra');
+            let els = historyData.filter(i => (i.category || i.c) === 'elemento');
+            
             let h = "";
             const rnd = (its, t) => {
                 if(its.length === 0) return "";
                 let s = `<h3 class="font-bold text-dark-green border-b border-tan pb-2 mb-3 mt-6 text-sm uppercase tracking-widest">${t}</h3>`;
-                its.sort((a,b) => a.s.localeCompare(b.s)).forEach(i => {
+                its.sort((a,b) => (a.sortKey || a.s || "").localeCompare(b.sortKey || b.s || "")).forEach(i => {
                     s += `<div class="p-4 bg-white border border-tan shadow-sm rounded-xl relative mb-3 pr-12 hover:shadow-md transition">
-                        <div class="text-xs text-stone-800 break-all leading-relaxed">${i.v}</div>
+                        <div class="text-xs text-stone-800 break-all leading-relaxed">${i.visual || i.v}</div>
                         <button onclick="del('${i.id}')" class="absolute right-3 top-3 text-stone-300 hover:text-rust p-2 transition" title="Borrar esta cita"><i class="fas fa-trash-alt"></i></button>
                     </div>`;
                 });
@@ -699,16 +698,16 @@
         // --- COPIAR Y EXPORTAR ---
         function copyFullBibliography(mode) {
             if(historyData.length === 0) return;
-            let obs = historyData.filter(i => i.c === 'obra').sort((a,b) => a.s.localeCompare(b.s));
-            let els = historyData.filter(i => i.c === 'elemento').sort((a,b) => a.s.localeCompare(b.s));
+            let obs = historyData.filter(i => (i.category || i.c) === 'obra').sort((a,b) => (a.sortKey || a.s || "").localeCompare(b.sortKey || b.s || ""));
+            let els = historyData.filter(i => (i.category || i.c) === 'elemento').sort((a,b) => (a.sortKey || a.s || "").localeCompare(b.sortKey || b.s || ""));
             let content = `<div style="line-height:1.6; font-family: sans-serif;">`;
             if(obs.length > 0) {
                 content += `<h3 style="color:#283618; margin-top:1.5em; border-bottom:1px solid #dda15e;">Bibliografía</h3>`;
-                obs.forEach(i => content += i.h);
+                obs.forEach(i => content += (i.html || i.h));
             }
             if(els.length > 0) {
                 content += `<h3 style="color:#283618; margin-top:2em; border-bottom:1px solid #dda15e;">Atribución de elementos</h3>`;
-                els.forEach(i => content += i.h);
+                els.forEach(i => content += (i.html || i.h));
             }
             content += `</div>`;
 
@@ -746,7 +745,7 @@
                         }));
                         historyData = historyData.concat(sanitized);
                     }
-                } catch(err) {}
+                } catch(err) { alert("Archivo no válido: " + f.name); }
             }
             renderHistory(); e.target.value = "";
         }
