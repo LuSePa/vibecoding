@@ -119,19 +119,19 @@
             <!-- Navegación de Pestañas (Fluido en escritorio, oculta en móviles) -->
             <div id="nav-container" class="hidden md:block border-b border-[#E5DACD] bg-[#FAFAF8] w-full">
                 <nav class="flex overflow-x-auto md:overflow-visible hide-scrollbar snap-x snap-mandatory" aria-label="Tabs">
-                    <button onclick="openTab(0)" class="tab-btn flex-1 py-3 sm:py-4 px-4 text-center border-b-4 font-montserrat font-bold text-sm sm:text-base md:text-sm lg:text-base transition-colors border-secundario text-secundario whitespace-nowrap md:whitespace-normal flex-shrink-0 md:flex-shrink snap-start outline-none focus:bg-[#F0EBE1] leading-snug">
+                    <button onclick="openTab(0)" class="tab-btn flex-1 py-3 sm:py-4 px-4 text-center border-b-4 font-montserrat font-bold text-sm sm:text-base md:text-sm lg:text-base transition-colors whitespace-nowrap md:whitespace-normal flex-shrink-0 md:flex-shrink snap-start outline-none leading-snug border-secundario text-secundario bg-[#F0EBE1]">
                         <i class="fa-solid fa-1 mr-1 sm:mr-2 rounded-full border-2 border-current p-1 text-xs"></i> Abrir agente
                     </button>
-                    <button onclick="openTab(1)" class="tab-btn flex-1 py-3 sm:py-4 px-4 text-center border-b-4 border-transparent font-montserrat font-bold text-sm sm:text-base md:text-sm lg:text-base text-[#8C7A6B] hover:text-primario hover:bg-[#F0EBE1] transition-colors whitespace-nowrap md:whitespace-normal flex-shrink-0 md:flex-shrink snap-start outline-none focus:bg-[#F0EBE1] leading-snug">
+                    <button onclick="openTab(1)" class="tab-btn flex-1 py-3 sm:py-4 px-4 text-center border-b-4 font-montserrat font-bold text-sm sm:text-base md:text-sm lg:text-base transition-colors whitespace-nowrap md:whitespace-normal flex-shrink-0 md:flex-shrink snap-start outline-none leading-snug border-transparent text-[#8C7A6B] hover:text-primario hover:bg-[#F0EBE1]">
                         <i class="fa-solid fa-2 mr-1 sm:mr-2 rounded-full border-2 border-current p-1 text-xs"></i> Tu pauta
                     </button>
-                    <button onclick="openTab(2)" class="tab-btn flex-1 py-3 sm:py-4 px-4 text-center border-b-4 border-transparent font-montserrat font-bold text-sm sm:text-base md:text-sm lg:text-base text-[#8C7A6B] hover:text-primario hover:bg-[#F0EBE1] transition-colors whitespace-nowrap md:whitespace-normal flex-shrink-0 md:flex-shrink snap-start outline-none focus:bg-[#F0EBE1] leading-snug">
+                    <button onclick="openTab(2)" class="tab-btn flex-1 py-3 sm:py-4 px-4 text-center border-b-4 font-montserrat font-bold text-sm sm:text-base md:text-sm lg:text-base transition-colors whitespace-nowrap md:whitespace-normal flex-shrink-0 md:flex-shrink snap-start outline-none leading-snug border-transparent text-[#8C7A6B] hover:text-primario hover:bg-[#F0EBE1]">
                         <i class="fa-solid fa-3 mr-1 sm:mr-2 rounded-full border-2 border-current p-1 text-xs"></i> El proceso
                     </button>
-                    <button onclick="openTab(3)" class="tab-btn flex-1 py-3 sm:py-4 px-4 text-center border-b-4 border-transparent font-montserrat font-bold text-sm sm:text-base md:text-sm lg:text-base text-[#8C7A6B] hover:text-primario hover:bg-[#F0EBE1] transition-colors whitespace-nowrap md:whitespace-normal flex-shrink-0 md:flex-shrink snap-start outline-none focus:bg-[#F0EBE1] leading-snug">
+                    <button onclick="openTab(3)" class="tab-btn flex-1 py-3 sm:py-4 px-4 text-center border-b-4 font-montserrat font-bold text-sm sm:text-base md:text-sm lg:text-base transition-colors whitespace-nowrap md:whitespace-normal flex-shrink-0 md:flex-shrink snap-start outline-none leading-snug border-transparent text-[#8C7A6B] hover:text-primario hover:bg-[#F0EBE1]">
                         <i class="fa-solid fa-4 mr-1 sm:mr-2 rounded-full border-2 border-current p-1 text-xs"></i> Síntesis
                     </button>
-                    <button onclick="openTab(4)" class="tab-btn flex-1 py-3 sm:py-4 px-4 text-center border-b-4 border-transparent font-montserrat font-bold text-sm sm:text-base md:text-sm lg:text-base text-[#8C7A6B] hover:text-primario hover:bg-[#F0EBE1] transition-colors whitespace-nowrap md:whitespace-normal flex-shrink-0 md:flex-shrink snap-start outline-none focus:bg-[#F0EBE1] leading-snug">
+                    <button onclick="openTab(4)" class="tab-btn flex-1 py-3 sm:py-4 px-4 text-center border-b-4 font-montserrat font-bold text-sm sm:text-base md:text-sm lg:text-base transition-colors whitespace-nowrap md:whitespace-normal flex-shrink-0 md:flex-shrink snap-start outline-none leading-snug border-transparent text-[#8C7A6B] hover:text-primario hover:bg-[#F0EBE1]">
                         <i class="fa-solid fa-5 mr-1 sm:mr-2 rounded-full border-2 border-current p-1 text-xs"></i> A trabajar
                     </button>
                 </nav>
@@ -141,7 +141,7 @@
             <div class="p-4 sm:p-6 md:p-6 lg:p-8 flex-grow flex flex-col">
                 
                 <!-- PASO 1: Abrir el agente -->
-                <div id="paso1" class="tab-content block h-full flex flex-col">
+                <div id="paso1" class="tab-content h-full flex-col" style="display: flex;">
                     <div class="text-center flex-grow">
                         <h3 class="text-2xl sm:text-3xl md:text-2xl font-bold text-primario mb-3 sm:mb-6 md:mb-3">Acceso a Microsoft Copilot</h3>
                         <p class="text-lg sm:text-xl md:text-base opacity-90 mb-5 sm:mb-8 md:mb-4 max-w-3xl mx-auto">
@@ -195,7 +195,7 @@
                             
                             <!-- Imagen optimizada en altura para PC -->
                             <img src="https://i.postimg.cc/6qP6X6FS/Captura-de-pantalla-2026-03-12-104631.png" 
-                                 alt="" 
+                                 alt="Captura de pantalla mostrando las sugerencias de chat de Copilot en la parte inferior." 
                                  class="rounded-lg shadow-md w-full h-auto max-h-48 md:max-h-56 object-contain mx-auto border border-gray-300">
                                  
                             <div class="mt-5 sm:mt-8 md:mt-5 p-3 sm:p-6 md:p-4 bg-white border-l-4 sm:border-l-8 border-acento text-base sm:text-lg md:text-sm rounded-r-lg shadow-sm flex items-start">
@@ -413,15 +413,22 @@
                 tabContents[i].style.display = "none";
             }
 
-            // Eliminar estilos activos de las pestañas superiores
+            // Eliminar estilos activos de las pestañas superiores y añadir las inactivas usando classList
             const tabLinks = document.getElementsByClassName("tab-btn");
+            const activeClasses = ["border-secundario", "text-secundario", "bg-[#F0EBE1]"];
+            const inactiveClasses = ["border-transparent", "text-[#8C7A6B]", "hover:text-primario", "hover:bg-[#F0EBE1]"];
+            
             for (let i = 0; i < tabLinks.length; i++) {
-                tabLinks[i].className = tabLinks[i].className.replace(" border-secundario text-secundario bg-[#F0EBE1]", " border-transparent text-[#8C7A6B] hover:text-primario hover:bg-[#F0EBE1]");
+                tabLinks[i].classList.remove(...activeClasses);
+                tabLinks[i].classList.add(...inactiveClasses);
             }
 
             // Mostrar el paso actual
             document.getElementById(tabsId[index]).style.display = "flex";
-            tabLinks[index].className = tabLinks[index].className.replace(" border-transparent text-[#8C7A6B] hover:text-primario hover:bg-[#F0EBE1]", " border-secundario text-secundario bg-[#F0EBE1]");
+            
+            // Añadir clases activas a la pestaña actual
+            tabLinks[index].classList.remove(...inactiveClasses);
+            tabLinks[index].classList.add(...activeClasses);
             
             // Asegurar que la pestaña activa sea visible en el scroll horizontal (escritorio si se reduce)
             if (window.innerWidth >= 768) {
