@@ -114,10 +114,10 @@
         </section>
 
         <!-- Contenedor Principal de Pestañas -->
-        <div class="bg-white rounded-2xl shadow-lg border border-[#E5DACD] flex flex-col overflow-hidden relative flex-grow">
+        <div id="main-card" class="bg-white rounded-2xl shadow-lg border border-[#E5DACD] flex flex-col overflow-hidden relative flex-grow">
             
-            <!-- Navegación de Pestañas (Fluido en escritorio, scroll en móviles) -->
-            <div id="nav-container" class="border-b border-[#E5DACD] bg-[#FAFAF8] w-full">
+            <!-- Navegación de Pestañas (Fluido en escritorio, oculta en móviles) -->
+            <div id="nav-container" class="hidden md:block border-b border-[#E5DACD] bg-[#FAFAF8] w-full">
                 <nav class="flex overflow-x-auto md:overflow-visible hide-scrollbar snap-x snap-mandatory" aria-label="Tabs">
                     <button onclick="openTab(0)" class="tab-btn flex-1 py-3 sm:py-4 px-4 text-center border-b-4 font-montserrat font-bold text-sm sm:text-base md:text-sm lg:text-base transition-colors border-secundario text-secundario whitespace-nowrap md:whitespace-normal flex-shrink-0 md:flex-shrink snap-start outline-none focus:bg-[#F0EBE1] leading-snug">
                         <i class="fa-solid fa-1 mr-1 sm:mr-2 rounded-full border-2 border-current p-1 text-xs"></i> Abrir agente
@@ -423,16 +423,18 @@
             document.getElementById(tabsId[index]).style.display = "flex";
             tabLinks[index].className = tabLinks[index].className.replace(" border-transparent text-[#8C7A6B] hover:text-primario hover:bg-[#F0EBE1]", " border-secundario text-secundario bg-[#F0EBE1]");
             
-            // Asegurar que la pestaña activa sea visible en el scroll horizontal (solo afecta a móviles)
-            tabLinks[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            // Asegurar que la pestaña activa sea visible en el scroll horizontal (escritorio si se reduce)
+            if (window.innerWidth >= 768) {
+                tabLinks[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
         }
 
         // Función auxiliar para navegar desde los botones inferiores
         function goToTab(index) {
             openTab(index);
-            // Hacer scroll hasta arriba de las pestañas SOLO en dispositivos móviles/tablets pequeños
+            // Hacer scroll hasta arriba de la tarjeta SOLO en dispositivos móviles/tablets pequeños
             if (window.innerWidth < 768) {
-                document.getElementById("nav-container").scrollIntoView({ behavior: 'smooth', block: 'start' });
+                document.getElementById("main-card").scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
 
