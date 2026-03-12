@@ -27,7 +27,6 @@
             font-family: 'Open Sans', sans-serif;
             background-color: var(--color-arena);
             color: var(--color-texto);
-            /* Tamaño base de fuente aumentado para accesibilidad */
             font-size: 110%; 
         }
 
@@ -50,7 +49,7 @@
         .bg-desplegables { background-color: var(--color-desplegables); }
         .text-desplegables { color: var(--color-desplegables); }
 
-        /* Ocultar contenido de pestañas por defecto */
+        /* Animación de pestañas */
         .tab-content {
             display: none;
             animation: fadeIn 0.4s ease-in-out;
@@ -70,13 +69,14 @@
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
         }
 
-        /* Ocultar barra de desplazamiento en las pestañas */
+        /* Ocultar barra de desplazamiento en las pestañas en móviles pero permitir scroll */
         .hide-scrollbar::-webkit-scrollbar {
             display: none;
         }
         .hide-scrollbar {
             -ms-overflow-style: none;
             scrollbar-width: none;
+            -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
         }
     </style>
 </head>
@@ -84,31 +84,31 @@
 
     <!-- Encabezado -->
     <header class="bg-primario text-white shadow-md sticky top-0 z-40 border-b-4 border-secundario">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col md:flex-row justify-between items-center">
-            <div>
-                <h1 class="text-2xl md:text-3xl font-bold tracking-tight">II Jornada de buenas prácticas y retos educativos en CEPA</h1>
-                <p class="mt-2 text-[#E0D5C1] text-base md:text-lg flex flex-wrap items-center gap-4">
-                    <span><i class="fa-solid fa-calendar-days mr-2"></i>13 de marzo de 2026</span>
-                    <span class="hidden md:inline">|</span>
-                    <span><i class="fa-solid fa-location-dot mr-2"></i>CEPA Simienza, Tomelloso</span>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-0">
+            <div class="text-center md:text-left">
+                <h1 class="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight leading-tight">II Jornada de buenas prácticas y retos educativos en CEPA</h1>
+                <p class="mt-2 text-[#E0D5C1] text-sm sm:text-base md:text-lg flex flex-wrap justify-center md:justify-start items-center gap-2 sm:gap-4">
+                    <span><i class="fa-solid fa-calendar-days mr-1 sm:mr-2"></i>13 de marzo de 2026</span>
+                    <span class="hidden sm:inline">|</span>
+                    <span><i class="fa-solid fa-location-dot mr-1 sm:mr-2"></i>CEPA Simienza, Tomelloso</span>
                 </p>
             </div>
-            <div class="mt-4 md:mt-0">
-                <span class="bg-white text-primario text-sm font-bold px-5 py-2 rounded-full uppercase tracking-wide shadow-sm">#DigEduCLM</span>
+            <div>
+                <span class="bg-white text-primario text-xs sm:text-sm font-bold px-4 sm:px-5 py-2 rounded-full uppercase tracking-wide shadow-sm inline-block">#DigEduCLM</span>
             </div>
         </div>
     </header>
 
     <!-- Contenido principal -->
-    <main class="flex-grow max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+    <main class="flex-grow max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 w-full">
         
         <!-- Bienvenida -->
-        <section class="text-center mb-10">
-            <h2 class="text-4xl font-bold text-primario mb-6">Taller DUA e IA: Prompts para una enseñanza inclusiva</h2>
-            <div class="text-xl font-medium opacity-90 max-w-4xl mx-auto leading-relaxed space-y-4">
+        <section class="text-center mb-8 sm:mb-10">
+            <h2 class="text-3xl sm:text-4xl font-bold text-primario mb-4 sm:mb-6 leading-tight">Taller DUA e IA: Prompts para una enseñanza inclusiva</h2>
+            <div class="text-lg sm:text-xl font-medium opacity-90 max-w-4xl mx-auto leading-relaxed space-y-4">
                 <p>Bienvenido a la guía interactiva del taller.</p>
-                <div class="bg-[#FFF8F0] border-l-4 border-acento p-4 rounded text-left shadow-sm">
-                    <p class="text-primario"><i class="fa-solid fa-circle-info text-acento mr-2"></i> <strong>Recomendación inicial:</strong> Antes de comenzar, lee todas las pestañas para saber qué se espera de tu grupo y poder resolver cualquier duda con los ponentes antes de que se produzca. Después, sigue los pasos para explorar las barreras de tu aula y diseñar respuestas inclusivas.</p>
+                <div class="bg-[#FFF8F0] border-l-4 border-acento p-4 rounded-r-lg text-left shadow-sm">
+                    <p class="text-primario text-base sm:text-lg"><i class="fa-solid fa-circle-info text-acento mr-2"></i> <strong>Recomendación inicial:</strong> Antes de comenzar, lee todas las pestañas para saber qué se espera de tu grupo y poder resolver cualquier duda con los ponentes antes de que se produzca. Después, sigue los pasos para explorar las barreras de tu aula y diseñar respuestas inclusivas.</p>
                 </div>
             </div>
         </section>
@@ -116,147 +116,147 @@
         <!-- Contenedor Principal de Pestañas -->
         <div class="bg-white rounded-2xl shadow-lg border border-[#E5DACD] flex flex-col overflow-hidden relative">
             
-            <!-- Navegación de Pestañas (Horizontal con scroll en móviles) -->
-            <div id="nav-container" class="border-b border-[#E5DACD] bg-[#FAFAF8]">
-                <nav class="flex overflow-x-auto hide-scrollbar" aria-label="Tabs">
-                    <button onclick="openTab(0)" class="tab-btn flex-1 py-5 px-6 text-center border-b-4 font-montserrat font-bold text-base md:text-lg transition-colors border-secundario text-secundario min-w-[max-content] whitespace-nowrap outline-none focus:bg-[#F0EBE1]">
-                        <i class="fa-solid fa-1 mr-2 rounded-full border-2 border-current p-1"></i> Abrir agente
+            <!-- Navegación de Pestañas (Horizontal fluido) -->
+            <div id="nav-container" class="border-b border-[#E5DACD] bg-[#FAFAF8] w-full">
+                <nav class="flex overflow-x-auto hide-scrollbar snap-x snap-mandatory" aria-label="Tabs">
+                    <button onclick="openTab(0)" class="tab-btn flex-1 py-4 sm:py-5 px-4 sm:px-6 text-center border-b-4 font-montserrat font-bold text-sm sm:text-base md:text-lg transition-colors border-secundario text-secundario whitespace-nowrap flex-shrink-0 snap-start outline-none focus:bg-[#F0EBE1]">
+                        <i class="fa-solid fa-1 mr-1 sm:mr-2 rounded-full border-2 border-current p-1 text-xs sm:text-sm"></i> Abrir agente
                     </button>
-                    <button onclick="openTab(1)" class="tab-btn flex-1 py-5 px-6 text-center border-b-4 border-transparent font-montserrat font-bold text-base md:text-lg text-[#8C7A6B] hover:text-primario hover:bg-[#F0EBE1] transition-colors min-w-[max-content] whitespace-nowrap outline-none focus:bg-[#F0EBE1]">
-                        <i class="fa-solid fa-2 mr-2 rounded-full border-2 border-current p-1"></i> Tu pauta
+                    <button onclick="openTab(1)" class="tab-btn flex-1 py-4 sm:py-5 px-4 sm:px-6 text-center border-b-4 border-transparent font-montserrat font-bold text-sm sm:text-base md:text-lg text-[#8C7A6B] hover:text-primario hover:bg-[#F0EBE1] transition-colors whitespace-nowrap flex-shrink-0 snap-start outline-none focus:bg-[#F0EBE1]">
+                        <i class="fa-solid fa-2 mr-1 sm:mr-2 rounded-full border-2 border-current p-1 text-xs sm:text-sm"></i> Tu pauta
                     </button>
-                    <button onclick="openTab(2)" class="tab-btn flex-1 py-5 px-6 text-center border-b-4 border-transparent font-montserrat font-bold text-base md:text-lg text-[#8C7A6B] hover:text-primario hover:bg-[#F0EBE1] transition-colors min-w-[max-content] whitespace-nowrap outline-none focus:bg-[#F0EBE1]">
-                        <i class="fa-solid fa-3 mr-2 rounded-full border-2 border-current p-1"></i> El proceso
+                    <button onclick="openTab(2)" class="tab-btn flex-1 py-4 sm:py-5 px-4 sm:px-6 text-center border-b-4 border-transparent font-montserrat font-bold text-sm sm:text-base md:text-lg text-[#8C7A6B] hover:text-primario hover:bg-[#F0EBE1] transition-colors whitespace-nowrap flex-shrink-0 snap-start outline-none focus:bg-[#F0EBE1]">
+                        <i class="fa-solid fa-3 mr-1 sm:mr-2 rounded-full border-2 border-current p-1 text-xs sm:text-sm"></i> El proceso
                     </button>
-                    <button onclick="openTab(3)" class="tab-btn flex-1 py-5 px-6 text-center border-b-4 border-transparent font-montserrat font-bold text-base md:text-lg text-[#8C7A6B] hover:text-primario hover:bg-[#F0EBE1] transition-colors min-w-[max-content] whitespace-nowrap outline-none focus:bg-[#F0EBE1]">
-                        <i class="fa-solid fa-4 mr-2 rounded-full border-2 border-current p-1"></i> Síntesis
+                    <button onclick="openTab(3)" class="tab-btn flex-1 py-4 sm:py-5 px-4 sm:px-6 text-center border-b-4 border-transparent font-montserrat font-bold text-sm sm:text-base md:text-lg text-[#8C7A6B] hover:text-primario hover:bg-[#F0EBE1] transition-colors whitespace-nowrap flex-shrink-0 snap-start outline-none focus:bg-[#F0EBE1]">
+                        <i class="fa-solid fa-4 mr-1 sm:mr-2 rounded-full border-2 border-current p-1 text-xs sm:text-sm"></i> Síntesis
                     </button>
-                    <button onclick="openTab(4)" class="tab-btn flex-1 py-5 px-6 text-center border-b-4 border-transparent font-montserrat font-bold text-base md:text-lg text-[#8C7A6B] hover:text-primario hover:bg-[#F0EBE1] transition-colors min-w-[max-content] whitespace-nowrap outline-none focus:bg-[#F0EBE1]">
-                        <i class="fa-solid fa-5 mr-2 rounded-full border-2 border-current p-1"></i> A trabajar
+                    <button onclick="openTab(4)" class="tab-btn flex-1 py-4 sm:py-5 px-4 sm:px-6 text-center border-b-4 border-transparent font-montserrat font-bold text-sm sm:text-base md:text-lg text-[#8C7A6B] hover:text-primario hover:bg-[#F0EBE1] transition-colors whitespace-nowrap flex-shrink-0 snap-start outline-none focus:bg-[#F0EBE1]">
+                        <i class="fa-solid fa-5 mr-1 sm:mr-2 rounded-full border-2 border-current p-1 text-xs sm:text-sm"></i> A trabajar
                     </button>
                 </nav>
             </div>
 
             <!-- Contenidos de los pasos -->
-            <div class="p-6 md:p-10 flex-grow min-h-[500px]">
+            <div class="p-5 sm:p-6 md:p-10 flex-grow min-h-[400px]">
                 
                 <!-- PASO 1: Abrir el agente -->
                 <div id="paso1" class="tab-content block">
                     <div class="text-center mb-4">
-                        <h3 class="text-3xl font-bold text-primario mb-6">Acceso a Microsoft Copilot</h3>
-                        <p class="text-xl opacity-90 mb-8 max-w-3xl mx-auto">
+                        <h3 class="text-2xl sm:text-3xl font-bold text-primario mb-4 sm:mb-6">Acceso a Microsoft Copilot</h3>
+                        <p class="text-lg sm:text-xl opacity-90 mb-6 sm:mb-8 max-w-3xl mx-auto">
                             El primer paso consistirá en iniciar el agente de inteligencia artificial que nos guiará durante el taller.
                         </p>
                         
-                        <div class="bg-[#FFF8F0] border-2 border-acento rounded-xl p-8 max-w-3xl mx-auto mb-10 text-left shadow-sm">
-                            <h4 class="font-bold text-primario flex items-center mb-4 text-2xl">
-                                <i class="fa-solid fa-triangle-exclamation text-acento mr-3 text-3xl"></i> Importante: Cuenta corporativa
+                        <div class="bg-[#FFF8F0] border-2 border-acento rounded-xl p-5 sm:p-8 max-w-3xl mx-auto mb-8 sm:mb-10 text-left shadow-sm">
+                            <h4 class="font-bold text-primario flex items-center mb-4 text-xl sm:text-2xl">
+                                <i class="fa-solid fa-triangle-exclamation text-acento mr-3 text-2xl sm:text-3xl"></i> Importante: Cuenta corporativa
                             </h4>
-                            <p class="text-lg opacity-90 mb-6 leading-relaxed">
+                            <p class="text-base sm:text-lg opacity-90 mb-5 sm:mb-6 leading-relaxed">
                                 Debes acceder obligatoriamente con tu cuenta corporativa <strong>@educastillalamancha.es</strong> para garantizar un entorno seguro y protegido, cumpliendo con la normativa de privacidad.
                             </p>
                             
-                            <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded text-red-800 font-medium text-lg">
+                            <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-5 sm:mb-6 rounded text-red-800 font-medium text-base sm:text-lg">
                                 <i class="fa-solid fa-circle-exclamation mr-2"></i> Atención: Si no accedes con tu cuenta @educastillalamancha.es, <strong>el agente no funcionará</strong>.
                             </div>
 
-                            <div class="flex items-start text-lg bg-white p-5 rounded-lg border border-[#E5DACD]">
-                                <i class="fa-solid fa-book-open text-secundario mt-1 mr-4 text-2xl"></i>
-                                <span>Tienes una <strong>guía rápida en papel en tu estación</strong>. También puedes <a href="https://luciaserrano.notion.site/Gu-a-de-uso-r-pido-de-Copilot-1ed820c4eab980f48b5aea97634df223" target="_blank" class="text-secundario font-bold hover:underline focus:ring-2 focus:ring-secundario rounded outline-none">consultar la guía online haciendo clic aquí</a>.</span>
+                            <div class="flex flex-col sm:flex-row items-start text-base sm:text-lg bg-white p-4 sm:p-5 rounded-lg border border-[#E5DACD] gap-3 sm:gap-0">
+                                <i class="fa-solid fa-book-open text-secundario mt-1 sm:mr-4 text-xl sm:text-2xl"></i>
+                                <span>Tienes una <strong>guía rápida en papel en tu estación</strong>. También puedes <a href="https://luciaserrano.notion.site/Gu-a-de-uso-r-pido-de-Copilot-1ed820c4eab980f48b5aea97634df223" target="_blank" class="text-secundario font-bold hover:underline focus:ring-2 focus:ring-secundario rounded outline-none break-words">consultar la guía online haciendo clic aquí</a>.</span>
                             </div>
                         </div>
 
-                        <div class="mt-8 p-6 bg-[#F0EBE1] rounded-xl inline-block shadow-sm">
-                            <p class="text-xl font-bold text-primario flex items-center">
-                                <i class="fa-solid fa-arrow-right-to-bracket mr-3 text-secundario"></i> 
-                                El enlace directo para acceder al agente lo encontrarás en la pestaña 5: "A trabajar".
+                        <div class="mt-6 sm:mt-8 p-4 sm:p-6 bg-[#F0EBE1] rounded-xl inline-block shadow-sm mx-auto w-full max-w-3xl">
+                            <p class="text-lg sm:text-xl font-bold text-primario flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-0">
+                                <i class="fa-solid fa-arrow-right-to-bracket sm:mr-3 text-secundario text-2xl"></i> 
+                                <span>El enlace directo para acceder al agente lo encontrarás en la pestaña 5: "A trabajar".</span>
                             </p>
                         </div>
                     </div>
 
                     <!-- Botones de navegación -->
-                    <div class="mt-12 flex justify-end border-t border-[#E5DACD] pt-8">
-                        <button onclick="goToTab(1)" class="inline-flex items-center px-8 py-3 bg-primario text-white text-lg font-bold rounded-full hover:brightness-125 transition-all shadow-md outline-none focus:ring-4 focus:ring-primario">
-                            Siguiente <i class="fa-solid fa-arrow-right ml-3"></i>
+                    <div class="mt-8 sm:mt-12 flex justify-end border-t border-[#E5DACD] pt-6 sm:pt-8 w-full">
+                        <button onclick="goToTab(1)" class="w-full sm:w-auto inline-flex justify-center items-center px-6 sm:px-8 py-3 sm:py-4 bg-primario text-white text-base sm:text-lg font-bold rounded-full hover:brightness-125 transition-all shadow-md outline-none focus:ring-4 focus:ring-primario">
+                            Siguiente <i class="fa-solid fa-arrow-right ml-2 sm:ml-3"></i>
                         </button>
                     </div>
                 </div>
 
                 <!-- PASO 2: Tu pauta -->
                 <div id="paso2" class="tab-content hidden">
-                    <h3 class="text-3xl font-bold text-primario mb-6">Inicia la conversación en el agente</h3>
-                    <p class="opacity-90 mb-8 text-xl leading-relaxed">
+                    <h3 class="text-2xl sm:text-3xl font-bold text-primario mb-4 sm:mb-6">Inicia la conversación en el agente</h3>
+                    <p class="opacity-90 mb-6 sm:mb-8 text-lg sm:text-xl leading-relaxed">
                         En el agente (cuando lo abras al final de este recorrido), <strong>no hace falta que escribas nada</strong> para empezar. Las indicaciones de cada grupo aparecen directamente como botones sugeridos en la pantalla principal.
                     </p>
 
-                    <div class="bg-gray-50 p-6 md:p-8 rounded-2xl border border-gray-200 mb-6 max-w-4xl mx-auto shadow-inner">
-                        <p class="text-lg text-center font-bold text-primario mb-6"><i class="fa-solid fa-hand-pointer mr-3"></i>Haz clic en el botón de tu grupo para comenzar</p>
+                    <div class="bg-gray-50 p-4 sm:p-6 md:p-8 rounded-2xl border border-gray-200 mb-6 max-w-4xl mx-auto shadow-inner">
+                        <p class="text-base sm:text-lg text-center font-bold text-primario mb-4 sm:mb-6"><i class="fa-solid fa-hand-pointer mr-2 sm:mr-3"></i>Haz clic en el botón de tu grupo para comenzar</p>
                         
                         <img src="https://i.postimg.cc/6qP6X6FS/Captura-de-pantalla-2026-03-12-104631.png" 
                              alt="Captura de pantalla de la interfaz de chat de Microsoft Copilot mostrando botones de sugerencias en la parte inferior. Estos botones contienen los textos de inicio para cada uno de los grupos del taller." 
                              class="rounded-lg shadow-md w-full h-auto border border-gray-300">
                              
-                        <div class="mt-8 p-6 bg-white border-l-8 border-acento text-lg rounded-r-lg shadow-sm flex items-start">
-                            <i class="fa-solid fa-circle-info text-acento mt-1 mr-4 text-2xl"></i>
+                        <div class="mt-6 sm:mt-8 p-4 sm:p-6 bg-white border-l-4 sm:border-l-8 border-acento text-base sm:text-lg rounded-r-lg shadow-sm flex items-start">
+                            <i class="fa-solid fa-circle-info text-acento mt-1 mr-3 sm:mr-4 text-xl sm:text-2xl"></i>
                             <p><strong>¿No ves tu pauta?</strong> Si tu grupo no aparece en los primeros botones visibles, pulsa en el botón inferior <strong>"Galería de indicaciones"</strong> para desplegar la lista completa.</p>
                         </div>
                     </div>
 
                     <!-- Botones de navegación -->
-                    <div class="mt-12 flex justify-between items-center border-t border-[#E5DACD] pt-8">
-                        <button onclick="goToTab(0)" class="inline-flex items-center px-6 py-3 bg-white border border-[#E5DACD] text-primario text-lg font-bold rounded-full hover:bg-[#F0EBE1] transition-all shadow-sm outline-none focus:ring-4 focus:ring-[#F0EBE1]">
-                            <i class="fa-solid fa-arrow-left mr-3"></i> Anterior
+                    <div class="mt-8 sm:mt-12 flex flex-col-reverse sm:flex-row justify-between items-center border-t border-[#E5DACD] pt-6 sm:pt-8 gap-4 sm:gap-0 w-full">
+                        <button onclick="goToTab(0)" class="w-full sm:w-auto inline-flex justify-center items-center px-6 sm:px-8 py-3 sm:py-4 bg-white border border-[#E5DACD] text-primario text-base sm:text-lg font-bold rounded-full hover:bg-[#F0EBE1] transition-all shadow-sm outline-none focus:ring-4 focus:ring-[#F0EBE1]">
+                            <i class="fa-solid fa-arrow-left mr-2 sm:mr-3"></i> Anterior
                         </button>
-                        <button onclick="goToTab(2)" class="inline-flex items-center px-8 py-3 bg-primario text-white text-lg font-bold rounded-full hover:brightness-125 transition-all shadow-md outline-none focus:ring-4 focus:ring-primario">
-                            Siguiente <i class="fa-solid fa-arrow-right ml-3"></i>
+                        <button onclick="goToTab(2)" class="w-full sm:w-auto inline-flex justify-center items-center px-6 sm:px-8 py-3 sm:py-4 bg-primario text-white text-base sm:text-lg font-bold rounded-full hover:brightness-125 transition-all shadow-md outline-none focus:ring-4 focus:ring-primario">
+                            Siguiente <i class="fa-solid fa-arrow-right ml-2 sm:ml-3"></i>
                         </button>
                     </div>
                 </div>
 
                 <!-- PASO 3: El proceso -->
                 <div id="paso3" class="tab-content hidden">
-                    <h3 class="text-3xl font-bold text-primario mb-6">Interacción guiada con la inteligencia artificial</h3>
-                    <p class="opacity-90 mb-8 text-xl leading-relaxed">
+                    <h3 class="text-2xl sm:text-3xl font-bold text-primario mb-4 sm:mb-6">Interacción guiada con la inteligencia artificial</h3>
+                    <p class="opacity-90 mb-6 sm:mb-8 text-lg sm:text-xl leading-relaxed">
                         Una vez que inicies la conversación en Microsoft Copilot, el agente tomará el control. Este es un esquema de lo que hará por vosotros y algunas recomendaciones para sacarle el máximo partido.
                     </p>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-4">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-4">
                         <!-- Qué hará el agente -->
-                        <div class="bg-white p-8 rounded-2xl border border-[#E5DACD] shadow-sm">
-                            <h4 class="font-bold text-secundario mb-6 text-2xl border-b border-secundario inline-block pb-2">¿Qué hará el agente?</h4>
-                            <ul class="space-y-6 text-lg text-slate-700">
+                        <div class="bg-white p-5 sm:p-8 rounded-2xl border border-[#E5DACD] shadow-sm">
+                            <h4 class="font-bold text-secundario mb-4 sm:mb-6 text-xl sm:text-2xl border-b border-secundario inline-block pb-2">¿Qué hará el agente?</h4>
+                            <ul class="space-y-4 sm:space-y-6 text-base sm:text-lg text-slate-700">
                                 <li class="flex items-start">
-                                    <div class="flex-shrink-0 w-10 h-10 rounded-full bg-[#F0EBE1] text-primario flex items-center justify-center font-bold mr-4 mt-1 border border-[#E5DACD]">1</div>
+                                    <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#F0EBE1] text-primario flex items-center justify-center font-bold mr-3 sm:mr-4 mt-1 border border-[#E5DACD] text-sm sm:text-base">1</div>
                                     <div>
-                                        <strong class="block text-primario text-xl mb-1">Exploración de la pauta</strong>
+                                        <strong class="block text-primario text-lg sm:text-xl mb-1">Exploración de la pauta</strong>
                                         <p>Primero, analizaréis en profundidad la pauta DUA que os ha tocado para entender su objetivo y alcance real.</p>
                                     </div>
                                 </li>
                                 <li class="flex items-start">
-                                    <div class="flex-shrink-0 w-10 h-10 rounded-full bg-[#F0EBE1] text-primario flex items-center justify-center font-bold mr-4 mt-1 border border-[#E5DACD]">2</div>
+                                    <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#F0EBE1] text-primario flex items-center justify-center font-bold mr-3 sm:mr-4 mt-1 border border-[#E5DACD] text-sm sm:text-base">2</div>
                                     <div>
-                                        <strong class="block text-primario text-xl mb-1">Contextualización</strong>
+                                        <strong class="block text-primario text-lg sm:text-xl mb-1">Contextualización</strong>
                                         <p>Os preguntará por la situación de vuestra aula para aterrizar la teoría en un caso real de adultos.</p>
                                     </div>
                                 </li>
                                 <li class="flex items-start">
-                                    <div class="flex-shrink-0 w-10 h-10 rounded-full bg-[#F0EBE1] text-primario flex items-center justify-center font-bold mr-4 mt-1 border border-[#E5DACD]">3</div>
+                                    <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#F0EBE1] text-primario flex items-center justify-center font-bold mr-3 sm:mr-4 mt-1 border border-[#E5DACD] text-sm sm:text-base">3</div>
                                     <div>
-                                        <strong class="block text-primario text-xl mb-1">Diseño guiado</strong>
+                                        <strong class="block text-primario text-lg sm:text-xl mb-1">Diseño guiado</strong>
                                         <p>Os enseñará a formular la instrucción perfecta paso a paso utilizando el método R.I.T.A.</p>
                                     </div>
                                 </li>
                                 <li class="flex items-start">
-                                    <div class="flex-shrink-0 w-10 h-10 rounded-full bg-[#F0EBE1] text-primario flex items-center justify-center font-bold mr-4 mt-1 border border-[#E5DACD]">4</div>
+                                    <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#F0EBE1] text-primario flex items-center justify-center font-bold mr-3 sm:mr-4 mt-1 border border-[#E5DACD] text-sm sm:text-base">4</div>
                                     <div>
-                                        <strong class="block text-primario text-xl mb-1">Creación de recursos</strong>
+                                        <strong class="block text-primario text-lg sm:text-xl mb-1">Creación de recursos</strong>
                                         <p>Producirá un borrador de actividad inclusiva basado en vuestras decisiones pedagógicas.</p>
                                     </div>
                                 </li>
                                 <li class="flex items-start">
-                                    <div class="flex-shrink-0 w-10 h-10 rounded-full bg-acento text-white flex items-center justify-center font-bold mr-4 mt-1 border border-acento">5</div>
+                                    <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-acento text-white flex items-center justify-center font-bold mr-3 sm:mr-4 mt-1 border border-acento text-sm sm:text-base">5</div>
                                     <div>
-                                        <strong class="block text-primario text-xl mb-1">Producto final</strong>
+                                        <strong class="block text-primario text-lg sm:text-xl mb-1">Producto final</strong>
                                         <p>Os ayudará a estructurar las conclusiones y preparará el resumen que compartiréis con el resto de compañeros.</p>
                                     </div>
                                 </li>
@@ -264,21 +264,21 @@
                         </div>
 
                         <!-- Recomendaciones -->
-                        <div class="bg-[#FFF8F0] p-8 rounded-2xl border-2 border-acento shadow-sm h-fit">
-                            <h4 class="font-bold text-primario mb-6 text-2xl flex items-center">
-                                <i class="fa-solid fa-lightbulb text-acento mr-3"></i> Recomendaciones prácticas
+                        <div class="bg-[#FFF8F0] p-5 sm:p-8 rounded-2xl border-2 border-acento shadow-sm h-fit">
+                            <h4 class="font-bold text-primario mb-4 sm:mb-6 text-xl sm:text-2xl flex items-center">
+                                <i class="fa-solid fa-lightbulb text-acento mr-2 sm:mr-3"></i> Recomendaciones prácticas
                             </h4>
-                            <ul class="space-y-5 text-lg opacity-90">
-                                <li class="flex items-start bg-white p-5 rounded-xl border border-[#E5DACD]">
-                                    <i class="fa-solid fa-check text-green-600 mt-1 mr-4 text-2xl"></i>
+                            <ul class="space-y-4 sm:space-y-5 text-base sm:text-lg opacity-90">
+                                <li class="flex items-start bg-white p-4 sm:p-5 rounded-xl border border-[#E5DACD] shadow-sm">
+                                    <i class="fa-solid fa-check text-green-600 mt-1 mr-3 sm:mr-4 text-xl sm:text-2xl"></i>
                                     <span>Sed específicos en las características y contexto de vuestros estudiantes de Educación de Personas Adultas.</span>
                                 </li>
-                                <li class="flex items-start bg-white p-5 rounded-xl border border-[#E5DACD]">
-                                    <i class="fa-solid fa-comments text-secundario mt-1 mr-4 text-2xl"></i>
+                                <li class="flex items-start bg-white p-4 sm:p-5 rounded-xl border border-[#E5DACD] shadow-sm">
+                                    <i class="fa-solid fa-comments text-secundario mt-1 mr-3 sm:mr-4 text-xl sm:text-2xl"></i>
                                     <span>Dialogad de forma natural. Si el primer resultado no es útil o no os convence, pedidle que lo ajuste.</span>
                                 </li>
-                                <li class="flex items-start bg-white p-5 rounded-xl border-l-8 border-l-red-500">
-                                    <i class="fa-solid fa-shield-halved text-red-600 mt-1 mr-4 text-2xl"></i>
+                                <li class="flex items-start bg-white p-4 sm:p-5 rounded-xl border-l-4 sm:border-l-8 border-l-red-500 shadow-sm">
+                                    <i class="fa-solid fa-shield-halved text-red-600 mt-1 mr-3 sm:mr-4 text-xl sm:text-2xl"></i>
                                     <span>No incluyáis en ningún momento nombres ni datos reales y sensibles de vuestro alumnado.</span>
                                 </li>
                             </ul>
@@ -286,89 +286,89 @@
                     </div>
 
                     <!-- Botones de navegación -->
-                    <div class="mt-12 flex justify-between items-center border-t border-[#E5DACD] pt-8">
-                        <button onclick="goToTab(1)" class="inline-flex items-center px-6 py-3 bg-white border border-[#E5DACD] text-primario text-lg font-bold rounded-full hover:bg-[#F0EBE1] transition-all shadow-sm outline-none focus:ring-4 focus:ring-[#F0EBE1]">
-                            <i class="fa-solid fa-arrow-left mr-3"></i> Anterior
+                    <div class="mt-8 sm:mt-12 flex flex-col-reverse sm:flex-row justify-between items-center border-t border-[#E5DACD] pt-6 sm:pt-8 gap-4 sm:gap-0 w-full">
+                        <button onclick="goToTab(1)" class="w-full sm:w-auto inline-flex justify-center items-center px-6 sm:px-8 py-3 sm:py-4 bg-white border border-[#E5DACD] text-primario text-base sm:text-lg font-bold rounded-full hover:bg-[#F0EBE1] transition-all shadow-sm outline-none focus:ring-4 focus:ring-[#F0EBE1]">
+                            <i class="fa-solid fa-arrow-left mr-2 sm:mr-3"></i> Anterior
                         </button>
-                        <button onclick="goToTab(3)" class="inline-flex items-center px-8 py-3 bg-primario text-white text-lg font-bold rounded-full hover:brightness-125 transition-all shadow-md outline-none focus:ring-4 focus:ring-primario">
-                            Siguiente <i class="fa-solid fa-arrow-right ml-3"></i>
+                        <button onclick="goToTab(3)" class="w-full sm:w-auto inline-flex justify-center items-center px-6 sm:px-8 py-3 sm:py-4 bg-primario text-white text-base sm:text-lg font-bold rounded-full hover:brightness-125 transition-all shadow-md outline-none focus:ring-4 focus:ring-primario">
+                            Siguiente <i class="fa-solid fa-arrow-right ml-2 sm:ml-3"></i>
                         </button>
                     </div>
                 </div>
 
                 <!-- PASO 4: Síntesis -->
                 <div id="paso4" class="tab-content hidden text-center">
-                    <div class="inline-flex justify-center items-center w-24 h-24 rounded-full bg-[#F5E6E3] text-secundario mb-6 shadow-sm">
-                        <i class="fa-solid fa-flag-checkered text-5xl"></i>
+                    <div class="inline-flex justify-center items-center w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#F5E6E3] text-secundario mb-4 sm:mb-6 shadow-sm">
+                        <i class="fa-solid fa-flag-checkered text-4xl sm:text-5xl"></i>
                     </div>
-                    <h3 class="text-4xl font-bold text-primario mb-6">Cierre y síntesis final</h3>
-                    <p class="text-xl opacity-90 max-w-3xl mx-auto mb-10 leading-relaxed">
+                    <h3 class="text-3xl sm:text-4xl font-bold text-primario mb-4 sm:mb-6">Cierre y síntesis final</h3>
+                    <p class="text-lg sm:text-xl opacity-90 max-w-3xl mx-auto mb-6 sm:mb-10 leading-relaxed px-2">
                         El propio agente os irá guiando en los pasos finales para redactar el resumen de vuestro grupo. Aseguraos de seguir sus instrucciones detenidamente.
                     </p>
                     
                     <!-- Compartimos hallazgos (Versión Resumida) -->
-                    <div class="bg-white rounded-2xl p-8 border-2 border-acento text-left max-w-3xl mx-auto shadow-lg relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-3 h-full bg-acento"></div>
+                    <div class="bg-white rounded-2xl p-6 sm:p-8 border-2 border-acento text-left max-w-3xl mx-auto shadow-lg relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-2 sm:w-3 h-full bg-acento"></div>
                         
-                        <h4 class="font-bold text-2xl text-primario mb-4 font-montserrat flex items-center">
-                            <div class="w-4 h-4 rounded-full bg-red-600 pulse-rojo mr-3"></div>
+                        <h4 class="font-bold text-xl sm:text-2xl text-primario mb-4 font-montserrat flex items-center">
+                            <div class="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-red-600 pulse-rojo mr-3"></div>
                             Compartimos hallazgos (Sesión grabada)
                         </h4>
                         
-                        <p class="mb-5 text-lg text-gray-800 leading-relaxed">
+                        <p class="mb-4 sm:mb-5 text-base sm:text-lg text-gray-800 leading-relaxed">
                             Grabaremos esta parte final en audio para trascender el taller. Usaremos inteligencia artificial (NotebookLM) para convertir vuestras reflexiones orales en recursos útiles para todos.
                         </p>
                         
-                        <ul class="space-y-4 mt-6 text-lg text-gray-700">
-                            <li class="flex items-start bg-[#FFF8F0] p-4 rounded-lg border border-[#E5DACD]">
-                                <i class="fa-solid fa-share-nodes mt-1 mr-4 text-secundario text-2xl"></i>
+                        <ul class="space-y-3 sm:space-y-4 mt-4 sm:mt-6 text-base sm:text-lg text-gray-700">
+                            <li class="flex items-start bg-[#FFF8F0] p-3 sm:p-4 rounded-lg border border-[#E5DACD]">
+                                <i class="fa-solid fa-share-nodes mt-1 mr-3 sm:mr-4 text-secundario text-xl sm:text-2xl"></i>
                                 <span><strong>Creación colectiva:</strong> Generaremos un podcast didáctico, un documento de síntesis y una infografía con las conclusiones de todos los CEPA.</span>
                             </li>
-                            <li class="flex items-start bg-[#FFF8F0] p-4 rounded-lg border border-[#E5DACD]">
-                                <i class="fa-solid fa-shield-halved mt-1 mr-4 text-secundario text-2xl"></i>
+                            <li class="flex items-start bg-[#FFF8F0] p-3 sm:p-4 rounded-lg border border-[#E5DACD]">
+                                <i class="fa-solid fa-shield-halved mt-1 mr-3 sm:mr-4 text-secundario text-xl sm:text-2xl"></i>
                                 <span><strong>Uso pedagógico:</strong> La grabación es confidencial y educativa (la participación implica aceptar estas condiciones).</span>
                             </li>
                         </ul>
                     </div>
                     
-                    <div class="mt-8 p-6 max-w-3xl mx-auto bg-[#F0EBE1] border-l-8 border-secundario text-primario rounded-r-xl shadow-md text-left flex items-start">
-                        <i class="fa-solid fa-lightbulb text-secundario mr-4 text-3xl mt-1"></i> 
-                        <span class="text-xl leading-relaxed"><strong>No olvidéis elegir a un portavoz</strong> de vuestro grupo para compartir las conclusiones cuando finalice el tiempo.</span>
+                    <div class="mt-6 sm:mt-8 p-4 sm:p-6 max-w-3xl mx-auto bg-[#F0EBE1] border-l-4 sm:border-l-8 border-secundario text-primario rounded-r-xl shadow-md text-left flex items-start">
+                        <i class="fa-solid fa-lightbulb text-secundario mr-3 sm:mr-4 text-2xl sm:text-3xl mt-1"></i> 
+                        <span class="text-base sm:text-xl leading-relaxed"><strong>No olvidéis elegir a un portavoz</strong> de vuestro grupo para compartir las conclusiones cuando finalice el tiempo.</span>
                     </div>
 
                     <!-- Botones de navegación -->
-                    <div class="mt-12 flex justify-between items-center border-t border-[#E5DACD] pt-8">
-                        <button onclick="goToTab(2)" class="inline-flex items-center px-6 py-3 bg-white border border-[#E5DACD] text-primario text-lg font-bold rounded-full hover:bg-[#F0EBE1] transition-all shadow-sm outline-none focus:ring-4 focus:ring-[#F0EBE1]">
-                            <i class="fa-solid fa-arrow-left mr-3"></i> Anterior
+                    <div class="mt-8 sm:mt-12 flex flex-col-reverse sm:flex-row justify-between items-center border-t border-[#E5DACD] pt-6 sm:pt-8 gap-4 sm:gap-0 w-full">
+                        <button onclick="goToTab(2)" class="w-full sm:w-auto inline-flex justify-center items-center px-6 sm:px-8 py-3 sm:py-4 bg-white border border-[#E5DACD] text-primario text-base sm:text-lg font-bold rounded-full hover:bg-[#F0EBE1] transition-all shadow-sm outline-none focus:ring-4 focus:ring-[#F0EBE1]">
+                            <i class="fa-solid fa-arrow-left mr-2 sm:mr-3"></i> Anterior
                         </button>
-                        <button onclick="goToTab(4)" class="inline-flex items-center px-8 py-3 bg-primario text-white text-lg font-bold rounded-full hover:brightness-125 transition-all shadow-md outline-none focus:ring-4 focus:ring-primario">
-                            Siguiente <i class="fa-solid fa-arrow-right ml-3"></i>
+                        <button onclick="goToTab(4)" class="w-full sm:w-auto inline-flex justify-center items-center px-6 sm:px-8 py-3 sm:py-4 bg-primario text-white text-base sm:text-lg font-bold rounded-full hover:brightness-125 transition-all shadow-md outline-none focus:ring-4 focus:ring-primario">
+                            Siguiente <i class="fa-solid fa-arrow-right ml-2 sm:ml-3"></i>
                         </button>
                     </div>
                 </div>
 
                 <!-- PASO 5: A trabajar -->
-                <div id="paso5" class="tab-content hidden text-center py-8">
-                    <div class="inline-flex justify-center items-center w-28 h-28 rounded-full bg-[#E5DACD] text-primario mb-8 shadow-md">
-                        <i class="fa-solid fa-rocket text-6xl"></i>
+                <div id="paso5" class="tab-content hidden text-center py-6 sm:py-8">
+                    <div class="inline-flex justify-center items-center w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-[#E5DACD] text-primario mb-6 sm:mb-8 shadow-md">
+                        <i class="fa-solid fa-rocket text-4xl sm:text-6xl"></i>
                     </div>
                     
-                    <h3 class="text-5xl font-bold text-primario mb-6 font-montserrat">¡A trabajar!</h3>
+                    <h3 class="text-4xl sm:text-5xl font-bold text-primario mb-4 sm:mb-6 font-montserrat">¡A trabajar!</h3>
                     
-                    <p class="text-2xl opacity-90 max-w-3xl mx-auto mb-12 leading-relaxed text-slate-700">
+                    <p class="text-lg sm:text-2xl opacity-90 max-w-3xl mx-auto mb-8 sm:mb-12 leading-relaxed text-slate-700 px-2">
                         Es el momento de poner en práctica todo lo que hemos visto. Haz clic en el botón inferior para abrir el agente en Microsoft Copilot y comenzar a diseñar.
                     </p>
                     
-                    <a href="https://m365.cloud.microsoft/chat/?titleId=T_e38e05fd-3025-2a80-3c3a-0301848a120f&source=embedded-builder" target="_blank" class="inline-flex items-center justify-center px-12 py-6 text-2xl font-bold text-white bg-secundario hover:brightness-110 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 focus:ring-4 focus:ring-secundario outline-none mb-4 group">
-                        <i class="fa-solid fa-robot mr-4 text-3xl group-hover:animate-bounce"></i> Abrir agente IA
+                    <a href="https://m365.cloud.microsoft/chat/?titleId=T_e38e05fd-3025-2a80-3c3a-0301848a120f&source=embedded-builder" target="_blank" class="w-full sm:w-auto inline-flex items-center justify-center px-6 sm:px-12 py-4 sm:py-6 text-xl sm:text-2xl font-bold text-white bg-secundario hover:brightness-110 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 sm:hover:-translate-y-2 focus:ring-4 focus:ring-secundario outline-none mb-4 group">
+                        <i class="fa-solid fa-robot mr-3 sm:mr-4 text-2xl sm:text-3xl group-hover:animate-bounce"></i> Abrir agente IA
                     </a>
                     
-                    <p class="mt-6 text-lg text-slate-500"><i class="fa-solid fa-shield-halved text-green-600 mr-2"></i> Recuerda: Accede al agente con tu cuenta @educastillalamancha.es</p>
+                    <p class="mt-4 sm:mt-6 text-base sm:text-lg text-slate-500 px-4"><i class="fa-solid fa-shield-halved text-green-600 mr-2"></i> Recuerda: Accede al agente con tu cuenta @educastillalamancha.es</p>
 
                     <!-- Botones de navegación -->
-                    <div class="mt-12 flex justify-start border-t border-[#E5DACD] pt-8 text-left">
-                        <button onclick="goToTab(3)" class="inline-flex items-center px-6 py-3 bg-white border border-[#E5DACD] text-primario text-lg font-bold rounded-full hover:bg-[#F0EBE1] transition-all shadow-sm outline-none focus:ring-4 focus:ring-[#F0EBE1]">
-                            <i class="fa-solid fa-arrow-left mr-3"></i> Anterior
+                    <div class="mt-8 sm:mt-12 flex justify-start border-t border-[#E5DACD] pt-6 sm:pt-8 text-left w-full">
+                        <button onclick="goToTab(3)" class="w-full sm:w-auto inline-flex justify-center items-center px-6 sm:px-8 py-3 sm:py-4 bg-white border border-[#E5DACD] text-primario text-base sm:text-lg font-bold rounded-full hover:bg-[#F0EBE1] transition-all shadow-sm outline-none focus:ring-4 focus:ring-[#F0EBE1]">
+                            <i class="fa-solid fa-arrow-left mr-2 sm:mr-3"></i> Anterior
                         </button>
                     </div>
                 </div>
@@ -379,14 +379,14 @@
     </main>
 
     <!-- Pie de página -->
-    <footer class="bg-primario text-[#E0D5C1] py-10 text-center mt-auto border-t-8 border-[#3A2518]">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-left">
-            <div class="mb-4 md:mb-0 text-center md:text-left">
-                <p class="mb-2 font-bold font-montserrat text-xl">II Jornada de buenas prácticas y retos educativos en CEPA</p>
-                <p class="text-base">Organizado por: Jesús María Cano Lara y Lucía Serrano Palomo</p>
+    <footer class="bg-primario text-[#E0D5C1] py-8 sm:py-10 text-center mt-auto border-t-8 border-[#3A2518]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-4 md:gap-0">
+            <div>
+                <p class="mb-1 sm:mb-2 font-bold font-montserrat text-lg sm:text-xl">II Jornada de buenas prácticas y retos educativos en CEPA</p>
+                <p class="text-sm sm:text-base">Organizado por: Jesús María Cano Lara y Lucía Serrano Palomo</p>
             </div>
-            <div class="text-center md:text-right text-base opacity-80">
-                <p><i class="fa-solid fa-location-dot mr-2"></i> CEPA Simienza, Tomelloso</p>
+            <div class="text-sm sm:text-base opacity-80">
+                <p><i class="fa-solid fa-location-dot mr-1 sm:mr-2"></i> CEPA Simienza, Tomelloso</p>
             </div>
         </div>
     </footer>
@@ -411,11 +411,15 @@
             // Mostrar el paso actual
             document.getElementById(tabsId[index]).style.display = "block";
             tabLinks[index].className = tabLinks[index].className.replace(" border-transparent text-[#8C7A6B] hover:text-primario hover:bg-[#F0EBE1]", " border-secundario text-secundario");
+            
+            // Asegurar que la pestaña activa sea visible en el scroll horizontal (para móviles)
+            tabLinks[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         }
 
         // Función auxiliar para navegar desde los botones inferiores y hacer scroll automático
         function goToTab(index) {
             openTab(index);
+            // Hacer scroll hasta arriba de las pestañas
             document.getElementById("nav-container").scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
