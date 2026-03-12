@@ -649,7 +649,37 @@
             const old = b.innerHTML;
             b.innerHTML = '<i class="fas fa-check"></i> ¡Guardado!';
             b.classList.add('bg-olive');
+            
+            clearFields();
+
             setTimeout(() => { b.innerHTML = old; b.classList.remove('bg-olive'); }, 1500);
+        }
+
+        function clearFields() {
+            if (currentMainTab === 'obras') {
+                document.getElementById('authorsList').innerHTML = "";
+                authorCount = 0;
+                addAuthorField();
+                document.getElementById('f_year').value = "";
+                document.getElementById('f_date_extra').value = "";
+                document.getElementById('f_title').value = "";
+                document.getElementById('f_source').value = "";
+                document.getElementById('f_url').value = "";
+                updatePreviewObras();
+            } else {
+                document.getElementById('el_type_num').value = "";
+                document.getElementById('el_title').value = "";
+                document.getElementById('el_action').value = "";
+                document.getElementById('el_tool').value = "";
+                document.getElementById('el_tool_url').value = "";
+                document.getElementById('el_company').value = "";
+                document.getElementById('el_company_url').value = "";
+                document.getElementById('el_year').value = "";
+                document.getElementById('el_license').value = "";
+                document.querySelector('input[name="el_author_type"][value="human"]').checked = true;
+                toggleElementType();
+                updatePreviewElementos();
+            }
         }
 
         function renderHistory() {
