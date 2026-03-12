@@ -90,11 +90,11 @@
     </nav>
 
     <main class="max-w-7xl mx-auto mt-6 p-4">
-        <!-- Contenedor grid: garantiza dos columnas paralelas en pantallas de tablet o mayores -->
-        <div id="layout-container" class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start w-full">
+        <!-- Contenedor grid: 3 columnas a partir de pantallas medianas -->
+        <div id="layout-container" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start w-full">
             
-            <!-- SECCIÓN IZQUIERDA: FORMULARIOS (8 columnas) -->
-            <div id="form-column" class="md:col-span-8 bg-white rounded-xl shadow-md border border-tan p-5 md:p-8 transition-all overflow-hidden min-w-0">
+            <!-- SECCIÓN IZQUIERDA: FORMULARIOS (Ocupa 2 de las 3 columnas en paralelo) -->
+            <div id="form-column" class="md:col-span-2 bg-white rounded-xl shadow-md border border-tan p-5 md:p-8 transition-all overflow-hidden min-w-0">
                 
                 <!-- Pestañas Principales -->
                 <div class="flex border-b border-tan mb-6 overflow-x-auto no-scrollbar">
@@ -160,8 +160,8 @@
                 <div id="view-elementos" class="hidden">
                     <div class="mb-6 flex flex-wrap justify-between items-center gap-4 bg-cream p-4 rounded-lg border border-tan">
                         <div class="flex flex-wrap gap-2">
-                            <button onclick="setTypeElementos('imagen')" id="btn-imagen" class="btn-special active px-4 py-2 rounded-md text-sm text-white transition font-medium" style="background-color: var(--special-ai);">Imagen / Figura</button>
-                            <button onclick="setTypeElementos('audio')" id="btn-audio" class="btn-special inactive px-4 py-2 rounded-md text-sm text-white transition font-medium" style="background-color: var(--special-ai);">Audio</button>
+                            <button onclick="setTypeElementos('imagen')" id="btn-imagen" class="px-4 py-2 rounded-md text-sm transition font-medium bg-rust text-white shadow-sm">Imagen / Figura</button>
+                            <button onclick="setTypeElementos('audio')" id="btn-audio" class="px-4 py-2 rounded-md bg-white text-stone-700 border border-tan text-sm transition hover:bg-stone-50">Audio</button>
                             <button onclick="setTypeElementos('video')" id="btn-video" class="px-4 py-2 rounded-md bg-white text-stone-700 border border-tan text-sm transition hover:bg-stone-50">Vídeo</button>
                         </div>
                         <button onclick="loadExampleElementos()" class="text-sm font-bold text-rust hover:underline"><i class="fas fa-lightbulb mr-1"></i> Cargar ejemplo</button>
@@ -245,7 +245,22 @@
 
                 <!-- VISTA: HISTORIAL -->
                 <div id="view-historial" class="hidden">
-                    <h2 class="text-xl font-bold mb-6 pb-2 border-b border-tan" style="color: var(--color-dark-green)">Bibliografía organizada</h2>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 pb-2 border-b border-tan gap-4">
+                        <h2 class="text-xl font-bold" style="color: var(--color-dark-green)">Bibliografía organizada</h2>
+                        
+                        <!-- DESPLEGABLE DE ORDENACIÓN -->
+                        <div class="flex items-center space-x-2 bg-cream p-1.5 rounded-lg border border-tan w-full sm:w-auto">
+                            <label for="history-sort" class="text-[11px] font-bold text-dark-green uppercase pl-2"><i class="fas fa-sort mr-1"></i> Orden:</label>
+                            <select id="history-sort" class="p-1 border border-stone-200 rounded text-xs bg-white focus:ring-1 focus:ring-tan outline-none flex-grow" onchange="renderHistory()">
+                                <option value="az">Alfabético (A-Z)</option>
+                                <option value="za">Alfabético (Z-A)</option>
+                                <option value="newest">Más recientes (guardado)</option>
+                                <option value="oldest">Más antiguos (guardado)</option>
+                                <option value="pub_desc">Año de publicación (Más nuevos)</option>
+                                <option value="pub_asc">Año de publicación (Más antiguos)</option>
+                            </select>
+                        </div>
+                    </div>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
                         <button onclick="copyFullBibliography('visual')" class="bg-rust text-white py-3 rounded-lg text-xs font-bold shadow hover:bg-orange-800 transition">Copiar Visual</button>
@@ -321,8 +336,8 @@
             </div>
 
             <!-- SECCIÓN DERECHA: RESULTADOS (Fija en paralelo) -->
-            <!-- 4 columnas reservadas para el lateral -->
-            <div id="results-column" class="md:col-span-4 space-y-4 transition-all overflow-hidden min-w-0">
+            <!-- 1 columna reservada para el lateral en el grid de 3 columnas -->
+            <div id="results-column" class="md:col-span-1 space-y-4 transition-all overflow-hidden min-w-0">
                 <div class="bg-white rounded-xl shadow-md border border-tan overflow-hidden sticky top-24">
                     <div class="bg-dark-green text-white p-4 flex justify-between items-center">
                         <h3 class="font-bold text-xs uppercase tracking-widest"><i class="fas fa-eye mr-2"></i> Resultados</h3>
@@ -410,7 +425,7 @@
         let historyData = [];
         let isPedagogyActive = true;
 
-        // Generador de ID único robusto
+        // Generador de ID único
         function generateUID() {
             return Date.now().toString(36) + Math.random().toString(36).substr(2);
         }
@@ -433,17 +448,16 @@
             const formCol = document.getElementById('form-column');
             const inlinePanel = document.getElementById('inline-citations-panel');
 
-            // Ajuste dinámico de columnas usando clases Tailwind para evitar scroll horizontal
+            // Ajuste dinámico de columnas asegurando comportamiento nativo de Tailwind
             if (tabName === 'historial' || tabName === 'ayuda') {
                 results.classList.add('hidden');
-                formCol.classList.remove('md:col-span-8');
-                formCol.classList.add('md:col-span-12');
+                formCol.classList.remove('md:col-span-2');
+                formCol.classList.add('md:col-span-3'); // Ocupa todo el ancho en modo pantalla completa
             } else {
                 results.classList.remove('hidden');
-                formCol.classList.remove('md:col-span-12');
-                formCol.classList.add('md:col-span-8');
+                formCol.classList.remove('md:col-span-3');
+                formCol.classList.add('md:col-span-2'); // Se ajusta a 2/3 para dejar espacio a resultados
                 
-                // Ocultar sección "Citas en párrafos" exclusivamente si estamos en "Elementos"
                 if (tabName === 'elementos') {
                     inlinePanel.classList.add('hidden');
                 } else {
@@ -451,7 +465,6 @@
                 }
             }
 
-            // Cambiamos a la pestaña solicitada y refrescamos la vista
             currentMainTab = (tabName === 'obras' || tabName === 'elementos') ? tabName : currentMainTab;
 
             if(tabName === 'historial') renderHistory();
@@ -504,7 +517,7 @@
                 visual = `${authStr} ${dateStr}. ${title || '[Título]'}. <i>${source || '[Sitio Web]'}</i>. ${url}`;
                 peda = "En recursos web, el nombre del sitio va en <em>cursiva</em> y el título normal.";
             }
-            renderOutput(visual, authStr, peda, 'obra');
+            renderOutput(visual, authStr, peda, 'obra', year);
             updateInline(authors, year, title);
         }
 
@@ -530,7 +543,6 @@
                 document.getElementById('el_company_url').value = "";
                 document.getElementById('el_year').value = "";
                 document.getElementById('el_license').value = "";
-                // Reset author type to human
                 document.querySelector('input[name="el_author_type"][value="human"]').checked = true;
                 toggleElementType();
                 updatePreviewElementos();
@@ -538,7 +550,6 @@
         }
 
         function loadExampleObras() {
-            // Aseguramos limpiar primero todos los campos para evitar arrastres
             document.getElementById('authorsList').innerHTML = "";
             authorCount = 0;
             document.getElementById('f_year').value = "";
@@ -613,13 +624,12 @@
                 const label = p[0].split(' (')[0];
                 vis += ` Licencia <a href="${p[1]}" class="preview-link" target="_blank">${label}</a>.`;
             }
-            renderOutput(vis, tit || num, "Los elementos embebidos deben llevar atribución y licencia clara.", 'elemento');
+            renderOutput(vis, tit || num, "Los elementos embebidos deben llevar atribución y licencia clara.", 'elemento', yea);
         }
 
         function loadExampleElementos() {
             const isAI = document.querySelector('input[name="el_author_type"]:checked').value === 'ai';
             
-            // Limpiamos los campos primero
             document.getElementById('el_type_num').value = "";
             document.getElementById('el_title').value = "";
             document.getElementById('el_action').value = "";
@@ -662,7 +672,7 @@
         }
 
         // --- SISTEMA COMÚN ---
-        function renderOutput(v, s, p, c) {
+        function renderOutput(v, s, p, c, y) {
             document.getElementById('preview-visual').innerHTML = v;
             const h = `<div style="margin-bottom:1em;line-height:1.6;">${v}</div>`;
             document.getElementById('preview-html').value = h;
@@ -670,7 +680,7 @@
             document.getElementById('pedagogyText').innerHTML = p;
             
             // Usar la sintaxis completa para mantener compatibilidad con exportaciones
-            window.curr = { html: h, visual: v, sortKey: s, category: c };
+            window.curr = { html: h, visual: v, sortKey: s, category: c, pubYear: y || "0" };
         }
 
         function hasContent() {
@@ -688,29 +698,45 @@
         }
 
         function processAndSave() {
-            // Forzar actualización final de los textos en pantalla a memoria
             if(currentMainTab === 'obras') updatePreviewObras(); else updatePreviewElementos();
             
-            // Bloquea el guardado si todo está absolutamente en blanco
             if (!hasContent()) { 
                 document.getElementById('modal-warning').classList.remove('hidden'); 
                 return; 
             }
             
-            // Guardamos al array del historial
-            historyData.push({ id: generateUID(), ...window.curr });
+            // Añadimos timestamp para habilitar el orden cronológico
+            historyData.push({ id: generateUID(), timestamp: Date.now(), ...window.curr });
             
-            // Feedback en el botón
             const b = event.currentTarget;
             const old = b.innerHTML;
             b.innerHTML = '<i class="fas fa-check"></i> ¡Guardado!';
             b.classList.add('bg-olive');
             
-            // Borra todos los campos visuales para la siguiente cita y previene arrastrar datos
             clearFields();
 
             setTimeout(() => { b.innerHTML = old; b.classList.remove('bg-olive'); }, 1500);
         }
+
+        // Función que ordena los elementos del historial según el selector
+        const sortHistoryItems = (items, mode) => {
+            return items.sort((a, b) => {
+                if (mode === 'az') return (a.sortKey || a.s || "").localeCompare(b.sortKey || b.s || "");
+                if (mode === 'za') return (b.sortKey || b.s || "").localeCompare(a.sortKey || a.s || "");
+                
+                let timeA = a.timestamp || 0;
+                let timeB = b.timestamp || 0;
+                if (mode === 'newest') return timeB - timeA;
+                if (mode === 'oldest') return timeA - timeB;
+
+                let yearA = parseInt(a.pubYear) || 0;
+                let yearB = parseInt(b.pubYear) || 0;
+                if (mode === 'pub_desc') return yearB - yearA;
+                if (mode === 'pub_asc') return yearA - yearB;
+                
+                return 0;
+            });
+        };
 
         function renderHistory() {
             const l = document.getElementById('historyList');
@@ -719,7 +745,8 @@
                 return; 
             }
             
-            // Compatible con versiones previas minimizadas ('c' o 'category')
+            let sortMode = document.getElementById('history-sort').value;
+
             let obs = historyData.filter(i => (i.category || i.c) === 'obra');
             let els = historyData.filter(i => (i.category || i.c) === 'elemento');
             
@@ -727,7 +754,7 @@
             const rnd = (its, t) => {
                 if(its.length === 0) return "";
                 let s = `<h3 class="font-bold text-dark-green border-b border-tan pb-2 mb-3 mt-6 text-sm uppercase tracking-widest">${t}</h3>`;
-                its.sort((a,b) => (a.sortKey || a.s || "").localeCompare(b.sortKey || b.s || "")).forEach(i => {
+                sortHistoryItems(its, sortMode).forEach(i => {
                     s += `<div class="p-4 bg-white border border-tan shadow-sm rounded-xl relative mb-3 pr-12 hover:shadow-md transition">
                         <div class="text-xs text-stone-800 break-all leading-relaxed">${i.visual || i.v}</div>
                         <button onclick="del('${i.id}')" class="absolute right-3 top-3 text-stone-300 hover:text-rust p-2 transition" title="Borrar esta cita"><i class="fas fa-trash-alt"></i></button>
@@ -758,8 +785,11 @@
         // --- COPIAR Y EXPORTAR ---
         function copyFullBibliography(mode) {
             if(historyData.length === 0) return;
-            let obs = historyData.filter(i => (i.category || i.c) === 'obra').sort((a,b) => (a.sortKey || a.s || "").localeCompare(b.sortKey || b.s || ""));
-            let els = historyData.filter(i => (i.category || i.c) === 'elemento').sort((a,b) => (a.sortKey || a.s || "").localeCompare(b.sortKey || b.s || ""));
+            
+            let sortMode = document.getElementById('history-sort').value;
+            let obs = sortHistoryItems(historyData.filter(i => (i.category || i.c) === 'obra'), sortMode);
+            let els = sortHistoryItems(historyData.filter(i => (i.category || i.c) === 'elemento'), sortMode);
+            
             let content = `<div style="line-height:1.6; font-family: sans-serif;">`;
             if(obs.length > 0) {
                 content += `<h3 style="color:#283618; margin-top:1.5em; border-bottom:1px solid #dda15e;">Bibliografía</h3>`;
@@ -801,7 +831,8 @@
                     if(Array.isArray(d)) {
                         const sanitized = d.map(item => ({
                             ...item,
-                            id: item.id || generateUID()
+                            id: item.id || generateUID(),
+                            timestamp: item.timestamp || Date.now() // Retrocompatibilidad cronológica
                         }));
                         historyData = historyData.concat(sanitized);
                     }
