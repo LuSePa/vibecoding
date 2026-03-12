@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador APA 7 para Moodle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Paleta de colores extraída de la imagen proporcionada */
+        :root {
+            --color-olive: #606c38;
+            --color-dark-green: #283618;
+            --color-cream: #fefae0;
+            --color-tan: #dda15e;
+            --color-rust: #bc6c25;
+            --special-ai: rgb(170, 0, 77);
+        }
+
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background-color: #fcfaf2; 
+            overflow-x: hidden; 
+            width: 100%;
+        }
+
+        .bg-olive { background-color: var(--color-olive); }
+        .bg-dark-green { background-color: var(--color-dark-green); }
+        .bg-cream { background-color: var(--color-cream); }
+        .bg-tan { background-color: var(--color-tan); }
+        .bg-rust { background-color: var(--color-rust); }
+        .text-rust { color: var(--color-rust); }
+        .border-tan { border-color: var(--color-tan); }
+
+        .tab-active { 
+            border-bottom: 4px solid var(--color-rust); 
+            color: var(--color-rust); 
+            font-weight: bold; 
+            background-color: white;
+        }
+
+        /* Tooltip */
+        .tooltip { position: relative; display: inline-block; cursor: help; }
+        .tooltip .tooltiptext {
+            visibility: hidden; width: 220px; background-color: var(--color-dark-green); color: #fff;
+            text-align: center; border-radius: 6px; padding: 10px; position: absolute;
+            z-index: 50; bottom: 125%; left: 50%; margin-left: -110px; opacity: 0;
+            transition: opacity 0.3s; font-size: 0.8rem; line-height: 1.2;
+        }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+
+        .btn-special.active {
+            opacity: 1;
+            box-shadow: 0 0 0 3px rgba(170, 0, 77, 0.4);
+            border: 2px solid white;
+        }
+        .btn-special.inactive { opacity: 0.5; }
+
+        .preview-link { color: #0284c7; text-decoration: underline; word-break: break-all; }
+        
+        /* Estilos para el nuevo pie de página */
+        .contacto-email { color: var(--color-rust); text-decoration: none; font-weight: 500; }
+        .contacto-email:hover { text-decoration: underline; color: var(--color-dark-green); }
+        .ia-credit { margin-top: 0.25rem; font-size: 0.75rem; color: #78716c; }
+
+        /* Grid responsivo blindado sin scroll horizontal */
+        .layout-wrapper {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            width: 100%;
+        }
+        @media (min-width: 1024px) {
+            .layout-wrapper.parallel-mode {
+                grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+            }
+            .layout-wrapper.full-mode {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .break-all { word-break: break-all; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-stone-800">
+
+    <!-- Cabecera -->
+    <nav class="bg-white shadow-sm border-b border-tan p-4 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto flex justify-between items-center px-2">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-leaf text-2xl" style="color: var(--color-olive)"></i>
+                <h1 class="text-xl font-bold" style="color: var(--color-dark-green)">CitaFácil Moodle</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <label class="flex items-center cursor-pointer">
+                    <div class="relative">
+                        <input type="checkbox" id="pedagogyToggle" class="sr-only" onchange="togglePedagogy()" checked>
+                        <div id="toggleBg" class="block w-10 h-6 rounded-full transition bg-rust"></div>
+                        <div id="toggleDot" class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition transform translate-x-4"></div>
+                    </div>
+                    <span class="ml-2 text-sm font-medium" style="color: var(--color-dark-green)">Modo pedagógico</span>
+                </label>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto mt-6 p-4">
+        <div id="layout-container" class="layout-wrapper parallel-mode">
+            
+            <!-- SECCIÓN IZQUIERDA: FORMULARIOS -->
+            <div id="form-column" class="bg-white rounded-xl shadow-md border border-tan p-5 md:p-8 transition-all overflow-hidden">
+                
+                <!-- Pestañas Principales -->
+                <div class="flex border-b border-tan mb-6 overflow-x-auto no-scrollbar">
+                    <button onclick="switchMainTab('obras')" id="tab-obras" class="py-3 px-6 text-sm text-stone-500 hover:text-rust transition whitespace-nowrap tab-active"><i class="fas fa-book mr-2"></i>Citador de obras</button>
+                    <button onclick="switchMainTab('elementos')" id="tab-elementos" class="py-3 px-6 text-sm text-stone-500 hover:text-rust transition whitespace-nowrap"><i class="fas fa-photo-video mr-2"></i>Citas de elementos</button>
+                    <button onclick="switchMainTab('historial')" id="tab-historial" class="py-3 px-6 text-sm text-stone-500 hover:text-rust transition whitespace-nowrap"><i class="fas fa-history mr-2"></i>Historial</button>
+                    <button onclick="switchMainTab('ayuda')" id="tab-ayuda" class="py-3 px-6 text-sm text-stone-500 hover:text-rust transition whitespace-nowrap"><i class="fas fa-question-circle mr-2"></i>Guía de uso</button>
+                </div>
+
+                <!-- VISTA: OBRAS -->
+                <div id="view-obras">
+                    <div class="mb-6 flex flex-wrap justify-between items-center gap-4 bg-cream p-4 rounded-lg border border-tan">
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="setTypeObras('libro')" id="btn-libro" class="px-4 py-2 rounded-md text-sm transition bg-rust text-white shadow-sm font-medium">Libro</button>
+                            <button onclick="setTypeObras('web')" id="btn-web" class="px-4 py-2 rounded-md bg-white text-stone-700 border border-tan text-sm transition hover:bg-stone-50">Página web</button>
+                            <button onclick="setTypeObras('articulo')" id="btn-articulo" class="px-4 py-2 rounded-md bg-white text-stone-700 border border-tan text-sm transition hover:bg-stone-50">Artículo revista</button>
+                        </div>
+                        <button onclick="loadExampleObras()" class="text-sm font-bold text-rust hover:underline"><i class="fas fa-lightbulb mr-1"></i> Cargar ejemplo</button>
+                    </div>
+
+                    <div class="space-y-5">
+                        <div class="p-4 rounded-lg border border-tan bg-white shadow-sm">
+                            <label class="block text-sm font-bold mb-3" style="color: var(--color-dark-green)">Autores / Creadores</label>
+                            <div id="authorsList" class="space-y-2 mb-3"></div>
+                            <button onclick="addAuthorField()" class="text-xs font-bold py-1 px-3 rounded border border-olive text-olive hover:bg-olive hover:text-white transition"><i class="fas fa-plus mr-1"></i> Añadir autor</button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold mb-1" style="color: var(--color-dark-green)">Año</label>
+                                <input type="text" id="f_year" placeholder="Ej: 2024" class="w-full p-2 border border-tan rounded-md focus:ring-2 focus:ring-tan outline-none text-sm" oninput="updatePreviewObras()">
+                            </div>
+                            <div id="field_mesdia" class="hidden">
+                                <label class="block text-sm font-bold mb-1" style="color: var(--color-dark-green)">Mes y día</label>
+                                <input type="text" id="f_date_extra" placeholder="Ej: 12 de mayo" class="w-full p-2 border border-tan rounded-md focus:ring-2 focus:ring-tan outline-none text-sm" oninput="updatePreviewObras()">
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label id="lbl_f_title" class="block text-sm font-bold mb-1" style="color: var(--color-dark-green)">Título de la obra</label>
+                                <input type="text" id="f_title" placeholder="Introduce el título completo" class="w-full p-2 border border-tan rounded-md focus:ring-2 focus:ring-tan outline-none text-sm" oninput="updatePreviewObras()">
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label id="lbl_f_source" class="block text-sm font-bold mb-1" style="color: var(--color-dark-green)">Editorial o Fuente</label>
+                                    <input type="text" id="f_source" placeholder="Entidad responsable" class="w-full p-2 border border-tan rounded-md focus:ring-2 focus:ring-tan outline-none text-sm" oninput="updatePreviewObras()">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold mb-1" style="color: var(--color-dark-green)">URL o DOI</label>
+                                    <input type="text" id="f_url" placeholder="https://doi.org/..." class="w-full p-2 border border-tan rounded-md focus:ring-2 focus:ring-tan outline-none text-sm" oninput="updatePreviewObras()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="processAndSave()" class="w-full mt-8 py-4 rounded-xl text-white font-bold text-lg bg-rust hover:bg-orange-800 shadow-lg transition transform hover:-translate-y-1 active:translate-y-0">
+                        <i class="fas fa-save mr-2"></i> Generar y guardar cita
+                    </button>
+                </div>
+
+                <!-- VISTA: ELEMENTOS -->
+                <div id="view-elementos" class="hidden">
+                    <div class="mb-6 flex flex-wrap justify-between items-center gap-4 bg-cream p-4 rounded-lg border border-tan">
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="setTypeElementos('imagen')" id="btn-imagen" class="btn-special active px-4 py-2 rounded-md text-sm text-white transition font-medium" style="background-color: var(--special-ai);">Imagen / Figura</button>
+                            <button onclick="setTypeElementos('audio')" id="btn-audio" class="btn-special inactive px-4 py-2 rounded-md text-sm text-white transition font-medium" style="background-color: var(--special-ai);">Audio</button>
+                            <button onclick="setTypeElementos('video')" id="btn-video" class="px-4 py-2 rounded-md bg-white text-stone-700 border border-tan text-sm transition hover:bg-stone-50">Vídeo</button>
+                        </div>
+                        <button onclick="loadExampleElementos()" class="text-sm font-bold text-rust hover:underline"><i class="fas fa-lightbulb mr-1"></i> Cargar ejemplo</button>
+                    </div>
+
+                    <div class="space-y-5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold mb-1" style="color: var(--color-dark-green)">Etiqueta (Figura 1, Audio 2...)</label>
+                                <input type="text" id="el_type_num" placeholder="Ej: Figura 1" class="w-full p-2 border border-tan rounded-md focus:ring-2 focus:ring-tan outline-none text-sm" oninput="updatePreviewElementos()">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-1" style="color: var(--color-dark-green)">Título del elemento</label>
+                                <input type="text" id="el_title" placeholder="Ej: Mapa conceptual" class="w-full p-2 border border-tan rounded-md focus:ring-2 focus:ring-tan outline-none text-sm" oninput="updatePreviewElementos()">
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-cream border border-tan rounded-lg">
+                            <label class="block text-sm font-bold mb-3" style="color: var(--color-dark-green)">Origen de la autoría</label>
+                            <div class="flex flex-wrap gap-6">
+                                <label class="flex items-center cursor-pointer text-sm">
+                                    <input type="radio" name="el_author_type" value="human" checked onchange="toggleElementType(); updatePreviewElementos()" class="w-4 h-4 text-rust focus:ring-rust">
+                                    <span class="ml-2 font-medium">Autor humano / Institución</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer text-sm">
+                                    <input type="radio" name="el_author_type" value="ai" onchange="toggleElementType(); updatePreviewElementos()" class="w-4 h-4 text-rust focus:ring-rust">
+                                    <span class="ml-2 font-medium">Cocreado o generado con IA</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 border border-tan rounded-lg shadow-sm">
+                            <div>
+                                <label id="lbl_el_action" class="block text-[10px] font-bold mb-1 uppercase tracking-tight text-stone-400">Atribución</label>
+                                <input type="text" id="el_action" placeholder="Ej: Creado por" class="w-full p-2 border border-stone-200 rounded-md text-xs focus:ring-1 focus:ring-tan outline-none" oninput="updatePreviewElementos()">
+                            </div>
+                            <div>
+                                <label id="lbl_el_tool" class="block text-[10px] font-bold mb-1 uppercase tracking-tight text-stone-400">Nombre</label>
+                                <input type="text" id="el_tool" placeholder="Nombre" class="w-full p-2 border border-stone-200 rounded-md text-xs focus:ring-1 focus:ring-tan outline-none" oninput="updatePreviewElementos()">
+                            </div>
+                            <div>
+                                <label id="lbl_el_tool_url" class="block text-[10px] font-bold mb-1 uppercase tracking-tight text-stone-400">Enlace</label>
+                                <input type="text" id="el_tool_url" placeholder="https://..." class="w-full p-2 border border-stone-200 rounded-md text-xs focus:ring-1 focus:ring-tan outline-none" oninput="updatePreviewElementos()">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 border border-tan rounded-lg shadow-sm">
+                            <div>
+                                <label id="lbl_el_company" class="block text-[10px] font-bold mb-1 uppercase tracking-tight text-stone-400">Plataforma</label>
+                                <input type="text" id="el_company" placeholder="Ej: YouTube" class="w-full p-2 border border-stone-200 rounded-md text-xs focus:ring-1 focus:ring-tan outline-none" oninput="updatePreviewElementos()">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold mb-1 uppercase tracking-tight text-stone-400">Enlace fuente</label>
+                                <input type="text" id="el_company_url" placeholder="https://..." class="w-full p-2 border border-stone-200 rounded-md text-xs focus:ring-1 focus:ring-tan outline-none" oninput="updatePreviewElementos()">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold mb-1 uppercase tracking-tight text-stone-400">Año</label>
+                                <input type="text" id="el_year" placeholder="2026" class="w-full p-2 border border-stone-200 rounded-md text-xs focus:ring-1 focus:ring-tan outline-none" oninput="updatePreviewElementos()">
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-cream border border-tan rounded-lg">
+                            <label class="block text-sm font-bold mb-2" style="color: var(--color-dark-green)">Licencia (Obligatoria para embebidos)</label>
+                            <select id="el_license" class="w-full p-2 border border-tan rounded-md bg-white text-sm focus:ring-2 focus:ring-tan outline-none" onchange="updatePreviewElementos()">
+                                <option value="">-- Sin licencia --</option>
+                                <option value="CC BY 4.0|https://creativecommons.org/licenses/by/4.0/deed.es">CC BY 4.0 (Reconocimiento)</option>
+                                <option value="CC BY-SA 4.0|https://creativecommons.org/licenses/by-sa/4.0/deed.es">CC BY-SA 4.0 (Compartir Igual)</option>
+                                <option value="CC BY-NC 4.0|https://creativecommons.org/licenses/by-nc/4.0/deed.es">CC BY-NC 4.0 (No Comercial)</option>
+                                <option value="CC BY-NC-SA 4.0|https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es">CC BY-NC-SA 4.0 (NoCom-CompIgual)</option>
+                                <option value="CC BY-ND 4.0|https://creativecommons.org/licenses/by-nd/4.0/deed.es">CC BY-ND 4.0 (Sin Obra Derivada)</option>
+                                <option value="CC0|https://creativecommons.org/publicdomain/zero/1.0/deed.es">Dominio Público (CC0)</option>
+                                <option value="Copyright|">Todos los derechos reservados</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button onclick="processAndSave()" class="w-full mt-8 py-4 rounded-xl text-white font-bold text-lg bg-rust hover:bg-orange-800 shadow-lg transition transform hover:-translate-y-1 active:translate-y-0">
+                        <i class="fas fa-save mr-2"></i> Generar y guardar cita
+                    </button>
+                </div>
+
+                <!-- VISTA: HISTORIAL -->
+                <div id="view-historial" class="hidden">
+                    <h2 class="text-xl font-bold mb-6 pb-2 border-b border-tan" style="color: var(--color-dark-green)">Bibliografía organizada</h2>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+                        <button onclick="copyFullBibliography('visual')" class="bg-rust text-white py-3 rounded-lg text-sm font-bold shadow hover:bg-orange-800 transition">Copiar Visual</button>
+                        <button onclick="copyFullBibliography('html')" class="bg-rust text-white py-3 rounded-lg text-sm font-bold shadow hover:bg-orange-800 transition">Copiar HTML</button>
+                        <button onclick="exportHistory()" class="bg-olive text-white py-3 rounded-lg text-sm font-bold shadow hover:bg-dark-green transition">Exportar</button>
+                        <button onclick="document.getElementById('importFile').click()" class="bg-olive text-white py-3 rounded-lg text-sm font-bold shadow hover:bg-dark-green transition">Importar</button>
+                        <input type="file" id="importFile" accept=".json" multiple class="hidden" onchange="importHistory(event)">
+                    </div>
+
+                    <div id="historyList" class="space-y-6 bg-cream p-5 md:p-8 rounded-xl min-h-[300px] shadow-inner border border-tan"></div>
+                </div>
+
+                <!-- VISTA: AYUDA EXHAUSTIVA -->
+                <div id="view-ayuda" class="hidden space-y-10">
+                    <h2 class="text-2xl font-bold border-b border-tan pb-3" style="color: var(--color-dark-green)">Normas de citado APA 7</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Obras -->
+                        <div class="space-y-4">
+                            <h3 class="font-bold text-rust text-lg uppercase tracking-wider">Citador de obras</h3>
+                            <p class="text-sm">Diseñado para la lista de referencias final. No requiere licencias individuales.</p>
+                            <div class="p-4 bg-white border border-tan rounded-lg text-xs space-y-2 shadow-sm">
+                                <p><strong>Libros:</strong> Autor. (Año). <em>Título del libro</em>. Editorial.</p>
+                                <p><strong>Web:</strong> Autor. (Año, Día de Mes). Título del post. <em>Nombre del Sitio</em>. URL</p>
+                                <p><strong>Revistas:</strong> Autor. (Año). Título del artículo. <em>Nombre Revista</em>, volumen(número).</p>
+                            </div>
+                        </div>
+
+                        <!-- Elementos -->
+                        <div class="space-y-4">
+                            <h3 class="font-bold text-rust text-lg uppercase tracking-wider">Citas de elementos</h3>
+                            <p class="text-sm">Diseñado para pies de foto, vídeo o audio integrados en el cuerpo del curso.</p>
+                            <div class="p-4 bg-white border border-tan rounded-lg text-xs space-y-2 shadow-sm">
+                                <p><strong>Formato:</strong> Etiqueta Número. <em>Título elemento</em>. Atribución (Fuente, Año). Licencia.</p>
+                                <p><strong>Obligatorio:</strong> En APA 7 para entornos educativos, los recursos embebidos deben declarar siempre su licencia de uso y autoría.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Casuística IA -->
+                    <div class="p-6 bg-cream border border-tan rounded-xl shadow-sm">
+                        <h3 class="font-bold text-dark-green mb-4 flex items-center"><i class="fas fa-robot mr-3"></i> Inteligencia Artificial y Transparencia</h3>
+                        <p class="text-sm mb-4 leading-relaxed text-pretty">Siguiendo las recomendaciones actuales de APA y las guías de OER, cuando un recurso es generado o coelaborado con IA, se debe especificar la herramienta y la empresa desarrolladora para mantener la integridad académica.</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-white p-4 rounded-lg border border-stone-200 shadow-sm">
+                                <p class="text-[10px] font-bold text-rust mb-2">EJEMPLO HUMANO</p>
+                                <p class="text-xs">Figura 1. <em>La Alhambra</em>. Fotografía de Juan Pérez (Pixabay, 2024). Licencia CC BY.</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg border border-stone-200 shadow-sm">
+                                <p class="text-[10px] font-bold text-rust mb-2">EJEMPLO CON IA</p>
+                                <p class="text-xs">Audio 2. <em>Explicación cuántica</em>. Generado con ElevenLabs (OpenAI, 2026). Licencia CC0.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Glosario -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs text-stone-600">
+                        <div>
+                            <p class="font-bold text-dark-green mb-1">(s.f.)</p>
+                            <p>Sin fecha. Úsalo si la fuente no indica el año de publicación original.</p>
+                        </div>
+                        <div>
+                            <p class="font-bold text-dark-green mb-1">DOI</p>
+                            <p>Digital Object Identifier. Un enlace estable y permanente para artículos académicos.</p>
+                        </div>
+                        <div>
+                            <p class="font-bold text-dark-green mb-1">CC BY-SA</p>
+                            <p>Atribución-CompartirIgual. Permite remezclar bajo la misma licencia.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN DERECHA: RESULTADOS (Fija en paralelo) -->
+            <div id="results-column" class="space-y-4 transition-all overflow-hidden">
+                <div class="bg-white rounded-xl shadow-md border border-tan overflow-hidden sticky top-24">
+                    <div class="bg-dark-green text-white p-4 flex justify-between items-center">
+                        <h3 class="font-bold text-xs uppercase tracking-widest"><i class="fas fa-eye mr-2"></i> Resultados</h3>
+                    </div>
+                    
+                    <div class="p-5 space-y-6">
+                        <!-- Panel Pedagógico -->
+                        <div id="pedagogyPanel" class="bg-cream border-l-4 border-tan p-4 text-xs text-stone-700 rounded-r-lg">
+                            <p id="pedagogyText">Los detalles de la normativa APA 7 aparecerán aquí conforme completes datos.</p>
+                        </div>
+
+                        <!-- Editor de contenido -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-[10px] font-bold text-stone-400 uppercase tracking-wider">1. Editor de contenido</label>
+                                <button onclick="copyRichText('preview-visual', this)" class="text-xs font-bold text-rust hover:underline uppercase">Copiar Texto</button>
+                            </div>
+                            <div id="preview-visual" class="p-4 bg-white border border-tan rounded-lg min-h-[80px] text-sm text-stone-800 break-all leading-relaxed"></div>
+                        </div>
+
+                        <!-- Citas en texto (Se oculta para Elementos) -->
+                        <div id="inline-citations-panel" class="pt-4 border-t border-stone-100">
+                            <label class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-2">2. Citas para tus párrafos</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="bg-cream p-3 rounded-lg border border-tan text-center">
+                                    <span class="block text-[10px] text-stone-500 mb-1">Narrativa</span>
+                                    <span id="cite-narrative" class="text-xs font-medium break-all">-</span>
+                                </div>
+                                <div class="bg-cream p-3 rounded-lg border border-tan text-center">
+                                    <span class="block text-[10px] text-stone-500 mb-1">Parentética</span>
+                                    <span id="cite-parenthetical" class="text-xs font-medium break-all">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Código HTML -->
+                        <div class="pt-4 border-t border-stone-100">
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-[10px] font-bold text-stone-400 uppercase tracking-wider">3. Código HTML (Moodle)</label>
+                                <button onclick="copyInputText('preview-html', this)" class="text-xs font-bold text-rust hover:underline uppercase">Copiar HTML</button>
+                            </div>
+                            <textarea id="preview-html" readonly class="w-full p-3 bg-stone-900 text-stone-300 font-mono text-[10px] rounded-lg border border-stone-700 h-[80px] mb-3 resize-none leading-normal"></textarea>
+                            
+                            <label class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-2">Vista previa:</label>
+                            <div id="html-render-preview" class="p-3 bg-cream border border-tan border-dashed rounded-lg text-xs text-stone-800 min-h-[40px] break-all leading-relaxed"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Pie de página actualizado -->
+    <footer class="max-w-7xl mx-auto mt-12 mb-8 p-6 text-center border-t border-tan text-stone-500 text-sm">
+        <p>Lucía Serrano Palomo - <a href="mailto:lucia.serrano@jccm.es" class="contacto-email"><em>lucia.serrano@jccm.es</em></a></p>
+        <p class="ia-credit">Realizado con la asistencia de IA (vibe coding)</p>
+    </footer>
+
+    <!-- Modal Avisos -->
+    <div id="modal-warning" class="fixed inset-0 bg-stone-900 bg-opacity-70 hidden flex items-center justify-center z-50 px-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center border-t-8 border-tan">
+            <div class="text-rust text-5xl mb-4"><i class="fas fa-exclamation-circle"></i></div>
+            <h2 class="text-xl font-bold mb-2" style="color: var(--color-dark-green)">Sin contenido</h2>
+            <p class="mb-6 text-stone-600 text-sm">Debes introducir datos en el formulario para poder generar y guardar una cita válida.</p>
+            <button onclick="closeModal('modal-warning')" class="w-full py-3 bg-rust text-white rounded-xl shadow hover:bg-orange-800 transition font-bold">Entendido</button>
+        </div>
+    </div>
+
+    <script>
+        let currentMainTab = 'obras';
+        let currentTypeObras = 'libro';
+        let currentTypeElementos = 'imagen';
+        let authorCount = 0;
+        let historyData = [];
+        let isPedagogyActive = true;
+
+        window.onload = function() {
+            addAuthorField();
+            switchMainTab('obras');
+            toggleElementType();
+        };
+
+        function switchMainTab(tabName) {
+            ['obras', 'elementos', 'historial', 'ayuda'].forEach(t => {
+                document.getElementById('view-' + t).classList.add('hidden');
+                document.getElementById('tab-' + t).classList.remove('tab-active');
+            });
+            document.getElementById('view-' + tabName).classList.remove('hidden');
+            document.getElementById('tab-' + tabName).classList.add('tab-active');
+            
+            const results = document.getElementById('results-column');
+            const layout = document.getElementById('layout-container');
+            const inlinePanel = document.getElementById('inline-citations-panel');
+
+            if (tabName === 'historial' || tabName === 'ayuda') {
+                results.classList.add('hidden');
+                layout.className = "layout-wrapper full-mode";
+            } else {
+                results.classList.remove('hidden');
+                layout.className = "layout-wrapper parallel-mode";
+                inlinePanel.classList.toggle('hidden', tabName === 'elementos');
+            }
+
+            if(tabName === 'historial') renderHistory();
+            if(tabName === 'obras') updatePreviewObras();
+            if(tabName === 'elementos') updatePreviewElementos();
+        }
+
+        function togglePedagogy() {
+            isPedagogyActive = document.getElementById('pedagogyToggle').checked;
+            document.getElementById('pedagogyPanel').classList.toggle('hidden', !isPedagogyActive);
+            document.getElementById('toggleDot').classList.toggle('translate-x-4', isPedagogyActive);
+            document.getElementById('toggleBg').classList.toggle('bg-rust', isPedagogyActive);
+            document.getElementById('toggleBg').classList.toggle('bg-stone-300', !isPedagogyActive);
+        }
+
+        // --- CITADOR DE OBRAS ---
+        function setTypeObras(type) {
+            currentTypeObras = type;
+            ['libro', 'web', 'articulo'].forEach(id => {
+                document.getElementById('btn-' + id).className = "px-4 py-2 rounded-md bg-white text-stone-700 border border-tan text-sm transition hover:bg-stone-50";
+            });
+            document.getElementById('btn-' + type).className = "px-4 py-2 rounded-md text-sm transition font-medium bg-rust text-white shadow-sm";
+            
+            document.getElementById('lbl_f_title').innerText = type === 'libro' ? "Título del libro" : "Título del artículo";
+            document.getElementById('lbl_f_source').innerText = type === 'libro' ? "Editorial" : "Nombre del sitio web o revista";
+            document.getElementById('field_mesdia').classList.toggle('hidden', type !== 'web');
+            updatePreviewObras();
+        }
+
+        function updatePreviewObras() {
+            const authors = getAuthorsArray();
+            let year = document.getElementById('f_year').value.trim();
+            let title = document.getElementById('f_title').value.trim();
+            let source = document.getElementById('f_source').value.trim();
+            let url = formatDOI(document.getElementById('f_url').value.trim());
+            let dateEx = document.getElementById('f_date_extra').value.trim();
+
+            let authStr = formatAuthorsAPA(authors);
+            if(!authStr && title) authStr = `<i>${title}</i>`;
+            else if (!authStr) authStr = "[Autor]";
+
+            let dateStr = year ? (dateEx ? `(${year}, ${dateEx})` : `(${year})`) : "(s.f.)";
+            let visual = "";
+            let peda = "";
+
+            if(currentTypeObras === 'libro') {
+                visual = `${authStr} ${dateStr}. <i>${title || '[Título]'}</i>. ${source || '[Editorial]'}. ${url}`;
+                peda = "En libros, el título va en <em>cursiva</em>. APA 7 ya no incluye la ciudad de la editorial.";
+            } else {
+                visual = `${authStr} ${dateStr}. ${title || '[Título]'}. <i>${source || '[Sitio Web]'}</i>. ${url}`;
+                peda = "En recursos web, el nombre del sitio va en <em>cursiva</em> y el título normal.";
+            }
+            renderOutput(visual, authStr, peda, 'obra');
+            updateInline(authors, year, title);
+        }
+
+        function loadExampleObras() {
+            document.getElementById('authorsList').innerHTML = "";
+            authorCount = 0;
+            if (currentTypeObras === 'libro') {
+                addAuthorField('D.', 'Norman');
+                document.getElementById('f_year').value = "2013";
+                document.getElementById('f_title').value = "El diseño de las cosas cotidianas";
+                document.getElementById('f_source').value = "Basic Books";
+            } else {
+                addAuthorField('', 'OMS');
+                document.getElementById('f_year').value = "2024";
+                document.getElementById('f_title').value = "Consejos de salud pública";
+                document.getElementById('f_source').value = "Organización Mundial de la Salud";
+            }
+            updatePreviewObras();
+        }
+
+        // --- CITAS DE ELEMENTOS ---
+        function toggleElementType() {
+            const isAI = document.querySelector('input[name="el_author_type"]:checked').value === 'ai';
+            document.getElementById('lbl_el_action').innerText = isAI ? "Acción IA" : "Atribución";
+            document.getElementById('lbl_el_tool').innerText = isAI ? "Herramienta IA" : "Nombre / Perfil";
+            document.getElementById('lbl_el_tool_url').innerText = isAI ? "Enlace IA" : "URL Perfil";
+            document.getElementById('lbl_el_company').innerText = isAI ? "Empresa Desarrolladora" : "Plataforma / Banco";
+            
+            document.getElementById('el_action').placeholder = isAI ? "Ej: Generado con" : "Ej: Fotografía de";
+            document.getElementById('el_tool').placeholder = isAI ? "Midjourney" : "María Pérez";
+        }
+
+        function setTypeElementos(type) {
+            currentTypeElementos = type;
+            ['imagen', 'audio', 'video'].forEach(id => {
+                const b = document.getElementById('btn-' + id);
+                if(id === 'audio' || id === 'imagen') {
+                    b.className = "btn-special inactive px-4 py-2 rounded-md text-sm text-white transition font-medium";
+                    b.style.backgroundColor = "rgb(170, 0, 77)";
+                } else { b.className = "px-4 py-2 rounded-md bg-white text-stone-700 border border-tan text-sm transition hover:bg-stone-50"; }
+            });
+            const act = document.getElementById('btn-' + type);
+            if(type === 'video') act.className = "px-4 py-2 rounded-md text-sm transition font-medium bg-rust text-white shadow-sm";
+            else act.classList.replace('inactive', 'active');
+            updatePreviewElementos();
+        }
+
+        function updatePreviewElementos() {
+            let num = document.getElementById('el_type_num').value.trim();
+            let tit = document.getElementById('el_title').value.trim();
+            let act = document.getElementById('el_action').value.trim();
+            let too = document.getElementById('el_tool').value.trim();
+            let tUrl = document.getElementById('el_tool_url').value.trim();
+            let com = document.getElementById('el_company').value.trim();
+            let cUrl = document.getElementById('el_company_url').value.trim();
+            let yea = document.getElementById('el_year').value.trim();
+            let lic = document.getElementById('el_license').value;
+
+            let vis = `${num || '[Etiqueta]'}. <i>${tit || '[Título]'}</i>. ${act || '[Acción]'} `;
+            if(tUrl) vis += `<a href="${tUrl}" class="preview-link" target="_blank">${too || '[Sujeto]'}</a>`;
+            else vis += too || '[Sujeto]';
+
+            vis += ` (`;
+            if(cUrl) vis += `<a href="${cUrl}" class="preview-link" target="_blank">${com || '[Fuente]'}</a>`;
+            else vis += com || '[Fuente]';
+            vis += `, ${yea || '[Año]'}).`;
+
+            if(lic) {
+                const p = lic.split('|');
+                const label = p[0].split(' (')[0];
+                vis += ` Licencia <a href="${p[1]}" class="preview-link" target="_blank">${label}</a>.`;
+            }
+            renderOutput(vis, tit || num, "Los elementos embebidos deben llevar atribución y licencia clara.", 'elemento');
+        }
+
+        function loadExampleElementos() {
+            const isAI = document.querySelector('input[name="el_author_type"]:checked').value === 'ai';
+            if (currentTypeElementos === 'imagen') {
+                document.getElementById('el_type_num').value = isAI ? "Figura 2" : "Figura 1";
+                document.getElementById('el_title').value = isAI ? "Concepto espacial" : "Paisaje de montaña";
+                document.getElementById('el_action').value = isAI ? "Generado con" : "Fotografía de";
+                document.getElementById('el_tool').value = isAI ? "Midjourney" : "L. Gómez";
+                document.getElementById('el_tool_url').value = "https://midjourney.com";
+                document.getElementById('el_company').value = isAI ? "Midjourney Inc." : "Unsplash";
+                document.getElementById('el_company_url').value = "https://unsplash.com";
+                document.getElementById('el_year').value = "2024";
+            } else if (currentTypeElementos === 'audio') {
+                document.getElementById('el_type_num').value = "Audio 1";
+                document.getElementById('el_title').value = "Relato breve";
+                document.getElementById('el_action').value = isAI ? "Voz generada con" : "Locutado por";
+                document.getElementById('el_tool').value = isAI ? "Murf AI" : "M. Ruiz";
+                document.getElementById('el_tool_url').value = "https://murf.ai";
+                document.getElementById('el_company').value = isAI ? "OpenAI" : "Radio Edu";
+                document.getElementById('el_company_url').value = "https://radio.es";
+                document.getElementById('el_year').value = "2025";
+            } else {
+                document.getElementById('el_type_num').value = "Vídeo 1";
+                document.getElementById('el_title').value = "Tutorial Moodle";
+                document.getElementById('el_action').value = isAI ? "Generado por" : "Publicado por";
+                document.getElementById('el_tool').value = isAI ? "Sora" : "Equipo TIC";
+                document.getElementById('el_tool_url').value = "https://youtube.com";
+                document.getElementById('el_company').value = "YouTube";
+                document.getElementById('el_company_url').value = "https://youtube.com";
+                document.getElementById('el_year').value = "2023";
+            }
+            document.getElementById('el_license').value = "CC BY 4.0|https://creativecommons.org/licenses/by/4.0/deed.es";
+            updatePreviewElementos();
+        }
+
+        // --- SISTEMA COMÚN ---
+        function renderOutput(v, s, p, c) {
+            document.getElementById('preview-visual').innerHTML = v;
+            const h = `<div style="margin-bottom:1em;line-height:1.6;">${v}</div>`;
+            document.getElementById('preview-html').value = h;
+            document.getElementById('html-render-preview').innerHTML = h;
+            document.getElementById('pedagogyText').innerHTML = p;
+            window.curr = { h, v, s, c };
+        }
+
+        function hasContent() {
+            if(currentMainTab === 'obras') {
+                const title = document.getElementById('f_title').value.trim();
+                const source = document.getElementById('f_source').value.trim();
+                const authors = getAuthorsArray();
+                return title !== "" || source !== "" || authors.length > 0;
+            } else {
+                const title = document.getElementById('el_title').value.trim();
+                const tool = document.getElementById('el_tool').value.trim();
+                const num = document.getElementById('el_type_num').value.trim();
+                return title !== "" || tool !== "" || num !== "";
+            }
+        }
+
+        function processAndSave() {
+            if(currentMainTab === 'obras') updatePreviewObras(); else updatePreviewElementos();
+            if (!hasContent()) { 
+                document.getElementById('modal-warning').classList.remove('hidden'); 
+                return; 
+            }
+            historyData.push({ id: Date.now(), ...window.curr });
+            const b = event.currentTarget;
+            const old = b.innerHTML;
+            b.innerHTML = '<i class="fas fa-check"></i> ¡Guardado!';
+            b.classList.add('bg-olive');
+            setTimeout(() => { b.innerHTML = old; b.classList.remove('bg-olive'); }, 1500);
+        }
+
+        function renderHistory() {
+            const l = document.getElementById('historyList');
+            if(historyData.length === 0) { 
+                l.innerHTML = '<div class="text-center py-12 text-stone-400 italic">No hay citas guardadas en el historial.</div>'; 
+                return; 
+            }
+            let obs = historyData.filter(i => i.c === 'obra');
+            let els = historyData.filter(i => i.c === 'elemento');
+            let h = "";
+            const rnd = (its, t) => {
+                if(its.length === 0) return "";
+                let s = `<h3 class="font-bold text-dark-green border-b border-tan pb-2 mb-3 mt-6 text-sm uppercase tracking-widest">${t}</h3>`;
+                its.sort((a,b) => a.s.localeCompare(b.s)).forEach(i => {
+                    s += `<div class="p-4 bg-white border border-tan shadow-sm rounded-xl relative mb-3 pr-10 hover:shadow-md transition">
+                        <div class="text-xs text-stone-800 break-all leading-relaxed">${i.v}</div>
+                        <button onclick="del(${i.id})" class="absolute right-2 top-2 text-stone-300 hover:text-rust p-2 transition"><i class="fas fa-trash-alt"></i></button>
+                    </div>`;
+                });
+                return s;
+            };
+            l.innerHTML = rnd(obs, "Obras Consultadas") + rnd(els, "Elementos Integrados");
+        }
+
+        function del(id) { historyData = historyData.filter(i => i.id !== id); renderHistory(); }
+
+        function copyFullBibliography(mode) {
+            if(historyData.length === 0) return;
+            let obs = historyData.filter(i => i.c === 'obra').sort((a,b) => a.s.localeCompare(b.s));
+            let els = historyData.filter(i => i.c === 'elemento').sort((a,b) => a.s.localeCompare(b.s));
+            let content = `<div style="line-height:1.6; font-family: sans-serif;">`;
+            if(obs.length > 0) {
+                content += `<h3 style="color:#283618; margin-top:1.5em; border-bottom:1px solid #dda15e;">Bibliografía</h3>`;
+                obs.forEach(i => content += i.h);
+            }
+            if(els.length > 0) {
+                content += `<h3 style="color:#283618; margin-top:2em; border-bottom:1px solid #dda15e;">Atribución de elementos</h3>`;
+                els.forEach(i => content += i.h);
+            }
+            content += `</div>`;
+
+            if(mode === 'html') {
+                const ta = document.createElement("textarea"); ta.value = content;
+                document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
+                alert("Código HTML copiado para Moodle.");
+            } else {
+                const d = document.createElement("div"); d.innerHTML = content;
+                d.style.position = "fixed"; d.style.opacity = "0"; document.body.appendChild(d);
+                const s = window.getSelection(); const r = document.createRange(); r.selectNodeContents(d);
+                s.removeAllRanges(); s.addRange(r); document.execCommand("copy"); document.body.removeChild(d);
+                alert("Texto visual copiado.");
+            }
+        }
+
+        function exportHistory() {
+            if(historyData.length === 0) return;
+            let n = prompt("Nombre del archivo de exportación:", "Citas") || "Citas";
+            const b = new Blob([JSON.stringify(historyData)], {type: "application/json"});
+            const u = URL.createObjectURL(b);
+            const a = document.createElement("a"); a.href = u; a.download = n + ".json";
+            a.click(); URL.revokeObjectURL(u);
+        }
+
+        async function importHistory(e) {
+            for(let f of e.target.files) {
+                try {
+                    const d = JSON.parse(await f.text());
+                    if(Array.isArray(d)) historyData = historyData.concat(d);
+                } catch(err) { alert("Archivo no válido: " + f.name); }
+            }
+            renderHistory(); e.target.value = "";
+        }
+
+        function addAuthorField(n='', a='') {
+            authorCount++; const id = authorCount;
+            const h = `<div class="flex gap-2 mb-2" id="auth_row_${id}">
+                <input type="text" id="auth_last_${id}" placeholder="Apellidos" class="w-1/2 p-2 border border-stone-200 rounded text-xs outline-none focus:ring-1 focus:ring-tan shadow-sm" value="${a}" oninput="updatePreviewObras()">
+                <input type="text" id="auth_first_${id}" placeholder="Iniciales" class="w-1/4 p-2 border border-stone-200 rounded text-xs outline-none focus:ring-1 focus:ring-tan shadow-sm" value="${n}" oninput="updatePreviewObras()">
+                ${id>1 ? `<button onclick="this.parentElement.remove();updatePreviewObras()" class="text-stone-300 hover:text-rust px-2">×</button>` : ''}
+            </div>`;
+            document.getElementById('authorsList').insertAdjacentHTML('beforeend', h);
+        }
+
+        function getAuthorsArray() {
+            let res = [];
+            for(let i=1; i<=authorCount; i++) {
+                const row = document.querySelector(`#auth_row_${i}`);
+                if(row) {
+                    const l = document.getElementById(`auth_last_${i}`).value.trim();
+                    const f = document.getElementById(`auth_first_${i}`).value.trim();
+                    if(l || f) res.push({last: l, first: f});
+                }
+            }
+            return res;
+        }
+
+        function formatAuthorsAPA(arr) {
+            if(arr.length === 0) return "";
+            if(arr.length === 1) return arr[0].last + (arr[0].first ? ", " + arr[0].first : "");
+            let last = arr.pop();
+            return arr.map(i => i.last + (i.first ? ", " + i.first : "")).join(", ") + " & " + last.last + (last.first ? ", " + last.first : "");
+        }
+
+        function updateInline(arr, y, t) {
+            let a = arr.length > 0 ? arr[0].last : (t ? `${t.substring(0,15)}...` : "Autor");
+            let ye = y || "s.f.";
+            document.getElementById('cite-narrative').innerHTML = `${a} (${ye})`;
+            document.getElementById('cite-parenthetical').innerHTML = `(${a.replace(/<[^>]*>?/gm, '')}, ${ye})`;
+        }
+
+        function copyRichText(id, btn) {
+            const el = document.getElementById(id); const s = window.getSelection(); const r = document.createRange();
+            r.selectNodeContents(el); s.removeAllRanges(); s.addRange(r); document.execCommand('copy'); s.removeAllRanges();
+            const old = btn.innerText; btn.innerText = "¡COPIADO!"; setTimeout(()=>btn.innerText = old, 1500);
+        }
+        function copyInputText(id, btn) { document.getElementById(id).select(); document.execCommand('copy'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function formatDOI(u) { if(u.startsWith("10.")) return "https://doi.org/" + u; return u; }
+    </script>
+</body>
+</html>
