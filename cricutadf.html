@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Taller - Cricut en el Aula del Futuro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- MANUAL DE ESTILO VISUAL --- */
+        :root {
+            --color-fondo: #FDF5E6;       /* Crema */
+            --color-titulos: #D2691E;     /* Chocolate */
+            --color-texto: #3C2A1E;       /* Café oscuro */
+            --color-acento: #E49B0F;      /* Calabaza */
+            --fuente-titulos: 'Montserrat', sans-serif;
+            --fuente-cuerpo: 'Open Sans', sans-serif;
+        }
+
+        /* --- ESTILOS GENERALES --- */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--fuente-cuerpo);
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+            line-height: 1.7;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+            min-height: 60vh;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: var(--fuente-titulos);
+            color: var(--color-titulos);
+            margin-bottom: 1rem;
+        }
+
+        p { margin-bottom: 1.25rem; }
+        em { font-style: italic; }
+        ul { margin-bottom: 1.25rem; padding-left: 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+
+        /* --- CABECERA CORREGIDA --- */
+        header {
+            position: relative;
+            width: 100%;
+            max-height: 350px; /* Límite máximo establecido en el manual */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--color-texto);
+            overflow: hidden;
+        }
+
+        .logo-cabecera {
+            width: 100%;
+            max-height: 350px; /* La imagen define la altura del header hasta este tope */
+            object-fit: cover;
+            display: block;
+            filter: brightness(0.65);
+        }
+        
+        .info-taller {
+            position: absolute;
+            z-index: 2; 
+            text-align: center;
+            padding: 1rem 2rem;
+            width: 100%;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: clamp(2rem, 5vw, 3rem);
+            color: var(--color-acento); 
+            text-shadow: 
+                -1px -1px 0 var(--color-texto),  
+                 1px -1px 0 var(--color-texto),
+                -1px  1px 0 var(--color-texto),
+                 1px  1px 0 var(--color-texto),
+                 0 0 12px rgba(60, 42, 30, 0.9);
+        }
+
+        header p {
+            margin: 0.5rem 0 0;
+            font-size: clamp(0.9rem, 2vw, 1.3rem);
+            font-weight: 600;
+            color: var(--color-fondo); 
+            text-shadow: 1px 1px 6px var(--color-texto);
+        }
+
+        /* --- NAVEGACIÓN (TABS) --- */
+        .tab-nav-wrapper {
+            background-color: var(--color-texto);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .tab-nav {
+            display: flex;
+            margin: 0 auto;
+            max-width: 100%;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .tab-nav::-webkit-scrollbar { display: none; }
+
+        .tab-link {
+            background: transparent;
+            border: none;
+            padding: 1rem 1.2rem;
+            color: var(--color-fondo);
+            font-family: var(--fuente-titulos);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: 0.3s;
+            white-space: nowrap;
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .tab-link:hover, .tab-link.active {
+            opacity: 1;
+        }
+
+        .tab-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 10%;
+            width: 80%;
+            height: 3px;
+            background-color: var(--color-acento);
+        }
+
+        /* --- PANELES DE PESTAÑAS --- */
+        .tab-panel {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- ÍNDICE DE TARJETAS --- */
+        .index-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .card {
+            background: #f7efe1;
+            border: 1px solid rgba(60, 42, 30, 0.1);
+            border-radius: 10px;
+            padding: 1.8rem;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 160px;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 15px rgba(60, 42, 30, 0.1);
+            border-color: var(--color-acento);
+        }
+
+        .card h3 {
+            color: var(--color-titulos);
+            font-variant: small-caps;
+            font-size: 1.25rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            margin: 0;
+            color: var(--color-texto);
+        }
+
+        /* --- DESPLEGABLES INTEGRADOS (ACORDEÓN) --- */
+        details.expandable-section {
+            border: 1px solid rgba(60, 42, 30, 0.15);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            background-color: #fff;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        summary {
+            font-family: var(--fuente-titulos);
+            font-size: 1.2rem;
+            color: var(--color-titulos);
+            padding: 1.2rem 1.5rem;
+            cursor: pointer;
+            list-style: none;
+            position: relative;
+            background-color: #f7efe1;
+            transition: background-color 0.3s;
+        }
+
+        summary:hover {
+            background-color: #f0e4cf;
+        }
+
+        summary::before {
+            content: '+';
+            font-family: monospace;
+            font-size: 1.6rem;
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-acento);
+        }
+
+        details[open] > summary::before { content: '−'; }
+
+        details[open] > summary {
+            border-bottom: 1px solid rgba(60, 42, 30, 0.1);
+        }
+
+        .details-content {
+            padding: 2rem 1.5rem;
+        }
+
+        /* --- CARRUSEL --- */
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #fdfaf6;
+            border: 1px solid rgba(60, 42, 30, 0.1);
+            margin: 1rem 0;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.3s ease;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            padding: 2rem 4rem; /* Padding lateral para que el texto no pise las flechas */
+            display: none;
+        }
+
+        .carousel-slide.active { display: block; }
+
+        .carousel-button {
+            background-color: var(--color-texto);
+            color: var(--color-fondo);
+            border: none;
+            border-radius: 50%;
+            width: 2.5rem;
+            height: 2.5rem;
+            cursor: pointer;
+            position: absolute; 
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+
+        .carousel-button.prev { left: 0.8rem; }
+        .carousel-button.next { right: 0.8rem; }
+        .carousel-button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* --- IMÁGENES Y TABLAS --- */
+        .machine-img {
+            width: 100%;
+            max-width: 320px;
+            height: 220px; /* Tamaño fijado para uniformidad total */
+            object-fit: contain; /* Evita recortes en las máquinas */
+            display: block;
+            margin: 1.5rem auto 0.5rem auto;
+            border-radius: 8px;
+            background-color: #fff;
+            padding: 1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            border: 1px solid rgba(60, 42, 30, 0.1);
+        }
+
+        .flex-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+            margin: 1.5rem auto 0.5rem auto;
+        }
+
+        .flex-images .img-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 220px;
+        }
+
+        .flex-images img {
+            width: 100%;
+            height: 180px; /* Tamaño fijado para uniformidad en grupos de imágenes */
+            object-fit: contain;
+            border-radius: 8px;
+            background-color: #fff;
+            padding: 1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            border: 1px solid rgba(60, 42, 30, 0.1);
+            margin-bottom: 0.5rem;
+        }
+
+        .img-caption {
+            display: block;
+            text-align: center;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .price-table {
+            width: 100%;
+            max-width: 500px;
+            margin: 1.5rem auto;
+            border-collapse: collapse;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid rgba(60, 42, 30, 0.1);
+        }
+
+        .price-table th, .price-table td {
+            padding: 0.8rem 1.2rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(60, 42, 30, 0.1);
+        }
+
+        .price-table th {
+            background-color: var(--color-titulos);
+            color: var(--color-fondo);
+            font-family: var(--fuente-titulos);
+            font-weight: 600;
+        }
+
+        .price-table td:last-child {
+            text-align: right;
+            font-weight: 600;
+            color: var(--color-acento);
+        }
+
+        .table-note {
+            font-size: 0.8rem;
+            text-align: center;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* --- RECURSOS --- */
+        .resource-banner {
+            background-color: var(--color-titulos);
+            color: var(--color-fondo);
+            padding: 2.5rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .resource-banner h3 { color: #fff; margin-top: 0; }
+
+        .btn-notebook {
+            background-color: var(--color-acento);
+            color: var(--color-texto);
+            padding: 0.8rem 1.8rem;
+            border-radius: 6px;
+            font-weight: 700;
+            display: inline-block;
+            transition: 0.3s;
+            margin-top: 1rem;
+            text-decoration: none;
+        }
+        .btn-notebook:hover { transform: scale(1.05); }
+
+        .resource-grid-wrapper {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding-top: 1rem;
+            width: 100%;
+        }
+        .resource-card {
+            background-color: #fff;
+            border: 1px solid rgba(60, 42, 30, 0.1);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .resource-card h4 {
+            color: var(--color-titulos);
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        .resource-card a { align-self: flex-start; font-size: 0.9rem; }
+
+        /* --- PIE DE PÁGINA --- */
+        footer {
+            border-top: 2px solid rgba(60, 42, 30, 0.1);
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            margin-top: 2rem;
+            font-size: 0.95rem;
+        }
+
+        footer .contacto {
+            color: var(--color-titulos);
+            font-weight: 600;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="https://i.postimg.cc/C58VkYnG/Gemini-Generated-Image-6dfqpb6dfqpb6dfq.png" alt="Cabecera Taller Aula del Futuro" class="logo-cabecera">
+        <div class="info-taller">
+            <h1><em>Cricut</em> en el Aula del Futuro</h1>
+            <p>Corte digital para entornos educativos.</p>
+        </div>
+    </header>
+
+    <div class="tab-nav-wrapper">
+        <nav class="tab-nav" role="tablist">
+            <button class="tab-link active" data-target="panel-contenidos" role="tab">Contenidos</button>
+            <button class="tab-link" data-target="panel-maquinas" role="tab">Máquinas y herramientas</button>
+            <button class="tab-link" data-target="panel-zonas" role="tab">Zonas de aprendizaje</button>
+            <button class="tab-link" data-target="panel-software" role="tab"><em>Software</em> de diseño</button>
+            <button class="tab-link" data-target="panel-proyectos" role="tab">Proyectos prácticos</button>
+            <button class="tab-link" data-target="panel-trucos" role="tab">Trucos y consejos</button>
+            <button class="tab-link" data-target="panel-recursos" role="tab">Recursos</button>
+        </nav>
+    </div>
+
+    <main>
+        <!-- SECCIÓN: CONTENIDOS (ÍNDICE) -->
+        <section id="panel-contenidos" class="tab-panel active" role="tabpanel">
+            <h2 style="text-align: center; margin-bottom: 2rem;">Índice del Taller</h2>
+            <div class="index-grid">
+                <div class="card" data-target="panel-maquinas">
+                    <h3>Máquinas y herramientas</h3>
+                    <p>Explora la gama de <em>plotters</em> y prensas disponibles.</p>
+                </div>
+                <div class="card" data-target="panel-zonas">
+                    <h3>Zonas de aprendizaje</h3>
+                    <p>Integración de la fabricación digital en las zonas del Aula del Futuro.</p>
+                </div>
+                <div class="card" data-target="panel-software">
+                    <h3><em>Software</em> de diseño</h3>
+                    <p>Primeros pasos con <em>Design Space</em> y flujo de trabajo digital.</p>
+                </div>
+                <div class="card" data-target="panel-proyectos">
+                    <h3>Proyectos prácticos</h3>
+                    <p>Ideas y guías paso a paso para aplicar en el aula.</p>
+                </div>
+                <div class="card" data-target="panel-trucos">
+                    <h3>Trucos y consejos</h3>
+                    <p>Secretos para optimizar materiales y acabados profesionales.</p>
+                </div>
+                <div class="card" data-target="panel-recursos">
+                    <h3>Recursos</h3>
+                    <p>Documentación, enlaces y el cuaderno del curso.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 1: MÁQUINAS Y HERRAMIENTAS -->
+        <section id="panel-maquinas" class="tab-panel" role="tabpanel">
+            <h2>1. Máquinas y herramientas</h2>
+            <p>El ecosistema de fabricación digital de <em>Cricut</em> se compone de trazadores de corte inteligentes, prensas térmicas de precisión y un conjunto de herramientas especializadas que permiten transformar materiales comunes en recursos educativos de alto valor.</p>
+
+            <details class="expandable-section">
+                <summary>Ecosistema de máquinas de corte inteligente</summary>
+                <div class="details-content">
+                    <p>Las máquinas <em>Cricut</em> son el núcleo de la fabricación en el aula. Dependiendo de la complejidad del proyecto y los materiales, existen diferentes modelos adaptados a cada necesidad.</p>
+                    <div class="carousel-container">
+                        <div class="carousel-track">
+                            
+                            <!-- Slide: Cricut Joy -->
+                            <div class="carousel-slide active">
+                                <h3>Gama <em>Cricut Joy</em></h3>
+                                <p>La opción más compacta y portátil, ideal para intervenciones rápidas y espacios reducidos.</p>
+                                
+                                <img src="https://cricut.com/on/demandware.static/-/Sites-cricut-navigation-emea/default/dwef98bbef/joyextra5.jpg" alt="Máquinas de corte compactas Cricut Joy y Cricut Joy Xtra sobre un escritorio" class="machine-img">
+                                <span class="img-caption">Fuente: <em>cricut.com</em></span>
+
+                                <ul>
+                                    <li><strong><em>Cricut Joy</em>:</strong> Enfocada en etiquetas, tarjetas personalizadas y proyectos de vinilo de hasta 13 cm de ancho.</li>
+                                    <li><strong><em>Cricut Joy Xtra</em>:</strong> Formato A4 que añade la capacidad de <em>Print Then Cut</em> (imprimir y luego cortar) para crear pegatinas a todo color.</li>
+                                    <li><strong>Uso ideal:</strong> Organización del aula, identificación de materiales y proyectos de papelería sencillos.</li>
+                                </ul>
+
+                                <table class="price-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Modelo</th>
+                                            <th>Precio Orientativo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><em>Cricut Joy</em></td>
+                                            <td>~ 189 €</td>
+                                        </tr>
+                                        <tr>
+                                            <td><em>Cricut Joy Xtra</em></td>
+                                            <td>~ 249 €</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p class="table-note">Precios orientativos. Fecha de consulta: 6 de abril de 2026.</p>
+                            </div>
+
+                            <!-- Slide: Cricut Explore -->
+                            <div class="carousel-slide">
+                                <h3><em>Cricut Explore 3</em></h3>
+                                <p>El "caballo de batalla" de los centros educativos por su equilibrio entre potencia, velocidad y versatilidad.</p>
+                                
+                                <img src="https://cricut.com/on/demandware.static/-/Sites-cricut-navigation-emea/default/dwdba45a08/E5_alpha.png" alt="Máquina de corte Cricut Explore 3 en color menta" class="machine-img">
+                                <span class="img-caption">Fuente: <em>cricut.com</em></span>
+
+                                <ul>
+                                    <li><strong>Capacidades:</strong> Corta más de 100 materiales (cartulina, vinilo, papel purpurina, etc.).</li>
+                                    <li><strong>Herramientas:</strong> Compatible con 6 herramientas para cortar, escribir, marcar y aplicar <em>foil</em>.</li>
+                                    <li><strong>Tecnología:</strong> Optimizado para <em>Smart Materials</em>, permitiendo cortes continuos de hasta 3.6 metros sin necesidad de tapete.</li>
+                                </ul>
+
+                                <table class="price-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Modelo</th>
+                                            <th>Precio Orientativo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><em>Cricut Explore 3</em></td>
+                                            <td>~ 339 €</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p class="table-note">Precios orientativos. Fecha de consulta: 6 de abril de 2026.</p>
+                            </div>
+
+                            <!-- Slide: Cricut Maker -->
+                            <div class="carousel-slide">
+                                <h3><em>Cricut Maker 3</em></h3>
+                                <p>La herramienta de grado profesional para laboratorios <em>STEAM</em> avanzados y proyectos de ingeniería.</p>
+                                
+                                <img src="https://cricut.com/on/demandware.static/-/Sites-cricut-navigation-emea/default/dw5d7f806b/navigation/cutting-machines/cutting-machines-cricut-maker-4.jpg" alt="Máquina de corte profesional Cricut Maker 3 cortando material azul" class="machine-img">
+                                <span class="img-caption">Fuente: <em>cricut.com</em></span>
+
+                                <ul>
+                                    <li><strong>Versatilidad:</strong> Corta más de 300 materiales, desde la seda más delicada hasta madera de balsa, cuero y cartón contrachapado.</li>
+                                    <li><strong>Sistema de Herramientas:</strong> Usa el <em>Adaptive Tool System</em> con 13 herramientas especializadas (cuchilla rotatoria, cuchilla de corte profundo, herramientas de grabado y repujado).</li>
+                                    <li><strong>Potencia:</strong> Ofrece hasta 10 veces más fuerza de corte que la gama <em>Explore</em>.</li>
+                                </ul>
+
+                                <table class="price-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Modelo</th>
+                                            <th>Precio Orientativo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><em>Cricut Maker 3</em></td>
+                                            <td>~ 449 €</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p class="table-note">Precios orientativos. Fecha de consulta: 6 de abril de 2026.</p>
+                            </div>
+
+                            <!-- Slide: Cricut Venture -->
+                            <div class="carousel-slide">
+                                <h3><em>Cricut Venture</em></h3>
+                                <p>Diseñada para la producción a gran escala y proyectos colaborativos de gran formato.</p>
+                                
+                                <img src="https://cricut.com/on/demandware.static/-/Sites-cricut-navigation-emea/default/dw506ac0ea/navigation/cutting-machines/venture_Main_2008739.jpg" alt="Máquina de corte de gran formato Cricut Venture sobre su soporte" class="machine-img">
+                                <span class="img-caption">Fuente: <em>cricut.com</em></span>
+
+                                <ul>
+                                    <li><strong>Formato:</strong> Capaz de cortar materiales de hasta 61 cm de ancho a velocidades industriales.</li>
+                                    <li><strong>Eficiencia:</strong> Corte en ángulo de 45 grados para ahorrar espacio en el aula mientras trabaja.</li>
+                                    <li><strong>Precisión:</strong> Ideal para murales escolares, señalética de gran tamaño y prototipos volumétricos complejos.</li>
+                                </ul>
+
+                                <table class="price-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Modelo</th>
+                                            <th>Precio Orientativo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><em>Cricut Venture</em></td>
+                                            <td>~ 1.099 €</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p class="table-note">Precios orientativos. Fecha de consulta: 6 de abril de 2026.</p>
+                            </div>
+                        </div>
+                        <button class="carousel-button prev" aria-label="Anterior">&lt;</button>
+                        <button class="carousel-button next" aria-label="Siguiente">&gt;</button>
+                    </div>
+                </div>
+            </details>
+
+            <!-- PRENSAS TÉRMICAS -->
+            <details class="expandable-section">
+                <summary>Prensas térmicas y personalización</summary>
+                <div class="details-content">
+                    <p>Para aplicar diseños de vinilo textil (<em>Iron-on</em>) o sublimación (<em>Infusible Ink</em>), las prensas térmicas garantizan una transferencia uniforme y duradera que no se consigue con una plancha doméstica.</p>
+                    <div class="carousel-container">
+                        <div class="carousel-track">
+                            
+                            <!-- Slide: EasyPress 3 -->
+                            <div class="carousel-slide active">
+                                <h3>Gama <em>EasyPress 3</em></h3>
+                                <p>Combina la velocidad de una prensa industrial con la sencillez de una herramienta doméstica.</p>
+                                
+                                <img src="https://cricut.com/on/demandware.static/-/Sites-cricut-navigation-emea/default/dw064fbccf/navigation/heat-presses/_2009150_272x112.jpg" alt="Prensa térmica Cricut EasyPress 3 con aplicación móvil conectada" class="machine-img">
+                                <span class="img-caption">Fuente: <em>cricut.com</em></span>
+
+                                <ul>
+                                    <li><strong>Control inteligente:</strong> Se conecta vía <em>Bluetooth</em> a la aplicación <em>Cricut Heat</em>, que envía los ajustes exactos de tiempo y temperatura según el material.</li>
+                                    <li><strong>Seguridad:</strong> Base de seguridad aislada y función de apagado automático para evitar accidentes en el aula.</li>
+                                    <li><strong>Variedad:</strong> Disponible en tamaños de 22x22 cm y 30x25 cm para adaptarse a diferentes proyectos textiles.</li>
+                                </ul>
+
+                                <table class="price-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Modelo</th>
+                                            <th>Precio Orientativo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><em>EasyPress 3</em> (Mediana)</td>
+                                            <td>~ 199 €</td>
+                                        </tr>
+                                        <tr>
+                                            <td><em>EasyPress 3</em> (Grande)</td>
+                                            <td>~ 249 €</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p class="table-note">Precios orientativos. Fecha de consulta: 6 de abril de 2026.</p>
+                            </div>
+
+                            <!-- Slide: Mug Press -->
+                            <div class="carousel-slide">
+                                <h3><em>Cricut Mug Press</em></h3>
+                                <p>Automatiza la creación de tazas personalizadas con resultados vibrantes y resistentes al lavavajillas.</p>
+
+                                <img src="https://cricut.com/on/demandware.static/-/Sites-cricut-navigation-emea/default/dw6ccfe604/navigation/heat-presses/heatpress-mugpress-272x112.jpg" alt="Prensa térmica para tazas Cricut Mug Press con una taza dentro" class="machine-img">
+                                <span class="img-caption">Fuente: <em>cricut.com</em></span>
+
+                                <ul>
+                                    <li><strong>Simplicidad:</strong> No requiere ajustes manuales; la prensa detecta la presión y temperatura óptimas de forma automática.</li>
+                                    <li><strong>Tecnología:</strong> Específicamente diseñada para trabajar con materiales de <em>Infusible Ink</em>, logrando una transferencia a nivel molecular que nunca se desprende.</li>
+                                </ul>
+
+                                <table class="price-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Modelo</th>
+                                            <th>Precio Orientativo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><em>Cricut Mug Press</em></td>
+                                            <td>~ 199 €</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p class="table-note">Precios orientativos. Fecha de consulta: 6 de abril de 2026.</p>
+                            </div>
+
+                            <!-- Slide: Prensas de Especialidad -->
+                            <div class="carousel-slide">
+                                <h3>Prensas de especialidad</h3>
+                                <p>Herramientas diseñadas para superficies curvas, objetos pequeños y producciones de alto volumen.</p>
+
+                                <div class="flex-images">
+                                    <div class="img-wrapper">
+                                        <img src="https://cricut.com/dw/image/v2/BFRQ_PRD/on/demandware.static/-/Sites-cricut-master-catalog/default/dw10713366/images/1/2009240_hero_1.jpeg?sw=449&q=65" alt="Prensa térmica para gorras Cricut Hat Press sobre su base">
+                                        <span class="img-caption"><em>Hat Press</em></span>
+                                    </div>
+                                    <div class="img-wrapper">
+                                        <img src="https://cricut.com/on/demandware.static/-/Sites-cricut-navigation-emea/default/dw7d83dff4/navigation/heat-presses/2009425__272x112.jpg" alt="Prensa térmica pequeña Cricut EasyPress Mini">
+                                        <span class="img-caption"><em>EasyPress Mini</em></span>
+                                    </div>
+                                    <div class="img-wrapper">
+                                        <img src="https://cricut.com/on/demandware.static/-/Sites-cricut-navigation-emea/default/dwc0ae03d0/navigation/heat-presses/autopress-machine.272x112.jpg" alt="Prensa térmica profesional automática Cricut Autopress">
+                                        <span class="img-caption"><em>Autopress</em></span>
+                                    </div>
+                                </div>
+                                <span class="img-caption" style="margin-top:-1rem;">Fuente: <em>cricut.com</em></span>
+
+                                <ul>
+                                    <li><strong><em>Cricut Hat Press</em>:</strong> Molde térmico curvado para personalizar gorras y sombreros sin arrugas.</li>
+                                    <li><strong><em>EasyPress Mini</em>:</strong> Ideal para objetos pequeños (zapatos, peluches) y zonas de difícil acceso como costuras o bolsillos.</li>
+                                    <li><strong><em>Cricut Autopress</em>:</strong> Prensa de gran formato con apertura asistida y cierre con dos dedos, perfecta para centros con alta demanda de producción.</li>
+                                </ul>
+
+                                <table class="price-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Modelo</th>
+                                            <th>Precio Orientativo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><em>Cricut Hat Press</em></td>
+                                            <td>~ 159 €</td>
+                                        </tr>
+                                        <tr>
+                                            <td><em>EasyPress Mini</em></td>
+                                            <td>~ 69 €</td>
+                                        </tr>
+                                        <tr>
+                                            <td><em>Cricut Autopress</em></td>
+                                            <td>~ 1.099 €</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p class="table-note">Precios orientativos. Fecha de consulta: 6 de abril de 2026.</p>
+                            </div>
+                        </div>
+                        <button class="carousel-button prev" aria-label="Anterior">&lt;</button>
+                        <button class="carousel-button next" aria-label="Siguiente">&gt;</button>
+                    </div>
+                </div>
+            </details>
+
+            <!-- ACCESORIOS Y HERRAMIENTAS -->
+            <details class="expandable-section">
+                <summary>Accesorios y herramientas manuales</summary>
+                <div class="details-content">
+                    <p>La precisión en el acabado final depende del uso correcto de los accesorios de preparación y pelado del material.</p>
+                    <div class="carousel-container">
+                        <div class="carousel-track">
+                            
+                            <!-- Slide: Tapetes -->
+                            <div class="carousel-slide active">
+                                <h3>Tipos de tapetes de corte</h3>
+                                <p>Cada color de tapete indica un nivel de adherencia específico para diferentes tipos de materiales.</p>
+                                
+                                <img src="https://cricut.com/dw/image/v2/BFRQ_PRD/on/demandware.static/-/Sites-cricut-master-catalog/default/dw7c485995/images//2/0/2003546-1.jpg?sw=449&q=65" alt="Conjunto de tres tapetes de corte Cricut de colores verde, azul y morado" class="machine-img" style="max-width: 250px;">
+                                <span class="img-caption">Fuente: <em>cricut.com</em></span>
+
+                                <ul>
+                                    <li><strong>Azul (<em>LightGrip</em>):</strong> Para materiales ligeros como papel común, cartulina fina o vinilo.</li>
+                                    <li><strong>Verde (<em>StandardGrip</em>):</strong> El más versátil, para cartulina pesada, vinilos termoadhesivos y papel estampado.</li>
+                                    <li><strong>Púrpura (<em>StrongGrip</em>):</strong> Adherencia fuerte para materiales gruesos como cuero, madera de balsa o cartón corrugado.</li>
+                                    <li><strong>Rosa (<em>FabricGrip</em>):</strong> Específico para telas, diseñado para evitar el deshilachado durante el corte.</li>
+                                    <li><strong>Tapete para tarjetas (<em>Card Mat</em>):</strong> Especialmente diseñado para crear tarjetas de felicitación personalizadas en minutos.</li>
+                                </ul>
+
+                                <table class="price-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Accesorio</th>
+                                            <th>Precio Orientativo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Tapetes de corte (Pack de 3)</td>
+                                            <td>~ 19 €</td>
+                                        </tr>
+                                        <tr>
+                                            <td><em>Card Mat 2x2</em></td>
+                                            <td>~ 24 €</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p class="table-note">Precios orientativos. Fecha de consulta: 6 de abril de 2026.</p>
+                            </div>
+
+                            <!-- Slide: Herramientas -->
+                            <div class="carousel-slide">
+                                <h3>Herramientas de pelado y aplicación</h3>
+                                <p>Fundamentales para retirar el material sobrante y asegurar una aplicación perfecta.</p>
+
+                                <img src="https://cricut.com/dw/image/v2/BFRQ_PRD/on/demandware.static/-/Sites-cricut-master-catalog/default/dwbeae5624/images//5/_/5_1_2.jpg?sw=449&q=65" alt="Kit de herramientas básicas de pelado de Cricut, incluyendo tijeras, espátula y pinzas" class="machine-img" style="max-width: 250px;">
+                                <span class="img-caption">Fuente: <em>cricut.com</em></span>
+
+                                <ul>
+                                    <li><strong>Peladores (<em>Weeders</em>):</strong> Ganchos metálicos para retirar las partes pequeñas del diseño del transportador.</li>
+                                    <li><strong>Espátula y Rascador:</strong> Para levantar piezas delicadas del tapete y limpiar restos de material.</li>
+                                    <li><strong>Rodillo (<em>Brayer</em>):</strong> Elimina burbujas de aire y asegura que el material esté perfectamente adherido al tapete antes de cortar.</li>
+                                </ul>
+
+                                <table class="price-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Accesorio</th>
+                                            <th>Precio Orientativo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Set básico de herramientas</td>
+                                            <td>~ 29 €</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Rodillo aplicador (<em>Brayer</em>)</td>
+                                            <td>~ 19 €</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p class="table-note">Precios orientativos. Fecha de consulta: 6 de abril de 2026.</p>
+                            </div>
+                        </div>
+                        <button class="carousel-button prev" aria-label="Anterior">&lt;</button>
+                        <button class="carousel-button next" aria-label="Siguiente">&gt;</button>
+                    </div>
+                </div>
+            </details>
+
+            <!-- MATERIALES Y CONSUMIBLES -->
+            <details class="expandable-section">
+                <summary>Materiales y consumibles</summary>
+                <div class="details-content">
+                    <p>La elección del material adecuado es vital para garantizar el éxito de los proyectos de fabricación digital en el entorno escolar. <em>Cricut</em> ofrece un amplio abanico diseñado para optimizar resultados.</p>
+                    <div class="carousel-container">
+                        <div class="carousel-track">
+                            
+                            <!-- Slide 1: Vinilo -->
+                            <div class="carousel-slide active">
+                                <h3>Gama de Vinilos (Adhesivo e <em>Iron-on</em>)</h3>
+                                <p>Los materiales más populares para prototipado rápido y personalización en el aula.</p>
+                                
+                                <img src="https://help.cricut.com/hc/article_attachments/26826326203031" alt="Rollos de vinilo y Smart Materials" class="machine-img" id="img-mat-vinilo" style="max-width: 550px; height: auto;">
+                                <span class="img-caption">Fuente: <em>cricut.com</em></span>
+
+                                <ul>
+                                    <li><strong>Vinilo Adhesivo:</strong> Disponible en acabados permanentes y removibles. Ideal para rotular material, señalética y decoración de espacios.</li>
+                                    <li><strong>Vinilo Termoadhesivo (<em>Iron-on</em>):</strong> Diseñado para su transferencia mediante calor a textiles, maderas y otras superficies porosas.</li>
+                                    <li><strong><em>Smart Materials</em>:</strong> Versiones exclusivas que pueden cargarse directamente sin tapete, permitiendo cortes continuos y rápidos.</li>
+                                </ul>
+                            </div>
+
+                            <!-- Slide 2: Papel y cartulina -->
+                            <div class="carousel-slide">
+                                <h3>Papel, cartulina y especialidades</h3>
+                                <p>Materiales accesibles para desarrollar habilidades de geometría y diseño 2D.</p>
+                                
+                                <img src="https://help.cricut.com/hc/theming_assets/01J98M6MCR4C8W20W5B3X8D257" alt="Tarjetas de cartulina" class="machine-img" id="img-mat-cartulina" style="max-width: 550px; height: auto;">
+                                <span class="img-caption">Fuente: <em>cricut.com</em></span>
+
+                                <ul>
+                                    <li><strong>Tarjetas de inserción (<em>Insert Cards</em>):</strong> Sistema rápido sin pegamento para crear tarjetas profesionales en minutos (ideal con el <em>Card Mat</em>).</li>
+                                    <li><strong>Cartulina y Kraft:</strong> Base perfecta para proyectos de geometría volumétrica, ingeniería de papel (<em>pop-ups</em>) y cartelería escolar.</li>
+                                </ul>
+                            </div>
+
+                            <!-- Slide 3: Materiales rígidos -->
+                            <div class="carousel-slide">
+                                <h3>Materiales rígidos y estructurales</h3>
+                                <p>Ideales para proyectos de ingeniería y maquetación (requieren la gama <em>Maker</em>).</p>
+                                
+                                <img src="https://help.cricut.com/hc/article_attachments/25996757892119" alt="Corte de precisión en madera de balsa usando la máquina Cricut Maker" class="machine-img">
+                                <span class="img-caption">Fuente: <em>cricut.com</em></span>
+
+                                <ul>
+                                    <li><strong>Madera de balsa y tilo:</strong> Permite construir maquetas arquitectónicas, engranajes y piezas para robótica educativa.</li>
+                                    <li><strong><em>Chipboard</em> (cartón contrachapado):</strong> Excelente para la creación de puzles pesados, cajas de organización y prototipos tridimensionales robustos.</li>
+                                </ul>
+                            </div>
+
+                            <!-- Slide 4: Papel de pegatina -->
+                            <div class="carousel-slide">
+                                <h3>Papel de pegatina imprimible</h3>
+                                <p>Permite a los alumnos diseñar, imprimir y recortar pegatinas con precisión.</p>
+                                
+                                <img src="https://help.cricut.com/hc/article_attachments/25992489024663" alt="Hojas de papel de pegatina imprimible de Cricut con diseños cortados" class="machine-img">
+                                <span class="img-caption">Fuente: <em>cricut.com</em></span>
+
+                                <ul>
+                                    <li><strong>Tecnología <em>Print Then Cut</em>:</strong> La máquina lee unas marcas de registro impresas para saber exactamente dónde cortar el contorno de los diseños a todo color.</li>
+                                    <li><strong>Aplicaciones educativas:</strong> Creación de insignias para gamificación, pegatinas de recompensa, etiquetado de inventario y diagramas interactivos.</li>
+                                </ul>
+                            </div>
+
+                            <!-- Slide 5: Infusible Ink -->
+                            <div class="carousel-slide">
+                                <h3>Sublimación con <em>Infusible Ink</em></h3>
+                                <p>Transferencias de tinta de calidad profesional que se integran en el material para durar.</p>
+                                
+                                <img src="https://help.cricut.com/hc/article_attachments/26804403694487" alt="Taza sublimada con Infusible Ink" class="machine-img" id="img-mat-infusible" style="max-width: 550px; height: auto;">
+                                <span class="img-caption">Fuente: <em>cricut.com</em></span>
+
+                                <ul>
+                                    <li><strong>Acabado impecable:</strong> A diferencia del vinilo, la tinta se convierte en gas y penetra en la base de poliéster, evitando que se cuartee o se pele con los lavados.</li>
+                                    <li><strong>Aplicaciones:</strong> Personalización duradera de posavasos, tazas (con <em>Mug Press</em>), y textiles con alto porcentaje de poliéster.</li>
+                                </ul>
+                            </div>
+
+                            <!-- Slide 6: Rotuladores -->
+                            <div class="carousel-slide">
+                                <h3>Rotuladores y bolígrafos</h3>
+                                <p>Herramientas de dibujo y escritura para añadir detalles, textos y arte a mano alzada a los proyectos.</p>
+                                
+                                <img src="https://cricut.com/dw/image/v2/BHBM_PRD/on/demandware.static/-/Library-Sites-cricut-content-na01/default/dw0ed8a46e/Pens/Image-1.jpg" alt="Conjunto de rotuladores y bolígrafos Cricut de diversos colores y grosores" class="machine-img">
+                                <span class="img-caption">Fuente: <em>cricut.com</em></span>
+
+                                <ul>
+                                    <li><strong>Variedad de puntas:</strong> Desde punta fina (0.4 mm) hasta marcadores gruesos y puntas caligráficas, adaptándose a cualquier necesidad de trazado escolar.</li>
+                                    <li><strong>Acabados especiales:</strong> Disponibles en colores sólidos, metálicos, neón e incluso como rotuladores de <em>Infusible Ink</em> para diseñar transferencias dibujadas por los propios alumnos.</li>
+                                    <li><strong>Integración en la máquina:</strong> Se colocan en el cabezal secundario de las máquinas, permitiendo a la herramienta dibujar el patrón exacto diseñado en la pantalla antes de cortarlo.</li>
+                                </ul>
+                            </div>
+
+                        </div>
+                        <button class="carousel-button prev" aria-label="Anterior">&lt;</button>
+                        <button class="carousel-button next" aria-label="Siguiente">&gt;</button>
+                    </div>
+                </div>
+            </details>
+        </section>
+
+        <!-- PESTAÑA 2: ZONAS DE APRENDIZAJE -->
+        <section id="panel-zonas" class="tab-panel" role="tabpanel">
+            <h2>2. Zonas de aprendizaje</h2>
+            <p>La implementación del modelo Aula del Futuro trasciende la mera dotación tecnológica. Representa un cambio hacia metodologías activas donde el espacio, la pedagogía y la tecnología convergen. En este ecosistema, la fabricación digital emerge como un puente tangible entre el pensamiento abstracto y la creación material.</p>
+            <p>La versatilidad de un <em>plotter</em> de corte permite que esta herramienta impacte positivamente en todo el ciclo de una situación de aprendizaje a través de las diferentes zonas.</p>
+
+            <details class="expandable-section">
+                <summary>1. Zona de Investigación (Investiga)</summary>
+                <div class="details-content">
+                    <p>El inicio del proyecto y el análisis de información donde el alumnado define el reto y busca soluciones técnicas.</p>
+                    <div class="carousel-container">
+                        <div class="carousel-track">
+                            <div class="carousel-slide active">
+                                <h4>Fase de documentación y búsqueda</h4>
+                                <p>Antes de fabricar, el alumnado debe investigar sobre el reto planteado (por ejemplo, la creación de un modelo del sistema solar, componentes robóticos o material para una cooperativa escolar).</p>
+                                <ul>
+                                    <li><strong>Análisis de viabilidad:</strong> Exploración de las propiedades físicas de los materiales (vinilo, madera, cartulina) para elegir el más adecuado.</li>
+                                    <li><strong>Búsqueda de referentes:</strong> Uso de dispositivos para navegar por la comunidad de <em>Cricut Design Space</em> e inspirarse en proyectos similares.</li>
+                                    <li><strong>Búsqueda de recursos:</strong> Localización y descarga de vectores libres de derechos (archivos <em>SVG</em>) y tipografías apropiadas para el corte.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <details class="expandable-section">
+                <summary>2. Zona de Exploración (Explora)</summary>
+                <div class="details-content">
+                    <p>Fomento del pensamiento crítico, la inspiración y la experimentación a través del juego y el diseño guiado.</p>
+                    <div class="carousel-container">
+                        <div class="carousel-track">
+                            <div class="carousel-slide active">
+                                <h4>Ideación y bocetado</h4>
+                                <p>El alumnado comienza a jugar con las posibilidades del diseño antes de tomar decisiones definitivas.</p>
+                                <ul>
+                                    <li><strong>Bocetado físico y digital:</strong> Transferencia de las primeras ideas al papel y su posterior reinterpretación en el lienzo de <em>Design Space</em>.</li>
+                                    <li><strong><em>Tinkering</em> digital:</strong> Manipulación libre de formas geométricas básicas dentro de la plataforma para entender cómo funcionan las herramientas de combinación (soldar, rebanar, aplanar).</li>
+                                    <li><strong>Experimentación material:</strong> Pruebas de textura y flexibilidad con retales de materiales de proyectos anteriores.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <details class="expandable-section">
+                <summary>3. Zona de Interacción (Interactúa)</summary>
+                <div class="details-content">
+                    <p>El espacio para la colaboración activa, el debate y la toma de decisiones en equipo.</p>
+                    <div class="carousel-container">
+                        <div class="carousel-track">
+                            <div class="carousel-slide active">
+                                <h4>Trabajo cooperativo y asignación de roles</h4>
+                                <p>El grupo debate y define las características finales del prototipo, unificando criterios y visiones.</p>
+                                <ul>
+                                    <li><strong>Consenso técnico:</strong> Discusión sobre las dimensiones reales del proyecto y ajuste de los archivos compartidos.</li>
+                                    <li><strong>Reparto de responsabilidades:</strong> Asignación de roles específicos: diseñador digital, operario de máquina, preparador de tapetes y especialista en ensamblaje.</li>
+                                    <li><strong>Revisión entre pares (<em>Peer Review</em>):</strong> Los equipos analizan los diseños de otros grupos en pantalla para detectar posibles errores antes del corte (líneas demasiado finas, piezas sueltas).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <details class="expandable-section">
+                <summary>4. Zona de Desarrollo (Desarrolla)</summary>
+                <div class="details-content">
+                    <p>La abstracción se convierte en plano. Es la zona del aprendizaje formal, el enfoque y el pensamiento computacional.</p>
+                    <div class="carousel-container">
+                        <div class="carousel-track">
+                            <div class="carousel-slide active">
+                                <h4>Diseño y programación geométrica</h4>
+                                <p>Estructuración técnica del proyecto utilizando el ecosistema digital de forma rigurosa.</p>
+                                <ul>
+                                    <li><strong>Pensamiento computacional:</strong> Programación de las capas, indicando al <em>software</em> qué líneas son de corte, doblez o dibujo con rotulador.</li>
+                                    <li><strong>Matemáticas aplicadas:</strong> Resolución de problemas espaciales en el lienzo digital, cálculo de escalas, proporciones, simetrías y anidación (aprovechamiento del material).</li>
+                                    <li><strong>Preparación de archivos:</strong> Agrupación y "aplanamiento" de las capas para que el <em>plotter</em> ejecute las órdenes correctamente.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <details class="expandable-section">
+                <summary>5. Zona de Creación (Crea)</summary>
+                <div class="details-content">
+                    <p>El taller de fabricación. Traslado del modelo digital al mundo real mediante la manipulación física.</p>
+                    <div class="carousel-container">
+                        <div class="carousel-track">
+                            <div class="carousel-slide active">
+                                <h4>Fabricación y ensamblaje</h4>
+                                <p>Manipulación directa de la tecnología y los materiales para dar vida al proyecto con un componente altamente <em>maker</em>.</p>
+                                <ul>
+                                    <li><strong>Operación de maquinaria:</strong> Preparación del tapete (limpieza y adhesión), carga del material y ejecución del corte con la máquina <em>Cricut</em>.</li>
+                                    <li><strong>Motricidad fina:</strong> Proceso de pelado (<em>weeding</em>) del vinilo excedente o extracción cuidadosa de piezas de cartulina de alta precisión.</li>
+                                    <li><strong>Terminación:</strong> Uso seguro de herramientas térmicas (<em>EasyPress</em> o <em>Mug Press</em>) para transferencias, y pegado o construcción tridimensional del producto final.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <details class="expandable-section">
+                <summary>6. Zona de Presentación (Presenta)</summary>
+                <div class="details-content">
+                    <p>Comunicación de los resultados, exposición pública y reflexión sobre el proceso de aprendizaje.</p>
+                    <div class="carousel-container">
+                        <div class="carousel-track">
+                            <div class="carousel-slide active">
+                                <h4>Exposición del producto final</h4>
+                                <p>El equipo comparte su creación finalizada (una maqueta, un circuito, material de campaña) con la comunidad educativa.</p>
+                                <ul>
+                                    <li><strong>Comunicación efectiva:</strong> Los alumnos explican el proceso creativo: desde el reto inicial y el diseño en <em>Design Space</em>, hasta la superación de problemas técnicos y de prototipado.</li>
+                                    <li><strong>Demostración:</strong> Exposición práctica de cómo el prototipo físico resuelve el problema planteado inicialmente.</li>
+                                    <li><strong>Evaluación formativa:</strong> Reflexión crítica sobre el aprendizaje adquirido, valoración del trabajo en equipo y propuestas de mejora para futuras iteraciones.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <div style="margin-top: 3rem; text-align: center;">
+                <h3>Resumen</h3>
+                <p>Visualiza a continuación el documento sobre el modelo del Aula del Futuro y la fabricación digital.</p>
+                
+                <div style="position: relative; width: 100%; height: 0; padding-top: 55.8342%; padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden; border-radius: 8px; will-change: transform;">
+                  <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
+                    src="https://www.canva.com/design/DAHGKr8cKNM/KQdRBPuPALn748yzYLM3YQ/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
+                  </iframe>
+                </div>
+                <div style="text-align: center; font-size: 0.9rem; margin-bottom: 1rem;">
+                    <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAHGKr8cKNM&#x2F;KQdRBPuPALn748yzYLM3YQ&#x2F;view?utm_content=DAHGKr8cKNM&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener" style="color: var(--color-titulos); text-decoration: underline;">Aula del Futuro.pdf</a> de Lucía Serrano
+                </div>
+                
+                <div style="margin-top: 1.5rem;">
+                    <a href="https://drive.google.com/uc?export=download&id=1QzJBEAHeCuI8OJUdsEf3yREe3_oF3gvS" class="btn-notebook" style="margin-top: 0;" target="_blank" rel="noopener noreferrer">Descargar PDF</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 3: SOFTWARE DE DISEÑO -->
+        <section id="panel-software" class="tab-panel" role="tabpanel">
+            <h2>3. <em>Software</em> de diseño</h2>
+            <p><em>Cricut Design Space</em> es la aplicación gratuita y esencial que actúa como cerebro de la máquina. Desde este espacio digital prepararemos, diseñaremos y enviaremos nuestras creaciones al <em>plotter</em> de corte.</p>
+
+            <details class="expandable-section">
+                <summary>Creación de cuenta e instalación</summary>
+                <div class="details-content">
+                    <p>Antes de poder diseñar, necesitamos preparar nuestro entorno digital creando un <em>Cricut ID</em> y descargando la aplicación oficial.</p>
+                    
+                    <div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%; padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden; border-radius: 8px; will-change: transform;">
+                      <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
+                        src="https://www.canva.com/design/DAHGKUtG34w/1Ut-4x_Hv5V377JQKlbPhA/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
+                      </iframe>
+                    </div>
+                    <div style="text-align: center; font-size: 0.9rem; margin-bottom: 1rem;">
+                        <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAHGKUtG34w&#x2F;1Ut-4x_Hv5V377JQKlbPhA&#x2F;view?utm_content=DAHGKUtG34w&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener" style="color: var(--color-titulos); text-decoration: underline;">Instalación <em>Cricut Design Space</em></a> de Lucía Serrano
+                    </div>
+                </div>
+            </details>
+
+            <details class="expandable-section">
+                <summary>Interfaz básica y el Lienzo</summary>
+                <div class="details-content">
+                    <p>El primer contacto con la plataforma es el Lienzo (<em>Canvas</em>), nuestro espacio de trabajo infinito.</p>
+                    
+                    <div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%; padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden; border-radius: 8px; will-change: transform;">
+                      <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
+                        src="https://www.canva.com/design/DAHGKofCJrw/OlQYz1R73WZDezyNMOLMuw/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
+                      </iframe>
+                    </div>
+                    <div style="text-align: center; font-size: 0.9rem; margin-bottom: 1rem;">
+                        <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAHGKofCJrw&#x2F;OlQYz1R73WZDezyNMOLMuw&#x2F;view?utm_content=DAHGKofCJrw&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener" style="color: var(--color-titulos); text-decoration: underline;">Interfaz <em>Cricut</em> (marzo 2026)</a> de Lucía Serrano
+                    </div>
+                </div>
+            </details>
+        </section>
+
+        <!-- PESTAÑA 4: PROYECTOS PRÁCTICOS -->
+        <section id="panel-proyectos" class="tab-panel" role="tabpanel">
+            <h2>4. Proyectos prácticos</h2>
+            <p>Para asimilar el flujo de trabajo de forma progresiva, hemos diseñado cuatro proyectos escalables que cubren el uso de las herramientas del lienzo, los diferentes tapetes y las técnicas de transferencia fundamentales.</p>
+
+            <details class="expandable-section">
+                <summary>Proyecto 1: Marcapáginas (Cartulina y Rotuladores)</summary>
+                <div class="details-content">
+                    <p><strong>Objetivo:</strong> Diseñar un marcapáginas desde cero utilizando formas básicas, la herramienta de sustracción para esculpir los troquelados y la función de dibujo para personalizarlo con un nombre.</p>
+                    
+                    <div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%; padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden; border-radius: 8px; will-change: transform;">
+                      <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
+                        src="https://www.canva.com/design/DAHGoeLCYoM/2zh2o_rJ24CvhSiOBhmHMg/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
+                      </iframe>
+                    </div>
+                    <div style="text-align: center; font-size: 0.9rem; margin-bottom: 1rem;">
+                        <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAHGoeLCYoM&#x2F;2zh2o_rJ24CvhSiOBhmHMg&#x2F;view?utm_content=DAHGoeLCYoM&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener" style="color: var(--color-titulos); text-decoration: underline;">Marcapáginas AdF</a> de Lucía Serrano
+                    </div>
+
+                    <ul style="margin-top: 1.5rem;">
+                        <li><strong>Material requerido:</strong> Cartulina de gramaje medio y rotuladores <em>Cricut</em>.</li>
+                        <li><strong>Tapete de corte:</strong> Verde (<em>StandardGrip</em>).</li>
+                    </ul>
+
+                    <div style="text-align: center; background-color: #f7efe1; border: 2px solid var(--color-acento); padding: 1.5rem; border-radius: 8px; margin-top: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                        <h4 style="margin-bottom: 0.5rem; font-size: 1.3rem;">¿Quieres empezar a crear ya?</h4>
+                        <p style="margin-bottom: 1.2rem; font-size: 0.95rem; color: var(--color-texto);">Puedes usar nuestra plantilla oficial para hacer tu proyecto directamente a partir del ejemplo de este taller.</p>
+                        <a href="https://design.cricut.com/landing/project-detail/69d607c5750d9108300d90bf" target="_blank" class="btn-notebook" style="margin-top: 0; padding: 0.8rem 2.5rem;">Usar plantilla en <em>Design Space</em></a>
+                    </div>
+                </div>
+            </details>
+
+            <details class="expandable-section">
+                <summary>Proyecto 2: Personalización (Vinilo Permanente)</summary>
+                <div class="details-content">
+                    <p><strong>Objetivo:</strong> Aplicar nombres o frases con tipografía caligráfica sobre una superficie plástica (como carpetas, estuches o botellas).</p>
+                    
+                    <div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%; padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden; border-radius: 8px; will-change: transform;">
+                      <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
+                        src="https://www.canva.com/design/DAHGojvmqoE/Vo6gDrSLrf-5igcmlILxHw/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
+                      </iframe>
+                    </div>
+                    <div style="text-align: center; font-size: 0.9rem; margin-bottom: 1rem;">
+                        <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAHGojvmqoE&#x2F;Vo6gDrSLrf-5igcmlILxHw&#x2F;view?utm_content=DAHGojvmqoE&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener" style="color: var(--color-titulos); text-decoration: underline;">Vinilo AdF</a> de Lucía Serrano
+                    </div>
+
+                    <ul style="margin-top: 1.5rem;">
+                        <li><strong>Material requerido:</strong> Vinilo adhesivo permanente y Cinta Transportadora (<em>Transfer Tape</em>).</li>
+                        <li><strong>Tapete de corte:</strong> Azul (<em>LightGrip</em>).</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details class="expandable-section">
+                <summary>Proyecto 3: Pegatinas Educativas (<em>Print Then Cut</em>)</summary>
+                <div class="details-content">
+                    <p><strong>Objetivo:</strong> Crear pegatinas a todo color utilizando la impresora del aula y la función automática de corte de contornos.</p>
+                    
+                    <div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%; padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden; border-radius: 8px; will-change: transform;">
+                      <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
+                        src="https://www.canva.com/design/DAHGoqAvQaE/GZy8hSDibW8l6jA9fXjshA/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
+                      </iframe>
+                    </div>
+                    <div style="text-align: center; font-size: 0.9rem; margin-bottom: 1rem;">
+                        <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAHGoqAvQaE&#x2F;GZy8hSDibW8l6jA9fXjshA&#x2F;view?utm_content=DAHGoqAvQaE&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener" style="color: var(--color-titulos); text-decoration: underline;">Pegatinas AdF</a> de Lucía Serrano
+                    </div>
+
+                    <ul style="margin-top: 1.5rem;">
+                        <li><strong>Material requerido:</strong> Papel de pegatina imprimible e impresora de inyección de tinta o láser estándar.</li>
+                        <li><strong>Tapete de corte:</strong> Azul (<em>LightGrip</em>).</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details class="expandable-section">
+                <summary>Proyecto 4: Caja 3D (Cartulina y <em>Stylus</em>)</summary>
+                <div class="details-content">
+                    <p><strong>Objetivo:</strong> Diseñar y ensamblar una caja volumétrica introduciendo las herramientas de marcado para facilitar el plegado sin romper el material.</p>
+                    <p style="font-size: 0.9rem; opacity: 0.8; margin-top: -0.5rem; margin-bottom: 1.5rem;"><em>Nota: El diseño de base utilizado en este proyecto es original de la usuaria <strong>Tgkatma</strong> (<a href="https://design.cricut.com/landing/profile/65995ccdce8cbd563823670d" target="_blank" rel="noopener" style="color: var(--color-titulos);">ver su perfil en Cricut Design Space</a>).</em></p>
+                    
+                    <div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%; padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden; border-radius: 8px; will-change: transform;">
+                      <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
+                        src="https://www.canva.com/design/DAHGpf3aLKk/pjj7ExrhOKziW7rXzQyI4g/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
+                      </iframe>
+                    </div>
+                    <div style="text-align: center; font-size: 0.9rem; margin-bottom: 1rem;">
+                        <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAHGpf3aLKk&#x2F;pjj7ExrhOKziW7rXzQyI4g&#x2F;view?utm_content=DAHGpf3aLKk&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener" style="color: var(--color-titulos); text-decoration: underline;">Caja AdF</a> de Lucía Serrano
+                    </div>
+
+                    <ul style="margin-top: 1.5rem;">
+                        <li><strong>Material requerido:</strong> Cartulina de alto gramaje (<em>Chipboard</em> o <em>Cardstock</em>).</li>
+                        <li><strong>Tapete de corte:</strong> Azul (<em>LightGrip</em>) o Verde (<em>StandardGrip</em>) según el grosor del papel.</li>
+                    </ul>
+
+                    <div style="text-align: center; background-color: #f7efe1; border: 2px solid var(--color-acento); padding: 1.5rem; border-radius: 8px; margin-top: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                        <h4 style="margin-bottom: 0.5rem; font-size: 1.3rem;">¿Quieres empezar a crear ya?</h4>
+                        <p style="margin-bottom: 1.2rem; font-size: 0.95rem; color: var(--color-texto);">Puedes usar nuestra plantilla oficial para hacer tu proyecto directamente a partir del ejemplo de este taller.</p>
+                        <a href="https://design.cricut.com/landing/project-detail/66acb9f0353d9b2ae9a98b7a" target="_blank" class="btn-notebook" style="margin-top: 0; padding: 0.8rem 2.5rem;">Usar plantilla en <em>Design Space</em></a>
+                    </div>
+                </div>
+            </details>
+        </section>
+
+        <!-- PESTAÑA 5: TRUCOS Y CONSEJOS -->
+        <section id="panel-trucos" class="tab-panel" role="tabpanel">
+            <h2>5. Trucos y consejos</h2>
+            <p>Decálogo de mantenimiento básico para optimizar tu flujo de trabajo en el aula y prolongar la vida de tus materiales y máquinas.</p>
+
+            <div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%; padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden; border-radius: 8px; will-change: transform;">
+              <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
+                src="https://www.canva.com/design/DAHGpc1ksZE/JjuIG5OHi7mDh-zVbebgrQ/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
+              </iframe>
+            </div>
+            <div style="text-align: center; font-size: 0.9rem; margin-bottom: 1rem;">
+                <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAHGpc1ksZE&#x2F;JjuIG5OHi7mDh-zVbebgrQ&#x2F;view?utm_content=DAHGpc1ksZE&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener" style="color: var(--color-titulos); text-decoration: underline;">Trucos y consejos</a> de Lucía Serrano
+            </div>
+        </section>
+
+        <!-- PESTAÑA 6: RECURSOS -->
+        <section id="panel-recursos" class="tab-panel" role="tabpanel">
+            <h2>Recursos</h2>
+            <div class="resource-banner">
+                <h3>Cuaderno del Taller en <em>Notebook LM</em></h3>
+                <p>Accede a todos los materiales ampliados y notas de este taller en un único cuaderno inteligente.</p>
+                <a href="https://notebooklm.google.com/notebook/0620ae08-6462-49f3-8ade-ef126ee412c6" class="btn-notebook" target="_blank" rel="noopener noreferrer">Acceder al Cuaderno</a>
+            </div>
+            
+            <h3>Enlaces y páginas de interés</h3>
+            <div class="resource-grid-wrapper">
+                <div class="resource-grid">
+                    <div class="resource-card">
+                        <h4><em>Cricut Learn</em> Oficial</h4>
+                        <p>Plataforma oficial con cursos básicos y avanzados, en directo y bajo demanda, impartidos de manera gratuita por expertos de la marca.</p>
+                        <a href="https://learn.cricut.com/es-es" target="_blank">Ir al recurso &rarr;</a>
+                    </div>
+                    <div class="resource-card">
+                        <h4>Canal <em>YouTube</em>: <em>Cricut</em> España</h4>
+                        <p>Tutoriales rápidos visuales, nuevas ideas de proyectos para el aula y solución de problemas técnicos directamente del equipo oficial.</p>
+                        <a href="https://www.youtube.com/@cricutespana" target="_blank">Ir al canal &rarr;</a>
+                    </div>
+                    <div class="resource-card">
+                        <h4>Guía de Calor <em>Cricut</em></h4>
+                        <p>Aplicación <em>web</em> interactiva indispensable. Permite calcular el tiempo y la temperatura exacta al aplicar vinilo textil según tu prensa y tu material base.</p>
+                        <a href="https://cricut.com/es-es/heatguide" target="_blank">Ir a la guía &rarr;</a>
+                    </div>
+                    <div class="resource-card">
+                        <h4><em>Cricut Design Space</em></h4>
+                        <p>Descarga del <em>software</em> y acceso a la comunidad donde miles de educadores comparten sus proyectos y lienzos preparados.</p>
+                        <a href="https://design.cricut.com/" target="_blank">Ir a la plataforma &rarr;</a>
+                    </div>
+                    <div class="resource-card">
+                        <h4>Aula del Futuro (INTEF)</h4>
+                        <p>Página oficial del proyecto en España. Ofrece <em>kits</em> de herramientas, situaciones de aprendizaje y acceso a la red de centros.</p>
+                        <a href="https://auladelfuturo.intef.es/" target="_blank">Ir a la web &rarr;</a>
+                    </div>
+                    <div class="resource-card">
+                        <h4><em>Future Classroom Lab</em></h4>
+                        <p>Iniciativa europea original impulsada por <em>European Schoolnet</em>, con directrices de diseño de espacios y metodologías activas.</p>
+                        <a href="https://fcl.eun.org/" target="_blank">Ir a la plataforma &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p><span class="autor">Lucía Serrano Palomo</span> — <a href="mailto:lucia.serrano@jccm.es" class="contacto"><em>lucia.serrano@jccm.es</em></a></p>
+        <p style="margin-top: 0.5rem; opacity: 0.8; font-style: italic;">Realizado con la asistencia de IA (<em>vibe coding</em>)</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabLinks = document.querySelectorAll('.tab-link');
+            const cards = document.querySelectorAll('.card');
+            const panels = document.querySelectorAll('.tab-panel');
+
+            function switchTab(targetId) {
+                // Cerramos las secciones expandibles (details) al cambiar de pestaña para mantener el orden
+                document.querySelectorAll('details.expandable-section[open]').forEach(d => d.removeAttribute('open'));
+
+                tabLinks.forEach(t => t.classList.remove('active'));
+                panels.forEach(p => p.classList.remove('active'));
+
+                const activeTab = document.querySelector(`[data-target="${targetId}"]`);
+                const activePanel = document.getElementById(targetId);
+
+                if (activeTab) activeTab.classList.add('active');
+                if (activePanel) activePanel.classList.add('active');
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                resetCarousels();
+            }
+
+            tabLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    switchTab(link.getAttribute('data-target'));
+                });
+            });
+
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    switchTab(card.getAttribute('data-target'));
+                });
+            });
+
+            // Gestión de carruseles
+            function initializeCarousels() {
+                const containers = document.querySelectorAll('.carousel-container');
+                containers.forEach(container => {
+                    const track = container.querySelector('.carousel-track');
+                    const slides = Array.from(track.querySelectorAll('.carousel-slide'));
+                    const nextBtn = container.querySelector('.carousel-button.next');
+                    const prevBtn = container.querySelector('.carousel-button.prev');
+                    let currentIndex = 0;
+
+                    function update() {
+                        slides.forEach((s, i) => s.classList.toggle('active', i === currentIndex));
+                        if(prevBtn) prevBtn.disabled = currentIndex === 0;
+                        if(nextBtn) nextBtn.disabled = currentIndex === slides.length - 1;
+                    }
+
+                    if(nextBtn) nextBtn.addEventListener('click', () => {
+                        if(currentIndex < slides.length - 1) {
+                            currentIndex++;
+                            update();
+                        }
+                    });
+
+                    if(prevBtn) prevBtn.addEventListener('click', () => {
+                        if(currentIndex > 0) {
+                            currentIndex--;
+                            update();
+                        }
+                    });
+
+                    update();
+                });
+            }
+
+            function resetCarousels() {
+                document.querySelectorAll('.carousel-container').forEach(container => {
+                    const slides = container.querySelectorAll('.carousel-slide');
+                    slides.forEach((s, i) => s.classList.toggle('active', i === 0));
+                    const nextBtn = container.querySelector('.carousel-button.next');
+                    const prevBtn = container.querySelector('.carousel-button.prev');
+                    if(prevBtn) prevBtn.disabled = true;
+                    if(nextBtn && slides.length > 1) nextBtn.disabled = false;
+                });
+            }
+
+            initializeCarousels();
+
+            window.addEventListener('pageshow', (e) => {
+                if (e.persisted) switchTab('panel-contenidos');
+            });
+        });
+    </script>
+</body>
+</html>
