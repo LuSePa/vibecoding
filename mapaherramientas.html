@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acuerdos de uso de IA en instituciones educativas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Aplicamos versalitas a la cabecera */
+        .versalitas {
+            font-variant: small-caps;
+        }
+        
+        /* Paleta de colores otoñales personalizada para Tailwind */
+        .bg-autumn-dark { background-color: #3E2723; } /* Marrón oscuro */
+        .text-autumn-light { color: #EFEBE9; } /* Beige claro */
+        .bg-autumn-base { background-color: #FBF8F1; } /* Fondo general muy suave */
+        .bg-autumn-card { background-color: #F3E5F5; background-color: #FFF3E0; } /* Naranja muy suave */
+        .border-autumn-accent { border-color: #D84315; } /* Naranja rojizo */
+        .text-autumn-text { color: #4E342E; } /* Texto marrón grisáceo */
+        .text-autumn-link { color: #BF360C; } /* Naranja fuerte para enlaces */
+    </style>
+</head>
+<body class="bg-autumn-base text-autumn-text font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Cabecera -->
+    <header class="bg-autumn-dark text-autumn-light py-8 px-4 shadow-md">
+        <div class="max-w-5xl mx-auto">
+            <h1 class="text-3xl md:text-4xl text-center font-semibold tracking-wider versalitas">
+                Acuerdos de uso de IA en las instituciones educativas españolas
+            </h1>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="flex-grow max-w-5xl mx-auto w-full px-4 py-10 flex flex-col gap-8">
+        
+        <!-- Disclaimer -->
+        <section class="bg-autumn-card border-l-4 border-autumn-accent p-6 rounded-r-lg shadow-sm">
+            <p class="text-lg leading-relaxed">
+                En el mapa, para cada Comunidad Autónoma está indicada la fuente de la información: Consejerías, docentes (agradezco al grupo de Telegram de IA Educativa <a href="https://t.me/ChatGPTedu" target="_blank" rel="noopener noreferrer" class="text-autumn-link font-medium underline hover:text-orange-900 transition-colors">ChatGPT-IA-edu</a> su colaboración) o búsqueda de internet. Si eres docente en el sistema público, puedes utilizar con seguridad las herramientas proporcionadas por tu Consejería mencionadas en el mapa, pero si la fuente mencionada es otros compañeros o en internet, deberías consultar antes de usarlas.
+            </p>
+        </section>
+
+        <!-- Contenedor del mapa H5P -->
+        <section class="w-full bg-white p-2 rounded-lg shadow-md border border-orange-100 overflow-hidden">
+            <!-- El iframe carga el mapa desde la URL proporcionada -->
+            <iframe 
+                src="https://lusepa.github.io/vibecoding/mapa.html" 
+                class="w-full h-[600px] rounded border-none overflow-hidden"
+                scrolling="no"
+                title="Mapa interactivo de acuerdos de uso de IA">
+            </iframe>
+        </section>
+
+    </main>
+
+    <!-- Pie de página -->
+    <footer class="bg-[#EFEBE9] py-6 mt-auto border-t border-[#D7CCC8]">
+        <div class="max-w-5xl mx-auto px-4 text-center">
+            <p class="text-sm text-[#5D4037]">
+                Generado con VibeCoding con Gemini por Lucía Serrano (lucia.serrano@jccm.es)
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>
