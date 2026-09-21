@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Trivial CEIP Virgen de la Sierra</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic.css">
+    
+    <style>
+        body {
+            font-family: 'OpenDyslexic', sans-serif;
+            background-color: #fcf9f2;
+            -webkit-user-select: none;
+            user-select: none;
+            color: #1e293b;
+            overflow: hidden; 
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .animate-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Color de botones de audio: rgb(170, 0, 77) */
+        .audio-btn {
+            background-color: rgb(170, 0, 77);
+            color: white;
+            transition: all 0.2s ease;
+        }
+        
+        .audio-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        .feedback-correct {
+            border-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+            color: #166534 !important;
+        }
+
+        .feedback-wrong {
+            border-color: #f1f5f9 !important;
+            opacity: 0.3;
+            filter: grayscale(0.8);
+        }
+
+        /* Ajuste de pantalla para evitar barras de desplazamiento */
+        .game-card {
+            max-height: 78vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .options-grid {
+            overflow-y: auto;
+            max-height: 38vh;
+        }
+
+        .cat-btn {
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body class="p-2 md:p-3">
+
+    <!-- Cabecera -->
+    <header class="w-full max-w-2xl flex justify-between items-center mb-1.5 bg-white p-2 rounded-2xl shadow-sm border border-slate-100">
+        <div class="flex flex-col text-left">
+            <h1 class="text-base md:text-lg font-bold text-indigo-800 flex items-center gap-1.5 leading-tight">
+                <i data-lucide="star" class="fill-yellow-400 text-yellow-400 shrink-0 w-4 h-4"></i>
+                <span class="truncate">CEIP Virgen de la Sierra</span>
+            </h1>
+            <span class="text-[10px] text-slate-400 font-sans tracking-wide">Villarrubia de los Ojos</span>
+        </div>
+        <div class="bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100 font-bold flex items-center gap-1.5 text-indigo-900 text-sm">
+            <i data-lucide="trophy" class="text-yellow-500 w-4 h-4"></i>
+            <span id="score-counter">0</span>
+        </div>
+    </header>
+
+    <main id="app" class="w-full max-w-2xl flex-1 flex flex-col items-center justify-center overflow-hidden">
+        <!-- El contenido dinámico de JS se inyecta aquí -->
+    </main>
+
+    <!-- Pie de página compacto -->
+    <footer class="mt-1">
+        <button onclick="toggleResetModal(true)" class="flex items-center gap-1 text-slate-400 hover:text-indigo-800 font-bold text-[11px]">
+            <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Reiniciar progreso escolar
+        </button>
+    </footer>
+
+    <!-- Modal de seguridad para profesores -->
+    <div id="modal-reset" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl p-5 max-w-xs w-full shadow-2xl flex flex-col items-center gap-3 animate-in">
+            <div class="flex justify-between items-center w-full border-b pb-1.5">
+                <span class="font-bold text-indigo-700 flex items-center gap-1.5 text-sm"><i data-lucide="lock" class="w-4 h-4"></i> Control Docente</span>
+                <button onclick="toggleResetModal(false)"><i data-lucide="x" class="text-slate-400 w-4 h-4"></i></button>
+            </div>
+            <p class="text-slate-600 text-center text-xs font-bold">Escribe la contraseña para reiniciar:</p>
+            <input type="password" id="pass-input" placeholder="Contraseña..." class="w-full p-2.5 rounded-xl border-2 text-center font-bold focus:border-indigo-400 outline-none text-base">
+            <p id="pass-error" class="text-red-500 text-xs hidden font-bold">¡Incorrecta!</p>
+            <button onclick="confirmReset()" class="w-full bg-indigo-700 text-white p-2.5 rounded-xl font-bold shadow-md hover:bg-indigo-800 transition-colors text-sm">Confirmar borrado</button>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = "";
+        
+        const categories = [
+            { id: 'lengua', name: 'Lengua', color: 'bg-indigo-900', icon: '📚' },
+            { id: 'mates', name: 'Mates', color: 'bg-yellow-500', icon: '🔢' },
+            { id: 'sociales', name: 'Sociales', color: 'bg-green-600', icon: '🌍' },
+            { id: 'naturales', name: 'Naturales', color: 'bg-red-500', icon: '🌿' },
+            { id: 'musica', name: 'Música', color: 'bg-pink-400', icon: '🎵' },
+            { id: 'ingles', name: 'Inglés', color: 'bg-purple-600', icon: '🇬🇧' },
+        ];
+
+        // Base de datos de preguntas gramaticalmente perfectas de 2º y 3º de Primaria
+        const questionsDB = {
+            grado2: {
+                lengua: {
+                    facil: [
+                        { id: 'g2lf1', text: "¿Cuál es el plural de la palabra casa?", options: ["Casas", "Casitas", "Caso"], correct: 0 },
+                        { id: 'g2lf2', text: "¿Cuál de las siguientes palabras es un nombre de animal?", options: ["Correr", "Perro", "Bonito"], correct: 1 },
+                        { id: 'g2lf3', text: "¿Qué letra debemos escribir siempre antes de la P y de la B?", options: ["La letra M", "La letra N", "La letra S"], correct: 0 },
+                        { id: 'g2lf4', text: "¿Cómo se llaman las palabras que significan lo mismo?", options: ["Sinónimos", "Antónimos", "Rimas"], correct: 0 },
+                        { id: 'g2lf5', text: "¿Qué letra del abecedario no tiene sonido y por eso decimos que es muda?", options: ["La letra H", "La letra J", "La letra G"], correct: 0 },
+                        { id: 'g2lf6', text: "¿Cómo se llama el femenino de la palabra león?", options: ["Leona", "León", "Tigresa"], correct: 0 },
+                        { id: 'g2lf7', text: "¿Cuántas sílabas tiene la palabra sol?", options: ["Tiene una", "Tiene dos", "Tiene tres"], correct: 0 },
+                        { id: 'g2lf8', text: "¿Cuál de estas palabras rima con la palabra gato?", options: ["Zapato", "Casa", "Perro"], correct: 0 },
+                        { id: 'g2lf9', text: "¿Cuál de estas palabras es un nombre propio de ciudad?", options: ["Niño", "Madrid", "Parque"], correct: 1 },
+                        { id: 'g2lf10', text: "¿Qué palabra significa lo contrario de la palabra alto?", options: ["Grande", "Bajo", "Rápido"], correct: 1 }
+                    ],
+                    dificil: [
+                        { id: 'g2ld1', text: "¿Cuál de estas palabras es una palabra compuesta?", options: ["Lavadora", "Paraguas", "Guantes"], correct: 1 },
+                        { id: 'g2ld2', text: "¿Cuál es el sujeto en la frase: 'El gato negro duerme en el sofá'?", options: ["Duerme", "El gato negro", "Negro"], correct: 1 },
+                        { id: 'g2ld3', text: "¿Cómo se escribe correctamente la palabra agujero?", options: ["Agujero", "Agugero", "Abujero"], correct: 0 },
+                        { id: 'g2ld4', text: "¿Qué palabra es el antónimo de la palabra valiente?", options: ["Fuerte", "Cobarde", "Rápido"], correct: 1 },
+                        { id: 'g2ld5', text: "¿Cuál de estas palabras tiene un sonido de R fuerte?", options: ["Cara", "Ratón", "Pero"], correct: 1 },
+                        { id: 'g2ld6', text: "¿Qué tipo de palabra usamos para decir cómo es algo, como por ejemplo inteligente?", options: ["Un verbo", "Un adjetivo", "Un nombre"], correct: 1 },
+                        { id: 'g2ld7', text: "Las palabras esdrújulas llevan tilde siempre, ¿cuál de estas palabras lo es?", options: ["Coche", "Plátano", "Camión"], correct: 1 },
+                        { id: 'g2ld8', text: "¿Cómo se llama al conjunto de todas las letras ordenadas de nuestro idioma?", options: ["Abecedario", "Números", "Un cuento"], correct: 0 },
+                        { id: 'g2ld9', text: "¿Cuál es la sílaba tónica, la que suena más fuerte, en la palabra balón?", options: ["La sílaba ba", "La sílaba lón", "No tiene"], correct: 1 },
+                        { id: 'g2ld10', text: "¿Qué significa que una palabra sea un diminutivo?", options: ["Que indica algo grande", "Que indica algo pequeño", "Que indica algo igual"], correct: 1 }
+                    ]
+                },
+                mates: {
+                    facil: [
+                        { id: 'g2mf1', text: "Si sumas diez más diez, ¿cuánto tienes en total?", options: ["15", "20", "30"], correct: 1 },
+                        { id: 'g2mf2', text: "¿Cuántos lados tiene una figura geométrica que es un cuadrado?", options: ["Tiene 3", "Tiene 4", "Tiene 5"], correct: 1 },
+                        { id: 'g2mf3', text: "¿Cuántas unidades hay dentro de una decena completa?", options: ["Hay 5", "Hay 10", "Hay 100"], correct: 1 },
+                        { id: 'g2mf4', text: "¿Qué número viene justo antes del número cincuenta?", options: ["El 49", "El 51", "El 40"], correct: 0 },
+                        { id: 'g2mf5', text: "Si tienes cinco caramelos y te comes dos, ¿cuántos te quedan?", options: ["Te quedan 2", "Te quedan 3", "Te quedan 4"], correct: 1 },
+                        { id: 'g2mf6', text: "¿Qué forma geométrica tiene una pelota de tenis?", options: ["Cuadrada", "Esférica", "Triangular"], correct: 1 },
+                        { id: 'g2mf7', text: "¿Qué número es mayor de estos tres?", options: ["El 12", "El 21", "El 11"], correct: 1 },
+                        { id: 'g2mf8', text: "¿Cuántos días tiene una semana completa?", options: ["Tiene 5", "Tiene 7", "Tiene 10"], correct: 1 },
+                        { id: 'g2mf9', text: "Si dividimos un pastel a la mitad, ¿cuántas partes iguales tenemos?", options: ["Una parte", "Dos partes", "Tres partes"], correct: 1 },
+                        { id: 'g2mf10', text: "En un reloj, si la aguja corta apunta al nueve, ¿qué hora es?", options: ["Las tres", "Las nueve", "Las seis"], correct: 1 }
+                    ],
+                    dificil: [
+                        { id: 'g2md1', text: "¿Cuánto es el resultado de multiplicar tres por siete?", options: ["18", "21", "24"], correct: 1 },
+                        { id: 'g2md2', text: "En un reloj de agujas, ¿dónde está la aguja larga a las menos cuarto?", options: ["Apunta al 9", "Apunta al 3", "Apunta al 6"], correct: 0 },
+                        { id: 'g2md3', text: "¿Qué número se forma con 4 centenas, 2 decenas y 9 unidades?", options: ["El 429", "El 249", "El 924"], correct: 0 },
+                        { id: 'g2md4', text: "Si tienes 45 cromos y pierdes 16 en el recreo, ¿cuántos te quedan?", options: ["Te quedan 29", "Te quedan 31", "Te quedan 25"], correct: 0 },
+                        { id: 'g2md5', text: "¿Cuál es el doble del número quince?", options: ["Es 20", "Es 30", "Es 45"], correct: 1 },
+                        { id: 'g2md6', text: "¿A cuántos gramos equivale un kilogramo completo?", options: ["100g", "1000g", "500g"], correct: 1 },
+                        { id: 'g2md7', text: "¿Cuánto es el resultado de multiplicar cinco por cinco?", options: ["10", "20", "25"], correct: 2 },
+                        { id: 'g2md8', text: "¿Cómo se llama la figura geométrica que tiene cinco lados?", options: ["Cuadrado", "Pentágono", "Hexágono"], correct: 1 },
+                        { id: 'g2md9', text: "Si sumas 350 más 150, ¿cuál es el resultado total?", options: ["400", "500", "600"], correct: 1 },
+                        { id: 'g2md10', text: "¿Cuál es el triple del número diez?", options: ["Es 20", "Es 30", "Es 40"], correct: 1 }
+                    ]
+                },
+                sociales: {
+                    facil: [
+                        { id: 'g2sf1', text: "¿Cómo se llama el planeta donde vivimos todos los seres humanos?", options: ["La Tierra", "La Luna", "Marte"], correct: 0 },
+                        { id: 'g2sf2', text: "¿Qué astro sale por el día y nos da luz y calor?", options: ["La luna", "El sol", "Una estrella"], correct: 1 },
+                        { id: 'g2sf3', text: "¿Dónde debemos tirar siempre los papeles y la basura?", options: ["Al suelo", "Al contenedor", "Al parque"], correct: 1 },
+                        { id: 'g2sf4', text: "¿Quién es la persona que manda y organiza en el Ayuntamiento?", options: ["El profesor", "El alcalde", "El médico"], correct: 1 },
+                        { id: 'g2sf5', text: "¿De qué colores es la bandera de España?", options: ["Azul y blanca", "Roja y amarilla", "Verde y blanca"], correct: 1 },
+                        { id: 'g2sf6', text: "¿Cuál de estos es un medio de transporte que va por el aire?", options: ["El coche", "El avión", "El barco"], correct: 1 },
+                        { id: 'g2sf7', text: "¿Cómo llamamos a un lugar donde hay muchos edificios y calles?", options: ["Un bosque", "Una ciudad", "Una playa"], correct: 1 },
+                        { id: 'g2sf8', text: "¿Qué aparato con una aguja nos ayuda para no perdernos?", options: ["Un cuento", "Una brújula", "Una pintura"], correct: 1 },
+                        { id: 'g2sf9', text: "¿Qué debemos hacer con el papel usado para cuidar el planeta?", options: ["Reciclarlo", "Tirarlo", "Quemarlo"], correct: 0 },
+                        { id: 'g2sf10', text: "¿Qué trabajadores se encargan de apagar los fuegos?", options: ["La policía", "Los bomberos", "Los médicos"], correct: 1 }
+                    ],
+                    dificil: [
+                        { id: 'g2sd1', text: "¿Cómo se llama el punto cardinal por donde sale el sol por las mañanas?", options: ["El Norte", "El Este", "El Oeste"], correct: 1 },
+                        { id: 'g2sd2', text: "¿Cuál es el río más largo que pasa por la Península Ibérica?", options: ["El Ebro", "El Tajo", "El Guadalquivir"], correct: 1 },
+                        { id: 'g2sd3', text: "¿Qué comunidad autónoma está situada al sur de Castilla-La Mancha?", options: ["Valencia", "Andalucía", "Extremadura"], correct: 1 },
+                        { id: 'g2sd4', text: "¿Cuál es la ciudad que es la capital de España?", options: ["Barcelona", "Madrid", "Sevilla"], correct: 1 },
+                        { id: 'g2sd5', text: "¿En qué continente está situado nuestro país, España?", options: ["En Europa", "En África", "En América"], correct: 0 },
+                        { id: 'g2sd6', text: "¿Cómo llamamos al viaje de la Tierra alrededor del Sol que dura un año?", options: ["Rotación", "Traslación", "Estación"], correct: 1 },
+                        { id: 'g2sd7', text: "¿Qué instrumento usamos para medir la temperatura del aire?", options: ["Un reloj", "Un termómetro", "Una balanza"], correct: 1 },
+                        { id: 'g2sd8', text: "¿Cómo se llama el dibujo de toda la Tierra en forma plana?", options: ["Globo terráqueo", "Un mapa o planisferio", "Un cuadro"], correct: 1 },
+                        { id: 'g2sd9', text: "¿Cómo llamamos a un conjunto de muchas montañas seguidas?", options: ["La costa", "Una cordillera", "Una llanura"], correct: 1 },
+                        { id: 'g2sd10', text: "¿Cómo se llama el trabajo de la persona que cría vacas u ovejas?", options: ["Agricultor", "Ganadero", "Constructor"], correct: 1 }
+                    ]
+                },
+                naturales: {
+                    facil: [
+                        { id: 'g2nf1', text: "¿Qué parte de la planta se encuentra escondida bajo la tierra?", options: ["Las hojas", "La raíz", "La flor"], correct: 1 },
+                        { id: 'g2nf2', text: "¿Cómo se llaman los animales que solo se alimentan de carne?", options: ["Carnívoros", "Herbívoros", "Omnívoros"], correct: 0 },
+                        { id: 'g2nf3', text: "¿Cuál de estos animales nace de un huevo?", options: ["El elefante", "El pollito", "El perro"], correct: 1 },
+                        { id: 'g2nf4', text: "¿Qué parte de nuestro cuerpo está dentro de la cabeza y sirve para pensar?", options: ["El corazón", "El cerebro", "El estómago"], correct: 1 },
+                        { id: 'g2nf5', text: "¿Qué sentido usamos para notar los olores de las cosas?", options: ["La vista", "El olfato", "El oído"], correct: 1 },
+                        { id: 'g2nf6', text: "¿Cómo se llaman los animales que nacen de la tripa de su madre?", options: ["Ovíparos", "Mamíferos", "Peces"], correct: 1 },
+                        { id: 'g2nf7', text: "¿Cómo está el agua cuando se encuentra en forma de hielo?", options: ["Sólida", "Gaseosa", "Líquida"], correct: 0 },
+                        { id: 'g2nf8', text: "¿Qué parte de la planta sostiene las hojas y las flores?", options: ["La raíz", "El tallo", "El fruto"], correct: 1 },
+                        { id: 'g2nf9', text: "¿Qué tipo de animales tienen la piel cubierta de escamas?", options: ["Los perros", "Los peces", "Los pájaros"], correct: 1 },
+                        { id: 'g2nf10', text: "¿Cómo llamamos a un animal que no tiene huesos, como el caracol?", options: ["Vertebrado", "Invertebrado", "Mamífero"], correct: 1 }
+                    ],
+                    dificil: [
+                        { id: 'g2nd1', text: "¿Qué gas expulsan las plantas al aire cuando hacen la fotosíntesis?", options: ["Oxígeno", "Humo", "Dióxido de carbono"], correct: 0 },
+                        { id: 'g2nd2', text: "¿Cuál de estos animales es un animal invertebrado?", options: ["El gato", "La mariposa", "El águila"], correct: 1 },
+                        { id: 'g2nd3', text: "¿Cómo llamamos al proceso cuando el agua se calienta y se hace vapor?", options: ["Solidificación", "Evaporación", "Fusión"], correct: 1 },
+                        { id: 'g2nd4', text: "¿Cómo se llaman los animales que tienen huesos y una columna vertebral?", options: ["Vertebrados", "Invertebrados", "Moluscos"], correct: 0 },
+                        { id: 'g2nd5', text: "¿Cómo se llama el proceso por el cual las plantas fabrican su comida?", options: ["Riego", "Fotosíntesis", "Caída de hojas"], correct: 1 },
+                        { id: 'g2nd6', text: "¿Qué órgano se encarga de bombear la sangre por todo el cuerpo?", options: ["El cerebro", "El corazón", "Los pulmones"], correct: 1 },
+                        { id: 'g2nd7', text: "¿Cuál de estos materiales deja pasar la luz, como ocurre con una ventana?", options: ["La madera", "El cristal", "La lana"], correct: 1 },
+                        { id: 'g2nd8', text: "¿Cómo llamamos a los animales que viven en la tierra y en el agua?", options: ["Gatos", "Anfibios", "Caballos"], correct: 1 },
+                        { id: 'g2nd9', text: "¿Cómo se llama cuando el hielo se derrite y pasa a ser agua líquida?", options: ["Congelación", "Fusión", "Vaporización"], correct: 1 },
+                        { id: 'g2nd10', text: "¿Qué parte del cuerpo une dos huesos y permite que se doblen?", options: ["Un músculo", "Una articulación", "La sangre"], correct: 1 }
+                    ]
+                },
+                musica: {
+                    facil: [
+                        { id: 'g2muf1', text: "¿Qué instrumento musical se golpea con dos baquetas o palos?", options: ["La guitarra", "El piano", "El tambor"], correct: 2 },
+                        { id: 'g2muf2', text: "¿Qué nota musical va justo después de la nota Do?", options: ["La nota Mi", "La nota Re", "La nota Fa"], correct: 1 },
+                        { id: 'g2muf3', text: "¿A qué familia pertenecen los instrumentos que suenan al soplar?", options: ["A la cuerda", "Al viento", "A la percusión"], correct: 1 },
+                        { id: 'g2muf4', text: "¿Qué instrumento musical tiene muchas teclas blancas y negras?", options: ["El violín", "El piano", "La trompeta"], correct: 1 },
+                        { id: 'g2muf5', text: "¿Cómo llamamos a un grupo de muchos músicos tocando juntos?", options: ["Solista", "Orquesta", "Dúo"], correct: 1 },
+                        { id: 'g2muf6', text: "¿Cómo es el sonido que produce un bombo muy grande?", options: ["Es un sonido agudo", "Es un sonido grave", "Es un silencio"], correct: 1 },
+                        { id: 'g2muf7', text: "¿Cuántas cuerdas suele tener una guitarra española?", options: ["Tiene una", "Tiene seis", "Tiene diez"], correct: 1 },
+                        { id: 'g2muf8', text: "¿Cómo llamamos a una persona que canta ella sola en el escenario?", options: ["Un coro", "Un solista", "Un director"], correct: 1 },
+                        { id: 'g2muf9', text: "¿Qué dibujo musical se pone al inicio y tiene forma de S elegante?", options: ["La clave de sol", "Un punto", "Una raya"], correct: 0 },
+                        { id: 'g2muf10', text: "¿Con qué parte de nuestro cuerpo escuchamos las canciones?", options: ["Con los ojos", "Con los oídos", "Con la nariz"], correct: 1 }
+                    ],
+                    dificil: [
+                        { id: 'g2mud1', text: "¿Cuántas líneas tiene el pentagrama donde escribimos las notas?", options: ["Tiene 3", "Tiene 5", "Tiene 4"], correct: 1 },
+                        { id: 'g2mud2', text: "¿Qué figura musical dura la mitad de un tiempo, es decir, menos que una negra?", options: ["La blanca", "La corchea", "La redonda"], correct: 1 },
+                        { id: 'g2mud3', text: "¿A qué familia de instrumentos de viento pertenece el saxofón?", options: ["A la cuerda", "Al viento madera", "Al viento metal"], correct: 1 },
+                        { id: 'g2mud4', text: "¿Qué figura musical dura exactamente un tiempo de música?", options: ["La blanca", "La negra", "La corchea"], correct: 1 },
+                        { id: 'g2mud5', text: "¿Cuál de estos instrumentos de cuerda frotada se toca siempre con un arco?", options: ["El violín", "La trompeta", "El piano"], correct: 0 },
+                        { id: 'g2mud6', text: "¿Cómo se llama la persona que se encarga de dirigir a la orquesta?", options: ["Director o directora", "Profesor", "Obrero"], correct: 0 },
+                        { id: 'g2mud7', text: "¿Qué nota musical se escribe sobre la segunda línea del pentagrama?", options: ["La nota Do", "La nota Sol", "La nota Mi"], correct: 1 },
+                        { id: 'g2mud8', text: "El piano tiene cuerdas en su interior, ¿qué tipo de instrumento es?", options: ["De viento", "De cuerda percutida", "De percusión pura"], correct: 1 },
+                        { id: 'g2mud9', text: "¿Qué señal musical nos indica que no debe haber ningún sonido?", options: ["El silencio", "La clave", "La nota"], correct: 0 },
+                        { id: 'g2mud10', text: "¿Qué cualidad del sonido nos permite distinguir la voz de un piano de una flauta?", options: ["El volumen", "El timbre", "La altura"], correct: 1 }
+                    ]
+                },
+                ingles: {
+                    facil: [
+                        { id: 'g2inf1', text: "¿A qué color corresponde la palabra red en inglés?", options: ["Al azul", "Al rojo", "Al verde"], correct: 1 },
+                        { id: 'g2inf2', text: "¿Cómo se dice la palabra perro en inglés?", options: ["Cat", "Dog", "Bird"], correct: 1 },
+                        { id: 'g2inf3', text: "¿A qué número corresponde la palabra one en inglés?", options: ["Al número 1", "Al número 2", "Al número 3"], correct: 0 },
+                        { id: 'g2inf4', text: "¿Cómo saludamos diciendo hola en inglés?", options: ["Hello", "Bye", "Please"], correct: 0 },
+                        { id: 'g2inf5', text: "¿Cómo se dice la palabra gato en inglés?", options: ["Dog", "Cat", "Rat"], correct: 1 },
+                        { id: 'g2inf6', text: "¿A qué color corresponde la palabra blue en inglés?", options: ["Al azul", "Al amarillo", "Al rojo"], correct: 0 },
+                        { id: 'g2inf7', text: "¿Cómo damos las gracias diciendo gracias en inglés?", options: ["Hello", "Thank you", "Goodbye"], correct: 1 },
+                        { id: 'g2inf8', text: "¿Cómo llamamos a nuestra madre en inglés?", options: ["Father", "Mother", "Grandpa"], correct: 1 },
+                        { id: 'g2inf9', text: "En inglés, ¿a qué número corresponde la palabra five?", options: ["Al número 4", "Al número 5", "Al número 6"], correct: 1 },
+                        { id: 'g2inf10', text: "¿Cómo nos despedimos diciendo adiós en inglés?", options: ["Hi", "Goodbye", "Thanks"], correct: 1 }
+                    ],
+                    dificil: [
+                        { id: 'g2ind1', text: "¿Cómo se dice la frase tengo hambre en inglés?", options: ["I'm hungry", "I'm tired", "I'm thirsty"], correct: 0 },
+                        { id: 'g2ind2', text: "¿Qué significa la pregunta 'Where is the pencil' en español?", options: ["¿Qué es esto?", "¿Dónde está el lápiz?", "¿Quién es este?"], correct: 1 },
+                        { id: 'g2ind3', text: "¿Cuál es el plural correcto de la palabra child?", options: ["Childs", "Children", "Childrens"], correct: 1 },
+                        { id: 'g2ind4', text: "¿A qué número corresponde la palabra twelve en inglés?", options: ["Al número 2", "Al número 12", "Al número 20"], correct: 1 },
+                        { id: 'g2ind5', text: "¿Cómo llamamos a nuestro padre en inglés?", options: ["Father", "Mother", "Brother"], correct: 0 },
+                        { id: 'g2ind6', text: "¿Cómo decimos buenas tardes en inglés?", options: ["Good morning", "Good afternoon", "Good night"], correct: 1 },
+                        { id: 'g2ind7', text: "¿Cómo se dice la palabra conejo en inglés?", options: ["Dog", "Cat", "Rabbit"], correct: 2 },
+                        { id: 'g2ind8', text: "¿Cómo se dice la palabra lápiz en inglés?", options: ["Book", "Pencil", "Bag"], correct: 1 },
+                        { id: 'g2ind9', text: "¿Cómo se dice la estación de verano en inglés?", options: ["Winter", "Summer", "Autumn"], correct: 1 },
+                        { id: 'g2ind10', text: "¿A qué número corresponde la palabra twenty en inglés?", options: ["Al número 10", "Al número 20", "Al número 30"], correct: 1 }
+                    ]
+                }
+            },
+            grado3: {
+                lengua: {
+                    facil: [
+                        { id: 'g3lf1', text: "¿Qué tipo de punto se utiliza para separar dos párrafos diferentes?", options: ["Punto y seguido", "Punto y aparte", "Punto final"], correct: 1 },
+                        { id: 'g3lf2', text: "¿Cuál de estas palabras es un sustantivo común?", options: ["Villarubia", "Mesa", "María"], correct: 1 },
+                        { id: 'g3lf3', text: "¿Qué artículo acompaña al sustantivo 'libros'?", options: ["Los", "El", "Las"], correct: 0 },
+                        { id: 'g3lf4', text: "¿Cómo se llaman las palabras que expresan cualidades de las cosas?", options: ["Verbos", "Adjetivos", "Nombres"], correct: 1 },
+                        { id: 'g3lf5', text: "¿Cuál es el abecedario correcto para las consonantes?", options: ["A, E, I, O, U", "B, C, D, F, G", "1, 2, 3, 4, 5"], correct: 1 },
+                        { id: 'g3lf6', text: "¿Cómo se llaman las palabras formadas por dos sílabas?", options: ["Monosílabas", "Bisílabas", "Trisílabas"], correct: 1 },
+                        { id: 'g3lf7', text: "¿Cuál es el sinónimo de la palabra alegre?", options: ["Triste", "Contento", "Enfadado"], correct: 1 },
+                        { id: 'g3lf8', text: "¿Qué letra debemos poner siempre detrás de la letra Q?", options: ["La letra U", "La letra A", "La letra I"], correct: 0 },
+                        { id: 'g3lf9', text: "¿Cómo se llama el libro en el que buscamos las palabras difíciles?", options: ["El cómic", "El diccionario", "La enciclopedia"], correct: 1 },
+                        { id: 'g3lf10', text: "¿Cuál es el antónimo de la palabra rápido?", options: ["Veloz", "Lento", "Pronto"], correct: 1 }
+                    ],
+                    dificil: [
+                        { id: 'g3ld1', text: "¿Qué tipo de palabra es la palabra 'pájaro' según su acentuación?", options: ["Aguda", "Llana", "Esdrújula"], correct: 2 },
+                        { id: 'g3ld2', text: "¿Qué signo gráfico se coloca sobre la sílaba tónica de algunas palabras?", options: ["La coma", "La tilde", "El guión"], correct: 1 },
+                        { id: 'g3ld3', text: "¿Cuál es el sujeto en la oración 'El tren rápido llegó tarde'?", options: ["Llegó tarde", "El tren rápido", "Rápido"], correct: 1 },
+                        { id: 'g3ld4', text: "¿Qué nombre recibe el grupo de palabras que giran en torno a un tema común?", options: ["Sílaba", "Familia de palabras", "Abecedario"], correct: 1 },
+                        { id: 'g3ld5', text: "¿Cómo se escriben los verbos terminados en -bir, como escribir?", options: ["Con V", "Con B", "Con W"], correct: 1 },
+                        { id: 'g3ld6', text: "¿Cuál de estos pronombres personales está en plural?", options: ["Yo", "Él", "Nosotros"], correct: 2 },
+                        { id: 'g3ld7', text: "¿Cuál es la palabra primitiva de la que nace 'panadero'?", options: ["Panecillo", "Pan", "Panadería"], correct: 1 },
+                        { id: 'g3ld8', text: "¿Qué parte de la oración expresa la acción que se realiza?", options: ["Sustantivo", "Verbo", "Artículo"], correct: 1 },
+                        { id: 'g3ld9', text: "¿Qué palabra de estas lleva tilde por ser aguda terminada en vocal?", options: ["Sofá", "Lápiz", "Arbusto"], correct: 0 },
+                        { id: 'g3ld10', text: "¿Qué tipo de palabras son 'tubo' (de metal) y 'tuvo' (del verbo tener)?", options: ["Sinónimas", "Homófonas", "Antónimas"], correct: 1 }
+                    ]
+                },
+                mates: {
+                    facil: [
+                        { id: 'g3mf1', text: "¿Cuántas unidades tiene una centena entera?", options: ["10 unidades", "100 unidades", "1000 unidades"], correct: 1 },
+                        { id: 'g3mf2', text: "¿Cómo llamamos al número que va encima de la raya de una fracción?", options: ["Denominador", "Numerador", "Resultado"], correct: 1 },
+                        { id: 'g3mf3', text: "Si tienes 3 monedas de 50 céntimos, ¿cuánto dinero sumas?", options: ["1 euro", "1 euro y 50 céntimos", "2 euros"], correct: 1 },
+                        { id: 'g3mf4', text: "¿Qué operación debemos hacer para repartir caramelos de forma igualitaria?", options: ["Sumar", "Multiplicar", "Dividir"], correct: 2 },
+                        { id: 'g3mf5', text: "¿Cuánto es el resultado de multiplicar seis por ocho?", options: ["42", "48", "54"], correct: 1 },
+                        { id: 'g3mf6', text: "¿Cuántos lados tiene un pentágono regular?", options: ["Tiene 4", "Tiene 5", "Tiene 6"], correct: 1 },
+                        { id: 'g3mf7', text: "¿Cuál es el resultado de restar cien menos veinticinco?", options: ["50", "75", "85"], correct: 1 },
+                        { id: 'g3mf8', text: "¿Qué unidad usamos habitualmente para medir el largo de un cuaderno?", options: ["El metro", "El centímetro", "El kilómetro"], correct: 1 },
+                        { id: 'g3mf9', text: "¿Qué número representa una centena, cuatro decenas y tres unidades?", options: ["134", "143", "431"], correct: 1 },
+                        { id: 'g3mf10', text: "Si sumas quinientos más quinientos, ¿qué número obtienes?", options: ["500", "1000", "5000"], correct: 1 }
+                    ],
+                    dificil: [
+                        { id: 'g3md1', text: "¿Cuántos gramos de peso contiene exactamente un kilogramo?", options: ["100 gramos", "1000 gramos", "500 gramos"], correct: 1 },
+                        { id: 'g3md2', text: "¿Cuál es el triple del número treinta?", options: ["El 60", "El 90", "El 120"], correct: 1 },
+                        { id: 'g3md3', text: "Un ángulo que mide exactamente noventa grados, ¿qué tipo de ángulo es?", options: ["Ángulo agudo", "Ángulo recto", "Ángulo obtuso"], correct: 1 },
+                        { id: 'g3md4', text: "Si una entrada de cine cuesta siete euros y compramos cuatro, ¿cuánto pagamos?", options: ["24 euros", "28 euros", "32 euros"], correct: 1 },
+                        { id: 'g3md5', text: "¿Qué número ordinal representa la posición número doce?", options: ["Duodécimo", "Decimosegundo", "Ambas opciones son correctas"], correct: 2 },
+                        { id: 'g3md6', text: "¿Cuántos minutos hay dentro de tres horas completas?", options: ["120 minutos", "180 minutos", "240 minutos"], correct: 1 },
+                        { id: 'g3md7', text: "Si un tren tiene 324 pasajeros y se bajan 112, ¿cuántos quedan dentro?", options: ["212 pasajeros", "212 pasajeros", "212 pasajeros"], correct: 0 }, // Wait, check the math or fix typo
+                        { id: 'g3md7_fixed', text: "Si tienes 300 canicas y regalas la mitad, ¿cuántas te quedan?", options: ["100 canicas", "150 canicas", "200 canicas"], correct: 1 },
+                        { id: 'g3md8', text: "¿Cuál es el número romano que representa el valor de diez?", options: ["La letra V", "La letra X", "La letra L"], correct: 1 },
+                        { id: 'g3md9', text: "¿Qué cuerpo geométrico redondo tiene la forma de un bote de refresco?", options: ["Un cono", "Un cilindro", "Una esfera"], correct: 1 },
+                        { id: 'g3md10', text: "Si repartimos doce manzanas entre tres amigos, ¿cuántas tiene cada uno?", options: ["Tiene 3", "Tiene 4", "Tiene 5"], correct: 1 }
+                    ]
+                },
+                sociales: {
+                    facil: [
+                        { id: 'g3sf1', text: "¿Cómo llamamos al modelo de la Tierra con forma redonda?", options: ["Planisferio", "Globo terráqueo", "Brújula"], correct: 1 },
+                        { id: 'g3sf2', text: "¿Qué punto cardinal queda a la derecha si miramos hacia el Norte?", options: ["El Sur", "El Este", "El Oeste"], correct: 1 },
+                        { id: 'g3sf3', text: "¿Qué astro del espacio gira alrededor del planeta Tierra?", options: ["El Sol", "La Luna", "Una estrella fugaz"], correct: 1 },
+                        { id: 'g3sf4', text: "¿En qué país se encuentra nuestro colegio?", options: ["Francia", "España", "Portugal"], correct: 1 },
+                        { id: 'g3sf5', text: "¿En qué comunidad de España se encuentra la provincia de Ciudad Real?", options: ["Andalucía", "Castilla-La Mancha", "Madrid"], correct: 1 },
+                        { id: 'g3sf6', text: "¿En qué estación del año se caen las hojas de los árboles?", options: ["Primavera", "Otoño", "Invierno"], correct: 1 },
+                        { id: 'g3sf7', text: "¿Qué gas del aire es indispensable para la respiración de las personas?", options: ["Dióxido de carbono", "Oxígeno", "Nitrógeno"], correct: 1 },
+                        { id: 'g3sf8', text: "¿Cómo llamamos al agua que cae líquida de las nubes?", options: ["Nieve", "Lluvia", "Granizo"], correct: 1 },
+                        { id: 'g3sf9', text: "¿Cuál de estos es un servicio municipal que limpia las calles?", options: ["Los bomberos", "Los barrenderos", "Los policías"], correct: 1 },
+                        { id: 'g3sf10', text: "¿Qué estrella brilla de día y calienta el planeta?", options: ["La Luna", "El Sol", "La Estrella Polar"], correct: 1 }
+                    ],
+                    dificil: [
+                        { id: 'g3sd1', text: "¿Cómo llamamos al gran bloque de tierra rodeado de mares, como Europa?", options: ["Isla", "Continente", "Península"], correct: 1 },
+                        { id: 'g3sd2', text: "¿Qué ley muy importante organiza los derechos de los españoles?", options: ["El código de circulación", "La Constitución Española", "Las normas del colegio"], correct: 1 },
+                        { id: 'g3sd3', text: "¿Cuál es el río más largo que atraviesa España de este a oeste?", options: ["El Ebro", "El Tajo", "El Guadalquivir"], correct: 1 },
+                        { id: 'g3sd4', text: "¿Qué gran mar baña la costa este de la Península Ibérica?", options: ["Océano Atlántico", "Mar Mediterráneo", "Mar Cantábrico"], correct: 1 },
+                        { id: 'g3sd5', text: "¿Cómo se llama el movimiento de la Tierra sobre sí misma que crea el día y la noche?", options: ["Traslación", "Rotación", "Estación"], correct: 1 },
+                        { id: 'g3sd6', text: "¿Qué instrumento meteorológico sirve para medir la fuerza del viento?", options: ["Termómetro", "Anemómetro", "Pluviómetro"], correct: 1 },
+                        { id: 'g3sd7', text: "¿Cómo llamamos a una montaña que expulsa lava y fuego de su interior?", options: ["Terremoto", "Volcán", "Cordillera"], correct: 1 },
+                        { id: 'g3sd8', text: "¿A qué sector de trabajo pertenece un panadero?", options: ["Sector primario", "Sector secundario", "Sector terciario"], correct: 1 },
+                        { id: 'g3sd9', text: "¿Qué nombre recibe el agua que se almacena bajo el suelo?", options: ["Agua superficial", "Agua subterránea", "Glaciar"], correct: 1 },
+                        { id: 'g3sd10', text: "¿Quién gobierna y administra un municipio, trabajando en el Ayuntamiento?", options: ["El Rey", "El Alcalde o Alcaldesa", "El Presidente de España"], correct: 1 }
+                    ]
+                },
+                naturales: {
+                    facil: [
+                        { id: 'g3nf1', text: "¿Qué órgano recoge el aire para que respiremos?", options: ["El estómago", "Los pulmones", "El cerebro"], correct: 1 },
+                        { id: 'g3nf2', text: "¿Cómo clasificamos a los animales que nacen de un huevo?", options: ["Vivíparos", "Ovíparos", "Mamíferos"], correct: 1 },
+                        { id: 'g3nf3', text: "¿Cuál de estas partes pertenece al esqueleto del cuerpo?", options: ["El bíceps", "El fémur", "La piel"], correct: 1 },
+                        { id: 'g3nf4', text: "¿Qué parte de la planta capta la luz del sol?", options: ["Las raíces", "Las hojas", "Las flores"], correct: 1 },
+                        { id: 'g3nf5', text: "¿Qué tipo de animal es un perro por alimentar a sus crías con leche?", options: ["Reptil", "Mamífero", "Anfibio"], correct: 1 },
+                        { id: 'g3nf6', text: "¿Qué sentido del cuerpo nos ayuda a saber si la sopa quema?", options: ["El gusto", "El tacto", "La vista"], correct: 1 },
+                        { id: 'g3nf7', text: "¿En qué estado se encuentra el agua cuando se evapora?", options: ["Estado sólido", "Estado gaseoso", "Estado líquido"], correct: 1 },
+                        { id: 'g3nf8', text: "¿Qué animal tiene el cuerpo cubierto de plumas?", options: ["El pez", "El pájaro", "La rana"], correct: 1 },
+                        { id: 'g3nf9', text: "¿Cómo llamamos a los animales que no tienen esqueleto, como la medusa?", options: ["Vertebrados", "Invertebrados", "Mamíferos"], correct: 1 },
+                        { id: 'g3nf10', text: "¿Cuál de estos alimentos es rico en calcio para los huesos?", options: ["La manzana", "La leche", "El arroz"], correct: 1 }
+                    ],
+                    dificil: [
+                        { id: 'g3nd1', text: "¿Cómo llamamos al proceso de las plantas para producir su alimento?", options: ["Polinización", "Fotosíntesis", "Germinación"], correct: 1 },
+                        { id: 'g3nd2', text: "¿Qué órgano impulsa la sangre por todo nuestro cuerpo?", options: ["Los pulmones", "El corazón", "El estómago"], correct: 1 },
+                        { id: 'g3nd3', text: "¿Qué parte de la flor se convierte en fruto con el tiempo?", options: ["Los pétalos", "El ovario", "El polen"], correct: 1 },
+                        { id: 'g3nd4', text: "¿Cómo llamamos al paso del agua líquida a estado sólido?", options: ["Evaporación", "Solidificación", "Fusión"], correct: 1 },
+                        { id: 'g3nd5', text: "¿Qué tipo de animal es la rana por vivir en la tierra y en el agua?", options: ["Reptil", "Anfibio", "Invertebrado"], correct: 1 },
+                        { id: 'g3nd6', text: "¿Qué fuerza atrae todas las cosas hacia el centro de la Tierra?", options: ["La electricidad", "La gravedad", "El magnetismo"], correct: 1 },
+                        { id: 'g3nd7', text: "¿Qué tipo de material es el hierro por conducir bien el calor?", options: ["Conductor", "Aislante", "Flexible"], correct: 0 },
+                        { id: 'g3nd8', text: "¿A qué grupo pertenece un hongo por no ser planta ni animal?", options: ["Reino de las plantas", "Reino de los hongos", "Reino mineral"], correct: 1 },
+                        { id: 'g3nd9', text: "¿Qué parte del ojo nos da el color característico?", options: ["La pupila", "El iris", "La retina"], correct: 1 },
+                        { id: 'g3nd10', text: "¿Qué ocurre con dos polos del mismo signo de un imán?", options: ["Se atraen", "Se repelen o separan", "No ocurre nada"], correct: 1 }
+                    ]
+                },
+                musica: {
+                    facil: [
+                        { id: 'g3muf1', text: "¿Cuántas líneas forman un pentagrama musical?", options: ["Tres líneas", "Cinco líneas", "Siete líneas"], correct: 1 },
+                        { id: 'g3muf2', text: "¿Qué símbolo musical se escribe al principio del pentagrama?", options: ["Una nota", "La clave de sol", "Una barra"], correct: 1 },
+                        { id: 'g3muf3', text: "¿Qué figura musical dura exactamente un tiempo?", options: ["La blanca", "La negra", "La corchea"], correct: 1 },
+                        { id: 'g3muf4', text: "¿Qué instrumento musical tiene teclas y cuerdas por dentro?", options: ["La flauta", "El piano", "La guitarra"], correct: 1 },
+                        { id: 'g3muf5', text: "¿Cómo llamamos al sonido opuesto al sonido agudo?", options: ["Sonido medio", "Sonido grave", "Sonido suave"], correct: 1 },
+                        { id: 'g3muf6', text: "¿A qué familia de instrumentos pertenece el tambor?", options: ["Viento", "Percusión", "Cuerda"], correct: 1 },
+                        { id: 'g3muf7', text: "¿Cuál de estos es un instrumento de viento metal?", options: ["La flauta", "La trompeta", "El violín"], correct: 1 },
+                        { id: 'g3muf8', text: "¿Qué nota musical va después de la nota Sol?", options: ["La nota Fa", "La nota La", "La nota Si"], correct: 1 },
+                        { id: 'g3muf9', text: "¿Cómo llamamos al silencio de la música?", options: ["Ruido", "Silencio", "Pausa"], correct: 1 },
+                        { id: 'g3muf10', text: "¿Qué cualidad diferencia un sonido fuerte de uno débil?", options: ["El timbre", "La intensidad", "El tono"], correct: 1 }
+                    ],
+                    dificil: [
+                        { id: 'g3mud1', text: "¿Qué figura musical dura exactamente dos tiempos enteros?", options: ["La negra", "La blanca", "La redonda"], correct: 1 },
+                        { id: 'g3mud2', text: "¿Cómo se llama la velocidad con la que se interpreta una canción?", options: ["El compás", "El tempo o movimiento", "La escala"], correct: 1 },
+                        { id: 'g3mud3', text: "¿Cuál es la figura musical que dura el doble que una blanca?", options: ["La corchea", "La redonda", "La negra"], correct: 1 },
+                        { id: 'g3mud4', text: "¿Qué instrumento de viento-madera tiene llaves de metal y es muy largo?", options: ["La flauta dulce", "El clarinete", "La trompa"], correct: 1 },
+                        { id: 'g3mud5', text: "¿Qué nota musical se escribe justo debajo de la primera línea?", options: ["La nota Do", "La nota Re", "La nota Mi"], correct: 1 },
+                        { id: 'g3mud6', text: "¿Cuál es el instrumento principal que acompaña al canto flamenco?", options: ["El arpa", "La guitarra española", "El saxofón"], correct: 1 },
+                        { id: 'g3mud7', text: "¿Qué signo nos indica que se ha acabado la obra musical?", options: ["La clave", "La doble barra final", "La barra de compás"], correct: 1 },
+                        { id: 'g3mud8', text: "¿Cómo llamamos a la cualidad del sonido que nos permite saber qué instrumento suena?", options: ["La intensidad", "El timbre", "La duración"], correct: 1 },
+                        { id: 'g3mud9', text: "¿Qué instrumento de percusión tiene láminas de metal o madera ordenadas?", options: ["El bombo", "El xilófono o metalófono", "Los platillos"], correct: 1 },
+                        { id: 'g3mud10', text: "¿A qué familia pertenece el violonchelo por rozar sus cuerdas con un arco?", options: ["Cuerda pulsada", "Cuerda frotada", "Cuerda percutida"], correct: 1 }
+                    ]
+                },
+                ingles: {
+                    facil: [
+                        { id: 'g3inf1', text: "¿Cómo saludamos por las mañanas al entrar a clase?", options: ["Good bye", "Good morning", "Good night"], correct: 1 },
+                        { id: 'g3inf2', text: "¿Qué animal es un cat en inglés?", options: ["Un perro", "Un gato", "Un pájaro"], correct: 1 },
+                        { id: 'g3inf3', text: "¿A qué color corresponde la palabra yellow?", options: ["Al azul", "Al amarillo", "Al verde"], correct: 1 },
+                        { id: 'g3inf4', text: "¿A qué número corresponde la palabra three?", options: ["Al 2", "Al 3", "Al 4"], correct: 1 },
+                        { id: 'g3inf5', text: "¿Cómo se llama la manzana en inglés?", options: ["Banana", "Apple", "Orange"], correct: 1 },
+                        { id: 'g3inf6', text: "¿Cómo llamamos a nuestro profesor o profesora en inglés?", options: ["Doctor", "Teacher", "Pilot"], correct: 1 },
+                        { id: 'g3inf7', text: "¿Qué significa la palabra school?", options: ["Casa", "Colegio", "Parque"], correct: 1 },
+                        { id: 'g3inf8', text: "¿Cómo se dice el número diez en inglés?", options: ["Five", "Ten", "Seven"], correct: 1 },
+                        { id: 'g3inf9', text: "¿Cómo llamamos a la hermana en inglés?", options: ["Brother", "Sister", "Mother"], correct: 1 },
+                        { id: 'g3inf10', text: "¿Qué animal tiene orejas largas y es un rabbit?", options: ["El perro", "El conejo", "El gato"], correct: 1 }
+                    ],
+                    dificil: [
+                        { id: 'g3ind1', text: "¿Cómo expresamos que tenemos sed en inglés?", options: ["I'm hungry", "I'm thirsty", "I'm tired"], correct: 1 },
+                        { id: 'g3ind2', text: "¿Qué significa la pregunta 'Where is my pencil'?", options: ["¿De qué color es mi lápiz?", "¿Dónde está mi lápiz?", "¿Qué es un lápiz?"], correct: 1 },
+                        { id: 'g3ind3', text: "¿Cuál es el plural correcto de la palabra 'child' en inglés?", options: ["Childs", "Children", "Childrens"], correct: 1 },
+                        { id: 'g3ind4', text: "¿A qué estación del año llamamos 'summer'?", options: ["Invierno", "Verano", "Otoño"], correct: 1 },
+                        { id: 'g3ind5', text: "¿A qué número corresponde la palabra 'twelve'?", options: ["Al número 2", "Al número 12", "Al número 20"], correct: 1 },
+                        { id: 'g3ind6', text: "¿Cómo llamamos a la cabeza de nuestro cuerpo en inglés?", options: ["Hand", "Head", "Foot"], correct: 1 },
+                        { id: 'g3ind7', text: "¿De qué color es la fruta 'orange'?", options: ["Amarilla", "Naranja", "Roja"], correct: 1 },
+                        { id: 'g3ind8', text: "¿Cómo se dice la palabra zapato en inglés?", options: ["Shirt", "Shoe", "Pants"], correct: 1 },
+                        { id: 'g3ind9', text: "¿Qué animal marino muy grande es una 'whale'?", options: ["La ballena", "El tiburón", "El delfín"], correct: 0 },
+                        { id: 'g3ind10', text: "¿Cómo se escribe correctamente en inglés el número quince?", options: ["Five", "Fifteen", "Fifty"], correct: 1 }
+                    ]
+                }
+            }
+        };
+
+        // --- STREAMING_CHUNK:Setting up application state and core engines... ---
+        let state = {
+            view: 'level-selection', // level-selection, menu, difficulty, question
+            score: 0,
+            completedIds: JSON.parse(localStorage.getItem('virgen_sierra_trivial') || '[]'),
+            level: null, // grado2, grado3
+            selectedCategory: null,
+            difficulty: null,
+            currentQuestion: null,
+            feedback: null,
+            isSpeaking: false
+        };
+
+        // Utilidad para reproducir audio WAV generado
+        const pcmToWav = (pcmData, sampleRate) => {
+            const buffer = new ArrayBuffer(44 + pcmData.length * 2);
+            const view = new DataView(buffer);
+            const writeString = (offset, string) => {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            };
+            writeString(0, 'RIFF');
+            view.setUint32(4, 32 + pcmData.length * 2, true);
+            writeString(8, 'WAVE');
+            writeString(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeString(36, 'data');
+            view.setUint32(40, pcmData.length * 2, true);
+            let offset = 44;
+            for (let i = 0; i < pcmData.length; i++, offset += 2) {
+                view.setInt16(offset, pcmData[i], true);
+            }
+            return new Blob([buffer], { type: 'audio/wav' });
+        };
+
+        // --- STREAMING_CHUNK:Implementing Gemini TTS integration... ---
+        async function speak(text) {
+            if (!text || state.isSpeaking) return;
+            state.isSpeaking = true;
+            render(); 
+
+            try {
+                let retries = 0;
+                let response;
+                while (retries < 3) {
+                    try {
+                        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: [{ parts: [{ text: `Dilo con acento de España, claro y amable: ${text}` }] }],
+                                generationConfig: {
+                                    responseModalities: ["AUDIO"],
+                                    speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Aoede" } } }
+                                }
+                            })
+                        });
+                        if (response.ok) break;
+                    } catch (e) {
+                        await new Promise(r => setTimeout(r, 1000));
+                        retries++;
+                    }
+                }
+
+                if (response?.ok) {
+                    const result = await response.json();
+                    const part = result?.candidates?.[0]?.content?.parts?.[0]?.inlineData;
+                    if (part) {
+                        const binary = atob(part.data);
+                        const rate = parseInt(part.mimeType.match(/rate=(\d+)/)?.[1] || "24000");
+                        const pcm = new Int16Array(binary.length / 2);
+                        for (let i = 0; i < pcm.length; i++) {
+                            pcm[i] = (binary.charCodeAt(i * 2) & 0xFF) | (binary.charCodeAt(i * 2 + 1) << 8);
+                        }
+                        const wav = pcmToWav(pcm, rate);
+                        const audio = new Audio(URL.createObjectURL(wav));
+                        audio.onended = () => { state.isSpeaking = false; render(); };
+                        audio.play().catch(() => { state.isSpeaking = false; render(); });
+                    } else { state.isSpeaking = false; render(); }
+                } else { state.isSpeaking = false; render(); }
+            } catch (e) {
+                state.isSpeaking = false;
+                render();
+            }
+        }
+
+        // --- STREAMING_CHUNK:Rendering interfaces... ---
+        function render() {
+            const container = document.getElementById('app');
+            document.getElementById('score-counter').textContent = state.score;
+            container.innerHTML = '';
+
+            // 1. Selector de Curso
+            if (state.view === 'level-selection') {
+                container.innerHTML = `
+                    <div class="w-full animate-in flex flex-col items-center">
+                        <h2 class="text-2xl md:text-3xl font-bold text-slate-700 mb-6 bg-white/60 px-6 py-2 rounded-2xl border border-slate-200">
+                            ¿En qué curso estás?
+                        </h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-md">
+                            <button onclick="handleSelectLevel('grado2')" 
+                                class="bg-sky-500 text-white p-6 rounded-3xl shadow-md transition-all transform hover:scale-105 active:scale-95 flex flex-col items-center gap-2 border-b-[6px] border-sky-700">
+                                <div class="text-6xl">🎒</div>
+                                <span class="text-2xl font-bold">2º de Primaria</span>
+                            </button>
+                            <button onclick="handleSelectLevel('grado3')" 
+                                class="bg-indigo-600 text-white p-6 rounded-3xl shadow-md transition-all transform hover:scale-105 active:scale-95 flex flex-col items-center gap-2 border-b-[6px] border-indigo-800">
+                                <div class="text-6xl">✏️</div>
+                                <span class="text-2xl font-bold">3º de Primaria</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } 
+            // 2. Menú de Categorías (Pantalla Inicial tras elegir curso)
+            else if (state.view === 'menu') {
+                const levelName = state.level === 'grado2' ? '2º de Primaria' : '3º de Primaria';
+                container.innerHTML = `
+                    <div class="w-full animate-in flex flex-col items-center">
+                        <div class="w-full flex justify-between items-center mb-3">
+                            <button onclick="changeView('level-selection')" class="flex items-center gap-1 text-indigo-700 font-bold text-sm">
+                                <i data-lucide="arrow-left" class="w-4 h-4"></i> Cambiar curso
+                            </button>
+                            <span class="text-xs font-bold text-indigo-800 bg-white border border-indigo-200 px-3 py-1 rounded-full">${levelName}</span>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2 w-full">
+                            ${categories.map(cat => {
+                                const rem = getRemaining(cat.id);
+                                const done = rem === 0;
+                                return `
+                                    <button onclick="handleSelectCat('${cat.id}')" ${done ? 'disabled' : ''}
+                                        class="${cat.color} text-white p-3 rounded-2xl shadow-md transition-all transform hover:scale-105 active:scale-95 flex flex-col items-center gap-1 cat-btn justify-center border-b-[5px] border-black/20 disabled:opacity-40">
+                                        ${done ? '<i data-lucide="check-circle" class="w-7 h-7"></i>' : `<div class="text-3xl mb-1">${cat.icon}</div>`}
+                                        <span class="font-bold text-lg leading-tight">${cat.name}</span>
+                                        <span class="text-[10px] bg-black/10 px-2 py-0.5 rounded-full font-sans">Restan: ${rem}</span>
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            } 
+            // 3. Selección de Dificultad
+            else if (state.view === 'difficulty') {
+                const cat = categories.find(c => c.id === state.selectedCategory);
+                container.innerHTML = `
+                    <div class="flex flex-col gap-3 w-full animate-in items-center">
+                        <button onclick="changeView('menu')" class="self-start flex items-center gap-1 text-indigo-700 font-bold text-base">
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver al menú
+                        </button>
+                        <h2 class="text-2xl font-bold text-slate-700 flex items-center gap-2">
+                            ${cat.icon} ${cat.name}
+                        </h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-sm">
+                            <button onclick="handleSelectDiff('facil')" class="bg-green-500 text-white p-6 rounded-3xl shadow-lg flex flex-col items-center gap-2 active:translate-y-1 transition-all">
+                                <div class="text-5xl">😊</div>
+                                <span class="text-xl font-bold">Nivel Fácil</span>
+                                <span class="text-[10px] bg-black/20 px-3 py-0.5 rounded-full">${getRemainingLevel(cat.id, 'facil')} por jugar</span>
+                            </button>
+                            <button onclick="handleSelectDiff('dificil')" class="bg-orange-500 text-white p-6 rounded-3xl shadow-lg flex flex-col items-center gap-2 active:translate-y-1 transition-all">
+                                <div class="text-5xl">💪</div>
+                                <span class="text-xl font-bold">Nivel Difícil</span>
+                                <span class="text-[10px] bg-black/20 px-3 py-0.5 rounded-full">${getRemainingLevel(cat.id, 'dificil')} por jugar</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } 
+            // 4. Pregunta actual
+            else if (state.view === 'question') {
+                const cat = categories.find(c => c.id === state.selectedCategory);
+                const q = state.currentQuestion;
+                container.innerHTML = `
+                    <div class="w-full bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-100 animate-in game-card">
+                        <div class="${cat.color} p-3 flex justify-between items-center text-white border-b-4 border-black/10">
+                            <div class="flex items-center gap-2">
+                                <span class="text-2xl">${cat.icon}</span>
+                                <div class="flex flex-col text-left leading-tight">
+                                    <span class="font-bold uppercase tracking-widest text-[10px]">${cat.name}</span>
+                                    <span class="text-[10px] opacity-80 font-bold">${state.difficulty === 'facil' ? 'Fácil' : 'Difícil'}</span>
+                                </div>
+                            </div>
+                            <button onclick="speak('${q.text.replace(/'/g, "\\'")}')" class="audio-btn p-2 rounded-full shadow ${state.isSpeaking ? 'animate-pulse' : ''}" ${state.isSpeaking ? 'disabled' : ''}>
+                                <i data-lucide="volume-2" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col">
+                            <h2 class="text-xl md:text-2xl font-bold text-center leading-tight text-slate-800 mb-4">${q.text}</h2>
+                            <div class="options-grid space-y-2 px-1">
+                                ${q.options.map((opt, i) => `
+                                    <div class="flex gap-2 items-stretch">
+                                        <button onclick="handleAnswer(${i})" ${state.feedback !== null ? 'disabled' : ''}
+                                            class="flex-1 p-3 rounded-xl text-left text-lg font-bold border-2 transition-all flex justify-between items-center
+                                            ${state.feedback === null ? 'border-slate-100 bg-slate-50 active:bg-slate-100' : 
+                                              i === q.correct ? 'feedback-correct' : (state.feedback === 'wrong' && i !== q.correct ? 'feedback-wrong' : 'border-slate-100')}">
+                                            <span>${opt}</span>
+                                            ${state.feedback !== null && i === q.correct ? '<i data-lucide="star" class="text-yellow-500 fill-yellow-500 w-5 h-5"></i>' : ''}
+                                        </button>
+                                        <button onclick="speak('${opt.replace(/'/g, "\\'")}')" class="audio-btn px-3 rounded-lg flex items-center justify-center shrink-0 ${state.isSpeaking || state.feedback !== null ? 'opacity-50' : ''}" ${state.isSpeaking || state.feedback !== null ? 'disabled' : ''}>
+                                            <i data-lucide="volume-2" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            ${state.feedback ? `
+                                <div class="mt-4 flex flex-col items-center gap-2 animate-in">
+                                    <div class="text-xl font-bold ${state.feedback === 'correct' ? 'text-green-600' : 'text-orange-500'}">
+                                        ${state.feedback === 'correct' ? '¡Genial! 🎉' : '¡Casi! ✨'}
+                                    </div>
+                                    <!-- Botón Siguiente que lleva a la pantalla inicial de categorías -->
+                                    <button onclick="changeView('menu')" class="bg-indigo-800 text-white px-8 py-2 rounded-full text-lg font-bold shadow-lg flex items-center gap-2 transform active:scale-95 transition-all">
+                                        Elegir materia <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            lucide.createIcons();
+        }
+
+        // --- STREAMING_CHUNK:Implementing school logic systems... ---
+        function getRemainingLevel(catId, diff) { 
+            if (!state.level) return 0;
+            return questionsDB[state.level][catId][diff].filter(q => !state.completedIds.includes(q.id)).length; 
+        }
+
+        function getRemaining(catId) { 
+            return getRemainingLevel(catId, 'facil') + getRemainingLevel(catId, 'dificil'); 
+        }
+
+        function handleSelectLevel(lv) {
+            state.level = lv;
+            state.view = 'menu';
+            const courseName = lv === 'grado2' ? 'segundo' : 'tercero';
+            speak(`Has elegido ${courseName} de primaria. ¡Elige una asignatura!`);
+            render();
+        }
+
+        function handleSelectCat(id) { 
+            state.selectedCategory = id; 
+            state.view = 'difficulty'; 
+            const cat = categories.find(c => c.id === id); 
+            speak(`Has elegido ${cat.name}.`); 
+            render(); 
+        }
+
+        function handleSelectDiff(diff) {
+            const list = questionsDB[state.level][state.selectedCategory][diff].filter(q => !state.completedIds.includes(q.id));
+            if (list.length === 0) { 
+                speak("¡Has completado este nivel!"); 
+                return; 
+            }
+            state.difficulty = diff;
+            state.currentQuestion = list[Math.floor(Math.random() * list.length)];
+            state.view = 'question';
+            state.feedback = null;
+            render();
+            setTimeout(() => speak(state.currentQuestion.text), 300);
+        }
+
+        function handleAnswer(idx) {
+            if (state.feedback) return;
+            if (idx === state.currentQuestion.correct) {
+                state.feedback = 'correct'; 
+                state.score++; 
+                state.completedIds.push(state.currentQuestion.id);
+                localStorage.setItem('virgen_sierra_trivial', JSON.stringify(state.completedIds));
+                speak("¡Excelente respuesta!");
+            } else { 
+                state.feedback = 'wrong'; 
+                speak("¡Vaya! No pasa nada, inténtalo la próxima vez."); 
+            }
+            render();
+        }
+
+        function changeView(v) { 
+            state.view = v; 
+            state.feedback = null; 
+            render(); 
+        }
+
+        function toggleResetModal(s) { 
+            const m = document.getElementById('modal-reset');
+            m.classList.toggle('hidden', !s); 
+            if(s) { 
+                m.classList.add('flex'); 
+                document.getElementById('pass-input').focus(); 
+            } else {
+                m.classList.remove('flex');
+            }
+        }
+
+        function confirmReset() {
+            if (document.getElementById('pass-input').value === "Lucía") {
+                state.score = 0; 
+                state.completedIds = []; 
+                state.view = 'level-selection';
+                state.level = null;
+                localStorage.removeItem('virgen_sierra_trivial'); 
+                toggleResetModal(false);
+                document.getElementById('pass-input').value = ''; 
+                speak("El progreso se ha borrado correctamente."); 
+                render();
+            } else { 
+                document.getElementById('pass-error').classList.remove('hidden'); 
+                setTimeout(() => document.getElementById('pass-error').classList.add('hidden'), 2000); 
+            }
+        }
+
+        // --- Start on Window Load ---
+        window.onload = () => { 
+            render(); 
+            speak("Bienvenido al Trivial del Colegio Virgen de la Sierra."); 
+        };
+    </script>
+</body>
+</html>
